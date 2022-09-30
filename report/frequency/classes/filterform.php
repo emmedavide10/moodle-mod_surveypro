@@ -18,7 +18,7 @@
  * Class to filter the item to get its frequency in the answers
  *
  * @package   surveyproreport_frequency
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * Class to filter output by group
  *
  * @package   surveyproreport_frequency
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filterform extends \moodleform {
@@ -61,21 +61,21 @@ class filterform extends \moodleform {
         // No matter for the page.
         // I get the list of fields that the use wants to see in the exported file.
 
-        $where = array();
+        $where = [];
         $where['surveyproid'] = $surveypro->id;
-        $where['type'] = SURVEYPRO_TYPEFIELD;
+        $where['type'] = 'field';
         $where['reserved'] = 0;
         $where['hidden'] = 0;
         $itemseeds = $DB->get_recordset('surveypro_item', $where, 'sortindex');
 
         // Build options array.
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        $options = array(get_string('choosedots'));
+        $options = [get_string('choosedots')];
         foreach ($itemseeds as $itemseed) {
             if (($itemseed->plugin == 'textarea') || ($itemseed->plugin == 'fileupload')) {
                 continue;
             }
-            $where = array('itemid' => $itemseed->id);
+            $where = ['itemid' => $itemseed->id];
             $thiscontent = $DB->get_field('surveypro'.$itemseed->type.'_'.$itemseed->plugin, 'content', $where);
             if (!empty($surveypro->template)) {
                 $thiscontent = get_string($thiscontent, 'surveyprotemplate_'.$surveypro->template);
@@ -92,7 +92,7 @@ class filterform extends \moodleform {
 
         if ($showjumper) {
             $fieldname = 'groupid';
-            $options = array();
+            $options = [];
             if ($canaccessallgroups) {
                 $options[] = get_string('allgroups');
             }

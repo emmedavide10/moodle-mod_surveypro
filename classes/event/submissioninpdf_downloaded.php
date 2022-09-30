@@ -18,7 +18,7 @@
  * mod_surveypro submission in pdf downloaded event.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace mod_surveypro\event;
  * The mod_surveypro submissionin in pdf downloaded event class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submissioninpdf_downloaded extends \core\event\base {
@@ -66,7 +66,7 @@ class submissioninpdf_downloaded extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        $paramurl = array();
+        $paramurl = [];
         $paramurl['id'] = $this->contextinstanceid;
         $paramurl['submissionid'] = $this->objectid;
         $paramurl['view'] = $this->other['view'];

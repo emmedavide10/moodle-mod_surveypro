@@ -48,9 +48,9 @@ Feature: test the use of multiselect setup form
     And I set the multiline field "Options" to "milk\n\n\ncoffee\n     butter\n\nbread\n\n\n      "
     And I set the multiline field "Default" to "\n\n\ncoffee\n    bread\n\n\n"
     And I set the following fields to these values:
-      | Height in rows           | 4                                       |
-      | Download format          | value of selected items                 |
-      | Minimum required items   | 5                                       |
+      | Height in rows           | 4                                      |
+      | Download format          | value of selected items                |
+      | Minimum required items   | 5                                      |
     And I press "Add"
 
     Then I should see "The minimum number of items to select must be lower than 4 (options count)"

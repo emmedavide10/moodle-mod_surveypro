@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_boolean
  *
  * @package   surveyprofield_boolean
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/boolean/lib.php');
  * Class to manage each aspect of the boolean item
  *
  * @package   surveyprofield_boolean
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -127,7 +127,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'boolean';
 
         // Override the list of fields using format, whether needed.
@@ -242,9 +242,9 @@ class item extends itembase {
      * @return list of contraints of the plugin (as parent) in text format
      */
     public function item_list_constraints() {
-        $constraints = array();
-
         $optionstr = get_string('option', 'surveyprofield_boolean');
+
+        $constraints = [];
         $constraints[] = $optionstr.': 0';
         $constraints[] = $optionstr.': 1';
 
@@ -268,7 +268,7 @@ class item extends itembase {
      * @return array of downloadformats
      */
     public function get_downloadformats() {
-        $options = array();
+        $options = [];
 
         for ($i = 1; $i < 11; $i++) {
             $strname = 'strfbool'.str_pad($i, 2, '0', STR_PAD_LEFT);
@@ -293,8 +293,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote'];
 
         return $fieldlist;
     }
@@ -355,10 +355,10 @@ EOS;
     public function parent_encode_child_parentcontent($childparentcontent) {
         $utilityitemman = new utility_item($this->cm, $this->surveypro);
         $parentcontents = array_unique($utilityitemman->multilinetext_to_array($childparentcontent));
-        $values = array('0', '1');
+        $values = ['0', '1'];
 
-        $childparentvalue = array();
-        $labels = array();
+        $childparentvalue = [];
+        $labels = [];
         foreach ($parentcontents as $parentcontent) {
             $key = array_search($parentcontent, $values);
             if ($key !== false) {
@@ -393,11 +393,11 @@ EOS;
      * return string $childparentcontent
      */
     public function parent_decode_child_parentvalue($childparentvalue) {
-        $values = array('0', '1');
+        $values = ['0', '1'];
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue);
         $actualcount = count($parentvalues);
 
-        $childparentcontent = array();
+        $childparentcontent = [];
         $key = array_search('>', $parentvalues);
         if ($key !== false) {
             for ($i = 0; $i < $key; $i++) {
@@ -439,7 +439,7 @@ EOS;
     public function parent_validate_child_constraints($childparentvalue) {
         // See parent method for explanation.
 
-        $values = array('0', '1');
+        $values = ['0', '1'];
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue);
         $actualcount = count($parentvalues);
 
@@ -470,15 +470,7 @@ EOS;
      */
     public function userform_mform_element($mform, $searchform, $readonly) {
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_boolean_'.$this->sortindex;
 
@@ -486,12 +478,12 @@ EOS;
         $nolabel = get_string('no');
         $noanswerstr = get_string('noanswer', 'mod_surveypro');
 
-        $attributes = array();
+        $attributes = [];
         $attributes['class'] = 'indent-'.$this->indent.' boolean_radio';
 
         if ($this->style == SURVEYPROFIELD_BOOLEAN_USESELECT) {
             // Begin of: element values.
-            $options = array();
+            $options = [];
             if (!$searchform) {
                 if ($this->defaultoption == SURVEYPRO_INVITEDEFAULT) {
                     $options[SURVEYPRO_INVITEVALUE] = get_string('choosedots');
@@ -502,7 +494,7 @@ EOS;
             $options['1'] = $yeslabel;
             $options['0'] = $nolabel;
             if (!$this->required) {
-                $options += array(SURVEYPRO_NOANSWERVALUE => $noanswerstr);
+                $options += [SURVEYPRO_NOANSWERVALUE => $noanswerstr];
             }
             // End of: element values.
 
@@ -522,7 +514,7 @@ EOS;
             // End of: mform element.
         } else { // SURVEYPROFIELD_BOOLEAN_USERADIOV or SURVEYPROFIELD_BOOLEAN_USERADIOH.
             $separator = ($this->style == SURVEYPROFIELD_BOOLEAN_USERADIOV) ? '<br />' : ' ';
-            $elementgroup = array();
+            $elementgroup = [];
 
             // Begin of: mform element.
             if (!$searchform) {
@@ -636,7 +628,7 @@ EOS;
     public function userform_get_parent_disabilitation_info($childparentvalue) {
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue); // 1;1;0;.
 
-        $disabilitationinfo = array();
+        $disabilitationinfo = [];
         $mformelementinfo = new \stdClass();
         $mformelementinfo->parentname = $this->itemname;
         $mformelementinfo->operator = 'neq';
@@ -690,7 +682,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -741,7 +733,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         if ($this->style == SURVEYPROFIELD_BOOLEAN_USESELECT) {
             $elementnames[] = $this->itemname;
         } else {

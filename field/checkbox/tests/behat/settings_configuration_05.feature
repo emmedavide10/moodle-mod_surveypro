@@ -42,8 +42,8 @@ Feature: Validate creation and submit for "checkbox" elements using the principa
     And I press "New response"
     Then I should not see "No more than"
     And I set the following fields to these values:
-      | id_surveypro_field_checkbox_1_0        | 1 |
-      | id_surveypro_field_checkbox_1_3        | 1 |
+      | id_surveypro_field_checkbox_1_0 | 1 |
+      | id_surveypro_field_checkbox_1_3 | 1 |
     And I press "Submit"
     And I press "Continue to responses list"
     Then I should see "1" submissions

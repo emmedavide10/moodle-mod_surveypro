@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_checkbox
  *
  * @package   surveyprofield_checkbox
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/checkbox/lib.php');
  * Class to manage each aspect of the checkbox item
  *
  * @package   surveyprofield_checkbox
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -168,7 +168,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'checkbox';
 
         // Override the list of fields using format, whether needed.
@@ -218,7 +218,7 @@ class item extends itembase {
 
         // Begin of: plugin specific settings (eventually overriding general ones).
         // Drop empty rows and trim trailing spaces from each textarea field.
-        $fieldlist = array('options', 'defaultvalue');
+        $fieldlist = ['options', 'defaultvalue'];
         $this->item_clean_textarea_fields($record, $fieldlist);
 
         // Set custom fields value as defined for this question plugin.
@@ -266,7 +266,7 @@ class item extends itembase {
 
         // 3. Set values corresponding to checkboxes.
         // Take care: 'required', 'trimonsave', 'hideinstructions' were already considered in get_common_settings.
-        $checkboxes = array('noanswerdefault');
+        $checkboxes = ['noanswerdefault'];
         foreach ($checkboxes as $checkbox) {
             $record->{$checkbox} = (isset($record->{$checkbox})) ? 1 : 0;
         }
@@ -291,7 +291,7 @@ class item extends itembase {
      */
     public function item_list_constraints() {
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        $constraints = array();
+        $constraints = [];
 
         $values = $this->get_content_array(SURVEYPRO_VALUES, 'options');
         $optionstr = get_string('option', 'surveyprofield_checkbox');
@@ -324,7 +324,7 @@ class item extends itembase {
      * @return array of downloadformats
      */
     public function get_downloadformats() {
-        $options = array();
+        $options = [];
 
         $options[SURVEYPRO_ITEMSRETURNSVALUES] = get_string('returnvalues', 'surveyprofield_checkbox');
         $options[SURVEYPRO_ITEMRETURNSLABELS] = get_string('returnlabels', 'surveyprofield_checkbox');
@@ -348,8 +348,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote', 'options', 'labelother', 'defaultvalue');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote', 'options', 'labelother', 'defaultvalue'];
 
         return $fieldlist;
     }
@@ -426,7 +426,7 @@ EOS;
         $values = $this->get_content_array(SURVEYPRO_VALUES, 'options');
 
         $childparentvalue = array_fill(0, count($values), 0);
-        $labels = array();
+        $labels = [];
         foreach ($parentcontents as $parentcontent) {
             $key = array_search($parentcontent, $values);
             if ($key !== false) {
@@ -465,7 +465,7 @@ EOS;
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue);
         $actualcount = count($parentvalues);
 
-        $childparentcontent = array();
+        $childparentcontent = [];
         $key = array_search('>', $parentvalues);
         if ($key !== false) {
             for ($i = 0; $i < $key; $i++) {
@@ -540,15 +540,7 @@ EOS;
      */
     public function userform_mform_element($mform, $searchform, $readonly) {
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_checkbox_'.$this->sortindex;
 
@@ -556,17 +548,21 @@ EOS;
         $utilityitemman = new utility_item($this->cm, $this->surveypro);
         $defaults = $utilityitemman->multilinetext_to_array($this->defaultvalue);
 
-        $attributes = array();
+        $attributes = [];
         $attributes['class'] = 'indent-'.$this->indent.' checkbox_check';
         $attributes['group'] = 1;
 
-        $options = array('0', '1');
-        $elementgroup = array();
+        $options = ['0', '1'];
+        $elementgroup = [];
+        $separator = [];
+        $usualseparator = ($this->adjustment == SURVEYPRO_VERTICAL) ? '<br />' : '';
+
         $i = 0;
         foreach ($labels as $label) {
             $itemname = $this->itemname.'_'.$i;
             $attributes['id'] = $idprefix.'_'.$i;
             $elementgroup[] = $mform->createElement('mod_surveypro_advcheckbox', $itemname, '', $label, $attributes, $options);
+            $separator[] = $usualseparator;
 
             if ($this->adjustment == SURVEYPRO_HORIZONTAL) {
                 $attributes['class'] = 'checkbox_check';
@@ -579,12 +575,15 @@ EOS;
             }
             $i++;
         }
+        array_pop($separator); // Why this must be added? GRRRR.
+
         if (!empty($this->labelother)) {
             list($othervalue, $otherlabel) = $this->get_other();
 
             $itemname = $this->itemname.'_other';
             $attributes['id'] = $idprefix.'_other';
             $elementgroup[] = $mform->createElement('mod_surveypro_advcheckbox', $itemname, '', $otherlabel, $attributes, $options);
+            $separator[] = '';
 
             unset($attributes['group']);
             $attributes['id'] = $idprefix.'_text';
@@ -598,36 +597,20 @@ EOS;
                 }
             }
             $mform->disabledIf($this->itemname.'_text', $this->itemname.'_other', 'notchecked');
+            $separator[] = $usualseparator;
         }
 
         if (!$this->required) {
             $itemname = $this->itemname.'_noanswer';
             $attributes['id'] = $idprefix.'_noanswer';
             $noanswerstr = get_string('noanswer', 'surveypro');
-            $options = array('0', '1');
             $elementgroup[] = $mform->createElement('mod_surveypro_advcheckbox', $itemname, '', $noanswerstr, $attributes, $options);
             if (!empty($this->noanswerdefault)) {
                 $mform->setDefault($itemname, '1');
             }
+            $separator[] = $usualseparator;
         }
 
-        if ($this->adjustment == SURVEYPRO_VERTICAL) {
-            $labelcount = count($labels);
-            if ($labelcount > 1) {
-                $separator = array_fill(0, $labelcount - 1, '<br />');
-            } else {
-                $separator = array();
-            }
-            if (!empty($this->labelother)) {
-                // $separator[] = '<br />';
-                $separator[] = '';
-            }
-            if (!$this->required) {
-                $separator[] = '<br />';
-            }
-        } else { // SURVEYPRO_HORIZONTAL.
-            $separator = ' ';
-        }
         $mform->addGroup($elementgroup, $this->itemname.'_group', $elementlabel, $separator, false);
 
         if (!$this->required) {
@@ -723,12 +706,12 @@ EOS;
      * @return array
      */
     public function userform_get_parent_disabilitation_info($childparentvalue) {
-        $disabilitationinfo = array();
+        $disabilitationinfo = [];
 
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue); // For instance: 1;1;0;.
 
-        $indexsubset = array();
-        $labelsubset = array();
+        $indexsubset = [];
+        $labelsubset = [];
         $key = array_search('>', $parentvalues);
         if ($key !== false) {
             $indexsubset = array_slice($parentvalues, 0, $key);
@@ -803,7 +786,7 @@ EOS;
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue); // For instance: 2;3;shark.
 
         // Build the local $parentconstrain variable that will be used to evaluate the status.
-        $parentconstrain = array();
+        $parentconstrain = [];
         if (!empty($this->labelother)) {
             $parentconstrain[$this->itemname.'_other'] = '0';
         }
@@ -842,7 +825,7 @@ EOS;
      */
     public function userform_get_filling_instructions() {
 
-        $arrayinstruction = array();
+        $arrayinstruction = [];
 
         if (!empty($this->minimumrequired)) {
             if ($this->minimumrequired == 1) {
@@ -911,7 +894,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -925,7 +908,7 @@ EOS;
 
             $answers = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $fromdb->content);
 
-            // Here $answers is an array like: array(1,1,0,0,'dummytext').
+            // Here $answers is an array like: [1,1,0,0,'dummytext'].
             foreach ($answers as $k => $checkboxvalue) {
                 $itemname = $this->itemname.'_'.$k;
                 $prefill[$itemname] = $checkboxvalue;
@@ -987,11 +970,11 @@ EOS;
         }
 
         // Output.
-        // Here $answers is an array like: array(1,1,0,0,'dummytext').
+        // Here $answers is an array like: [1,1,0,0,'dummytext'].
         switch ($format) {
             case SURVEYPRO_ITEMSRETURNSVALUES:
                 $answers = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $content);
-                $output = array();
+                $output = [];
                 $values = $this->get_content_array(SURVEYPRO_VALUES, 'options');
 
                 foreach ($values as $k => $value) {
@@ -1014,7 +997,7 @@ EOS;
                 break;
             case SURVEYPRO_ITEMRETURNSLABELS:
                 $answers = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $content);
-                $output = array();
+                $output = [];
                 $values = $this->get_content_array(SURVEYPRO_LABELS, 'options');
 
                 foreach ($values as $k => $value) {
@@ -1054,7 +1037,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         $elementnames[] = $this->itemname.'_group';
 
         return $elementnames;

@@ -18,7 +18,7 @@
  * Surveypro mastertemplate class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +31,7 @@ use mod_surveypro\templatebase;
  * The class representing a master template
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mastertemplate extends templatebase {
@@ -39,7 +39,7 @@ class mastertemplate extends templatebase {
     /**
      * @var array
      */
-    protected $langtree = array();
+    protected $langtree = [];
 
     /**
      * Display the welcome message of the apply page.
@@ -109,6 +109,39 @@ class mastertemplate extends templatebase {
     }
 
     /**
+     * Count available user template.
+     *
+     * @return array
+     */
+    public function get_mtemplates() {
+        $utemplates = [];
+        if ($mtemplatepluginlist = \core_component::get_plugin_list('surveyprotemplate')) {
+            foreach ($mtemplatepluginlist as $mtemplatename => $mtemplatepath) {
+                if (!get_config('surveyprotemplate_'.$mtemplatename, 'disabled')) {
+                    $mtemplates[$mtemplatename] = get_string('pluginname', 'surveyprotemplate_'.$mtemplatename);
+                }
+            }
+            asort($mtemplates);
+        }
+
+        return $mtemplates;
+    }
+
+    /**
+     * Count available user template.
+     *
+     * @return array
+     */
+    public function get_mtemplates_count() {
+        $mtemplatescount = 0;
+        if ($mtemplatepluginlist = \core_component::get_plugin_list('surveyprotemplate')) {
+            $mtemplatescount += count($mtemplatepluginlist);
+        }
+
+        return $mtemplatescount;
+    }
+
+    /**
      * Generate master template.
      *
      * @return void
@@ -146,9 +179,9 @@ class mastertemplate extends templatebase {
             $message = 'The "templatemaster" folder does not match the expected one. This is a security issue. I must stop.';
             debugging($message, DEBUG_DEVELOPER);
 
-            $paramurl = array();
+            $paramurl = [];
             $paramurl['id'] = $this->cm->id;
-            $returnurl = new \moodle_url('/mod/surveypro/layout_itemlist.php', $paramurl);
+            $returnurl = new \moodle_url('/mod/surveypro/layout_itemslist.php', $paramurl);
             redirect($returnurl);
         }
 
@@ -160,12 +193,6 @@ class mastertemplate extends templatebase {
             make_temp_directory($temppath); // I just created the folder for the current plugin.
 
             $dataabsolutepath = $CFG->tempdir.'/'.$temppath;
-
-            // echo '<hr />Operate on the file: '.$masterfile.'<br />';
-            // echo $masterfileinfo["dirname"] . "<br />";
-            // echo $masterfileinfo["basename"] . "<br />";
-            // echo $masterfileinfo["extension"] . "<br />";
-            // echo dirname($masterfile) . "<br />";
 
             if ($masterfileinfo['basename'] == 'icon.png') {
                 // Simply copy icon.png.
@@ -221,8 +248,6 @@ class mastertemplate extends templatebase {
                     // I need to create the folder lang/it.
                     make_temp_directory($datarelativedir.'/lang/'.$userlang);
                 }
-
-                // echo '$masterbasepath = '.$masterbasepath.'<br />';
 
                 $filecontent = file_get_contents($masterbasepath.'/lang/en/surveyprotemplate_pluginname.php');
 
@@ -295,7 +320,7 @@ class mastertemplate extends templatebase {
             $filenames[] = 'lang/'.$userlang.'/surveyprotemplate_'.$pluginname.'.php';
         }
 
-        $filelist = array();
+        $filelist = [];
         foreach ($filenames as $filename) {
             $filelist[$filename] = $dataabsolutedir.'/'.$filename;
         }
@@ -307,7 +332,7 @@ class mastertemplate extends templatebase {
         $fp->archive_to_pathname($filelist, $exportfile);
 
         // Zip file has been created. Now clean the temporary folder.
-        $dirnames = array('classes/privacy/', 'classes/', 'lang/en/', 'pix/', );
+        $dirnames = ['classes/privacy/', 'classes/', 'lang/en/', 'pix/', ];
         if ($userlang != 'en') {
             $dirnames[] = 'lang/'.$userlang.'/';
         }
@@ -336,7 +361,7 @@ class mastertemplate extends templatebase {
 
         $pluginversion = self::get_subplugin_versions();
 
-        $where = array('surveyproid' => $this->surveypro->id);
+        $where = ['surveyproid' => $this->surveypro->id];
         if ($visiblesonly) {
             $where['hidden'] = '0';
         }
@@ -368,7 +393,7 @@ class mastertemplate extends templatebase {
                     $parentid = $item->get_parentid();
                     if ($parentid) {
                         // Store the sortindex of the parent instead of its id, because at restore time parentid will change.
-                        $whereparams = array('id' => $parentid);
+                        $whereparams = ['id' => $parentid];
                         $sortindex = $DB->get_field('surveypro_item', 'sortindex', $whereparams, MUST_EXIST);
                         $val = $item->get_parentvalue();
 
@@ -437,9 +462,6 @@ class mastertemplate extends templatebase {
             $dom->preserveWhiteSpace = false;
             $dom->formatOutput = true;
             $dom->loadXML($xmltemplate->asXML());
-
-            // echo '$xmltemplate = <br />';
-            // print_object($xmltemplate);
 
             return $dom->saveXML();
         }
@@ -514,7 +536,7 @@ class mastertemplate extends templatebase {
 
         // Begin of: delete all existing items.
         $utilitylayoutman = new utility_layout($this->cm);
-        $whereparams = array('surveyproid' => $this->surveypro->id);
+        $whereparams = ['surveyproid' => $this->surveypro->id];
         $utilitylayoutman->delete_items($whereparams);
         // End of: delete all existing items.
 
@@ -527,7 +549,7 @@ class mastertemplate extends templatebase {
 
         $this->add_items_from_template();
 
-        $paramurl = array('s' => $this->surveypro->id);
+        $paramurl = ['s' => $this->surveypro->id];
         $redirecturl = new \moodle_url('/mod/surveypro/layout_preview.php', $paramurl);
         redirect($redirecturl);
     }
@@ -546,7 +568,7 @@ class mastertemplate extends templatebase {
 
         if ($hassubmissions && (!$riskyediting)) {
             echo $OUTPUT->notification(get_string('applyusertemplatedenied01', 'mod_surveypro'), 'notifyproblem');
-            $url = new \moodle_url('/mod/surveypro/view_submissions.php', array('s' => $this->surveypro->id));
+            $url = new \moodle_url('/mod/surveypro/view_submissions.php', ['s' => $this->surveypro->id]);
             echo $OUTPUT->continue_button($url);
             echo $OUTPUT->footer();
             die();
@@ -572,7 +594,7 @@ class mastertemplate extends templatebase {
 
         $simplexml = new \SimpleXMLElement($templatecontent);
 
-        if (!$sortindexoffset = $DB->get_field('surveypro_item', 'MAX(sortindex)', array('surveyproid' => $this->surveypro->id))) {
+        if (!$sortindexoffset = $DB->get_field('surveypro_item', 'MAX(sortindex)', ['surveyproid' => $this->surveypro->id])) {
             $sortindexoffset = 0;
         }
 
@@ -678,7 +700,7 @@ class mastertemplate extends templatebase {
                     $naturalsortindex++;
                     $record->sortindex = $naturalsortindex + $sortindexoffset;
                     if (!empty($record->parentid)) {
-                        $whereparams = array();
+                        $whereparams = [];
                         $whereparams['surveyproid'] = $this->surveypro->id;
                         $whereparams['sortindex'] = $record->parentid + $sortindexoffset;
                         $record->parentid = $DB->get_field('surveypro_item', 'id', $whereparams, MUST_EXIST);
@@ -726,7 +748,7 @@ class mastertemplate extends templatebase {
      * @return void
      */
     public function get_lang_file_content() {
-        $stringsastext = array();
+        $stringsastext = [];
         foreach ($this->langtree as $langbranch) {
             foreach ($langbranch as $k => $stringcontent) {
                 // Do not use php addslashes() because it adds slashes to " too.
@@ -745,8 +767,8 @@ class mastertemplate extends templatebase {
      * @return void
      */
     public function trigger_event($eventname) {
-        $eventdata = array('context' => $this->context, 'objectid' => $this->surveypro->id);
-        $eventdata['other'] = array('templatename' => $this->formdata->mastertemplate);
+        $eventdata = ['context' => $this->context, 'objectid' => $this->surveypro->id];
+        $eventdata['other'] = ['templatename' => $this->formdata->mastertemplate];
         switch ($eventname) {
             case 'mastertemplate_applied':
                 $event = \mod_surveypro\event\mastertemplate_applied::create($eventdata);
@@ -770,7 +792,7 @@ class mastertemplate extends templatebase {
      * @return void
      */
     public function get_translated_strings($userlang) {
-        $stringsastext = array();
+        $stringsastext = [];
         $a = new \stdClass();
         $a->userlang = $userlang;
         foreach ($this->langtree as $langbranch) {

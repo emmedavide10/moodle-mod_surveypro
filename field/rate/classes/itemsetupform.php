@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyprofield_rate
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +36,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/rate/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyprofield_rate
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -58,14 +58,13 @@ class itemsetupform extends itemsetupbaseform {
         // Item: style.
         $fieldname = 'style';
         $options = array(SURVEYPROFIELD_RATE_USERADIO => get_string('useradio', 'surveyprofield_rate'),
-                         SURVEYPROFIELD_RATE_USESELECT => get_string('usemenu', 'surveyprofield_rate')
-                   );
+                         SURVEYPROFIELD_RATE_USESELECT => get_string('usemenu', 'surveyprofield_rate'));
         $mform->addElement('select', $fieldname, get_string($fieldname, 'surveyprofield_rate'), $options);
         $mform->setDefault($fieldname, '0');
         $mform->addHelpButton($fieldname, $fieldname, 'surveyprofield_rate');
         $mform->setType($fieldname, PARAM_INT);
 
-        $textareaoptions = array('wrap' => 'virtual', 'rows' => '10', 'cols' => '65');
+        $textareaoptions = ['wrap' => 'virtual', 'rows' => '10', 'cols' => '65'];
 
         // Item: options.
         $fieldname = 'options';
@@ -86,7 +85,7 @@ class itemsetupform extends itemsetupbaseform {
         $customdefaultstr = get_string('customdefault', 'surveyprofield_rate');
         $invitedefaultstr = get_string('invitedefault', 'mod_surveypro');
         $noanswerstr = get_string('noanswer', 'mod_surveypro');
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $customdefaultstr, SURVEYPRO_CUSTOMDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $invitedefaultstr, SURVEYPRO_INVITEDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $noanswerstr, SURVEYPRO_NOANSWERDEFAULT);
@@ -144,8 +143,8 @@ class itemsetupform extends itemsetupbaseform {
         $cleanrates = $utilityitemman->multilinetext_to_array($data['rates']);
         $cleandefaultvalue = isset($data['defaultvalue']) ? $utilityitemman->multilinetext_to_array($data['defaultvalue']) : '';
 
-        $values = array();
-        $labels = array();
+        $values = [];
+        $labels = [];
         foreach ($cleanrates as $rate) {
             if (strpos($rate, SURVEYPRO_VALUELABELSEPARATOR) === false) {
                 $values[] = $rate;

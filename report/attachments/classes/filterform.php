@@ -18,7 +18,7 @@
  * Class to filter the attachment item to overview
  *
  * @package   surveyproreport_attachments
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * The class to filter the attachment item to overview
  *
  * @package   surveyproreport_attachments
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filterform extends \moodleform {
@@ -69,24 +69,24 @@ class filterform extends \moodleform {
         }
 
         // Itemid.
-        $options = array('0' => get_string('eachitem', 'surveyproreport_attachments'));
+        $options = ['0' => get_string('eachitem', 'surveyproreport_attachments')];
         foreach ($itemseeds as $itemseed) {
             if ($itemseed->plugin != 'fileupload') {
                 continue;
             }
-            $content = $DB->get_field('surveyprofield_fileupload', 'content', array('itemid' => $itemseed->id));
+            $content = $DB->get_field('surveyprofield_fileupload', 'content', ['itemid' => $itemseed->id]);
             $options[$itemseed->id] = strip_tags($content);
         }
         $itemseeds->close();
 
-        $elementgroup = array();
+        $elementgroup = [];
         $mform->addElement('select', 'itemid', get_string('item', 'surveypro'), $options);
 
         // Get users.
         $coursecontext = \context_course::instance($COURSE->id);
         $userfieldsapi = \core_user\fields::for_userpic()->get_sql('u');
 
-        $whereparams = array();
+        $whereparams = [];
         $whereparams['surveyproid'] = $surveypro->id;
         $sql = 'SELECT DISTINCT u.id as userid'.$userfieldsapi->selects.'
                 FROM {user} u
@@ -105,11 +105,11 @@ class filterform extends \moodleform {
         }
         $users = $DB->get_recordset_sql($sql, $whereparams);
 
-        $options = array();
+        $options = [];
 
         // Get submissions of $userid.
-        $options = array();
-        $whereparams = array('surveyproid' => $surveypro->id, 'userid' => $userid);
+        $options = [];
+        $whereparams = ['surveyproid' => $surveypro->id, 'userid' => $userid];
         $submissions = $DB->get_records('surveypro_submission', $whereparams);
 
         // Define $options for current $userid.
@@ -159,7 +159,7 @@ class filterform extends \moodleform {
         $mform->setDefault('container', $container);
 
         // Button.
-        $buttonarray = array();
+        $buttonarray = [];
         $buttonarray[] = $mform->createElement('submit', 'changeuser', get_string('changeuser', 'surveyproreport_attachments'));
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('reload'));
         $mform->addGroup($buttonarray, 'buttonsrow', '', ' ', false);

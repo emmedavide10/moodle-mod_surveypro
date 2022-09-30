@@ -11,10 +11,10 @@ Feature: Duplicate a surveypro instance
     And I log in as "admin"
 
   @javascript
-  Scenario: Duplicate a surveypro with some item
+  Scenario: Duplicate a surveypro
     Given the following "activities" exist:
-      | activity  | name           | intro              | course |
-      | surveypro | surveypro test | For testing backup | C1     |
+      | activity  | name           | intro              | course | section |
+      | surveypro | surveypro test | For testing backup | C1     | 1       |
     And surveypro "surveypro test" contains the following items:
       | type   | plugin      |
       | format | label       |
@@ -31,8 +31,10 @@ Feature: Duplicate a surveypro instance
     And I turn editing mode on
     And I duplicate "surveypro test" activity editing the new copy with:
       | Name | Copy of surveypro test |
-    And I follow "Copy of surveypro test"
-    And I follow "Layout"
+    And I turn editing mode off
+
+    And I wait until section "1" is available
+    When I am on the "Copy of surveypro test" "mod_surveypro > Layout" page
     Then I should see "Welcome to this new instance of surveypro"
     And I should see "Grouped data"
     And I should see "What do you usually get for breakfast?"

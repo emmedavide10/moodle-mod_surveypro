@@ -18,7 +18,7 @@
  * The userform class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +33,7 @@ use mod_surveypro\formbase;
  * The class managing the form where users are supposed to enter expected data
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class view_form extends formbase {
@@ -44,14 +44,8 @@ class view_form extends formbase {
     protected $view;
 
     /**
-     * @var int Tab of the module where the page will be shown
-     */
-    protected $tabtab;
-
-    /**
      * @var int This is the page of the module. Nothing to share with $formpage
      */
-    protected $tabpage;
 
     /**
      * @var int Final validation of the submitted response
@@ -80,7 +74,7 @@ class view_form extends formbase {
         global $DB;
 
         // Assign pages to items.
-        $userformpagecount = $DB->get_field('surveypro_item', 'MAX(formpage)', array('surveyproid' => $this->surveypro->id));
+        $userformpagecount = $DB->get_field('surveypro_item', 'MAX(formpage)', ['surveyproid' => $this->surveypro->id]);
         if (!$userformpagecount) {
             $utilitylayoutman = new utility_layout($this->cm, $this->surveypro);
             $userformpagecount = $utilitylayoutman->assign_pages();
@@ -92,7 +86,6 @@ class view_form extends formbase {
         $this->set_submissionid($submissionid);
         $this->set_formpage($formpage);
 
-        $this->set_tabs_params();
         $this->prevent_direct_user_input();
         $this->trigger_event();
     }
@@ -109,26 +102,6 @@ class view_form extends formbase {
         $this->view = $view;
     }
 
-    /**
-     * Set TAB tab.
-     *
-     * @param int $tabtab
-     * @return void
-     */
-    public function set_tabtab($tabtab) {
-        $this->tabtab = $tabtab;
-    }
-
-    /**
-     * Set TAB page.
-     *
-     * @param int $tabpage
-     * @return void
-     */
-    public function set_tabpage($tabpage) {
-        $this->tabpage = $tabpage;
-    }
-
     // MARK get.
 
     /**
@@ -138,24 +111,6 @@ class view_form extends formbase {
      */
     public function get_view() {
         return $this->view;
-    }
-
-    /**
-     * Get TAB tab.
-     *
-     * @return the content of $tabtab property
-     */
-    public function get_tabtab() {
-        return $this->tabtab;
-    }
-
-    /**
-     * Get TAB page.
-     *
-     * @return the content of $tabpage property
-     */
-    public function get_tabpage() {
-        return $this->tabpage;
     }
 
     /**
@@ -176,33 +131,43 @@ class view_form extends formbase {
         return $this->userdeservesthanks;
     }
 
-    // MARK general methods.
-
     /**
-     * Set tabs params.
+     * Proccess message method
      *
-     * @return void
+     * @return String the processed message
      */
-    private function set_tabs_params() {
-        $this->set_tabtab(SURVEYPRO_TABSUBMISSIONS); // Needed by tabs.class.php.
-        switch ($this->view) {
-            case SURVEYPRO_NOVIEW:
-                $this->set_tabpage(SURVEYPRO_SUBMISSION_CPANEL); // Needed by tabs.class.php.
-                break;
-            case SURVEYPRO_NEWRESPONSE:
-                $this->set_tabpage(SURVEYPRO_SUBMISSION_INSERT); // Needed by tabs.class.php.
-                break;
-            case SURVEYPRO_EDITRESPONSE:
-                $this->set_tabpage(SURVEYPRO_SUBMISSION_EDIT); // Needed by tabs.class.php.
-                break;
-            case SURVEYPRO_READONLYRESPONSE:
-                $this->set_tabpage(SURVEYPRO_SUBMISSION_READONLY); // Needed by tabs.class.php.
-                break;
-            default:
-                $message = 'Unexpected $this->view = '.$this->view;
-                debugging('Error at line '.__LINE__.' of '.__FILE__.'. '.$message , DEBUG_DEVELOPER);
+    public function get_message() {
+        global $CFG, $USER, $COURSE;
+
+        $coveredattr = 'xxxxx';
+        if (!empty($this->surveypro->mailcontent)) {
+            $fullname = fullname($USER);
+            $surveyproname = $this->surveypro->name;
+            $url = $CFG->wwwroot.'/mod/surveypro/view_submissions.php?s='.$this->surveypro->id;
+
+            $content = $this->surveypro->mailcontent;
+            $originals = ['{FIRSTNAME}', '{LASTNAME}', '{FULLNAME}', '{COURSENAME}', '{SURVEYPRONAME}', '{SURVEYPROURL}'];
+            if (empty($this->surveypro->anonymous)) {
+                $replacements = [$USER->firstname, $USER->lastname, $fullname, $COURSE->fullname, $surveyproname, $url];
+            } else {
+                $replacements = [$coveredattr, $coveredattr, $coveredattr, $COURSE->fullname, $surveyproname, $url];
+            }
+
+            $content = str_replace($originals, $replacements, $content);
+        } else {
+            $a = new \stdClass();
+            $a->username = empty($this->surveypro->anonymous) ? fullname($USER) : $coveredattr;
+            $a->surveyproname = $this->surveypro->name;
+            $a->title = get_string('reviewsubmissions', 'mod_surveypro');
+            $a->href = $CFG->wwwroot.'/mod/surveypro/view_submissions.php?s='.$this->surveypro->id;
+
+            $content = get_string('newsubmissionbody', 'mod_surveypro', $a);
         }
+
+        return $content;
     }
+
+    // MARK general methods.
 
     /**
      * Save user submission.
@@ -244,8 +209,8 @@ class view_form extends formbase {
 
             $submission->id = $DB->insert_record('surveypro_submission', $submission);
 
-            $eventdata = array('context' => $this->context, 'objectid' => $submission->id);
-            $eventdata['other'] = array('view' => SURVEYPRO_NEWRESPONSE);
+            $eventdata = ['context' => $this->context, 'objectid' => $submission->id];
+            $eventdata['other'] = ['view' => SURVEYPRO_NEWRESPONSE];
             $event = \mod_surveypro\event\submission_created::create($eventdata);
             $event->trigger();
         } else {
@@ -273,8 +238,8 @@ class view_form extends formbase {
 
             $DB->update_record('surveypro_submission', $submission);
 
-            $eventdata = array('context' => $this->context, 'objectid' => $submission->id);
-            $eventdata['other'] = array('view' => SURVEYPRO_EDITRESPONSE);
+            $eventdata = ['context' => $this->context, 'objectid' => $submission->id];
+            $eventdata['other'] = ['view' => SURVEYPRO_EDITRESPONSE];
             $event = \mod_surveypro\event\submission_modified::create($eventdata);
             $event->trigger();
         }
@@ -481,7 +446,7 @@ class view_form extends formbase {
             }
         }
 
-        $itemhelperinfo = array();
+        $itemhelperinfo = [];
         foreach ($this->formdata as $elementname => $content) {
             if ($matches = utility_item::get_item_parts($elementname)) {
                 // With the introduction of interactive fieldset...
@@ -490,7 +455,7 @@ class view_form extends formbase {
                 // Drop them out.
                 $condition = false;
                 $condition = $condition || ($matches['prefix'] == SURVEYPRO_DONTSAVEMEPREFIX);
-                $condition = $condition || ($matches['type'] == SURVEYPRO_TYPEFORMAT);
+                $condition = $condition || ($matches['type'] == 'format');
                 if ($condition) {
                     continue; // To next foreach.
                 }
@@ -526,7 +491,7 @@ class view_form extends formbase {
         // ->   I update/create the corresponding record asking to each item class to manage its informations.
 
         foreach ($itemhelperinfo as $iteminfo) {
-            $where = array('submissionid' => $iteminfo->submissionid, 'itemid' => $iteminfo->itemid);
+            $where = ['submissionid' => $iteminfo->submissionid, 'itemid' => $iteminfo->itemid];
             if (!$useranswer = $DB->get_record('surveypro_answer', $where)) {
                 // Quickly make one new!
                 $useranswer = new \stdClass();
@@ -588,7 +553,7 @@ class view_form extends formbase {
             if ($this->responsestatus != SURVEYPRO_VALIDRESPONSE) {
                 // User jumped pages using direct input (or something more dangerous).
                 // Set this submission as SURVEYPRO_STATUSINPROGRESS.
-                $conditions = array('id' => $this->get_submissionid());
+                $conditions = ['id' => $this->get_submissionid()];
                 $DB->set_field('surveypro_submission', 'status', SURVEYPRO_STATUSINPROGRESS, $conditions);
             }
         }
@@ -612,23 +577,23 @@ class view_form extends formbase {
 
         // Get the list of used plugin.
         $utilitysubmissionman = new utility_submission($this->cm, $this->surveypro);
-        $pluginlist = $utilitysubmissionman->get_used_plugin_list(SURVEYPRO_TYPEFIELD);
+        $pluginlist = $utilitysubmissionman->get_used_plugin_list('field');
 
         // Begin of: get the list of all mandatory fields.
-        $requireditems = array();
+        $requireditems = [];
         foreach ($pluginlist as $plugin) {
-            $classname = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$plugin.'\item';
+            $classname = 'surveyprofield_'.$plugin.'\item';
             $canbemandatory = $classname::item_uses_mandatory_dbfield();
             if ($canbemandatory) {
                 $sql = 'SELECT i.id, i.parentid, i.parentvalue, i.reserved
                         FROM {surveypro_item} i
-                            JOIN {surveypro'.SURVEYPRO_TYPEFIELD.'_'.$plugin.'} p ON p.itemid = i.id
+                            JOIN {surveyprofield_'.$plugin.'} p ON p.itemid = i.id
                         WHERE i.surveyproid = :surveyproid
                             AND i.hidden = :hidden
                             AND p.required > :required
                         ORDER BY p.itemid';
 
-                $whereparams = array('surveyproid' => $this->surveypro->id, 'hidden' => 0, 'required' => 0);
+                $whereparams = ['surveyproid' => $this->surveypro->id, 'hidden' => 0, 'required' => 0];
                 $pluginitems = $DB->get_records_sql($sql, $whereparams);
 
                 foreach ($pluginitems as $pluginitem) {
@@ -644,7 +609,7 @@ class view_form extends formbase {
 
         // Make only ONE query taking ALL the answer provided in the frame of this submission.
         // (and, implicitally, for this surveypro).
-        $whereparams = array('submissionid' => $this->get_submissionid());
+        $whereparams = ['submissionid' => $this->get_submissionid()];
         $providedanswers = $DB->get_records_menu('surveypro_answer', $whereparams, 'itemid', 'itemid, 1');
 
         foreach ($requireditems as $itemseed) {
@@ -674,7 +639,7 @@ class view_form extends formbase {
     private function check_all_was_verified() {
         global $DB;
 
-        $conditions = array('submissionid' => $this->get_submissionid(), 'verified' => 0);
+        $conditions = ['submissionid' => $this->get_submissionid(), 'verified' => 0];
         if ($DB->get_record('surveypro_answer', $conditions, 'id', IGNORE_MULTIPLE)) {
             $this->responsestatus = SURVEYPRO_MISSINGVALIDATION;
         }
@@ -744,7 +709,7 @@ class view_form extends formbase {
         if ($this->surveypro->mailroles) {
             $roles = explode(',', $this->surveypro->mailroles);
             if (count($mygroups)) {
-                $recipients = array();
+                $recipients = [];
                 $userfieldsapi = \core_user\fields::for_userpic()->get_sql('u');
                 $fields = 'u.maildisplay, u.mailformat'.$userfieldsapi->selects;
                 foreach ($mygroups as $mygroup) {
@@ -762,10 +727,10 @@ class view_form extends formbase {
                     }
                 }
             } else {
-                // get_enrolled_users($courseid, $options = array()) <-- role is missing.
+                // get_enrolled_users($courseid, $options = []) <-- role is missing.
                 // get_users_from_role_on_context($role, $coursecontext); <-- this is ok but I need to call it once per $role.
                 $userfieldsapi = \core_user\fields::for_userpic()->get_sql('u');
-                $whereparams = array();
+                $whereparams = [];
 
                 list($enrolsql, $eparams) = get_enrolled_sql($coursecontext);
                 $whereparams = array_merge($whereparams, $eparams);
@@ -786,7 +751,7 @@ class view_form extends formbase {
             }
         } else {
             // Notification to roles was not requested.
-            $recipients = array();
+            $recipients = [];
         }
 
         if (!empty($this->surveypro->mailextraaddresses)) {
@@ -822,42 +787,6 @@ class view_form extends formbase {
     }
 
     /**
-     * Proccess message method
-     *
-     * @return String the processed message
-     */
-    public function get_message() {
-        global $CFG, $USER, $COURSE;
-
-        $coveredattr = 'xxxxx';
-        if (!empty($this->surveypro->mailcontent)) {
-            $fullname = fullname($USER);
-            $surveyproname = $this->surveypro->name;
-            $url = $CFG->wwwroot.'/mod/surveypro/view_submissions.php?s='.$this->surveypro->id;
-
-            $content = $this->surveypro->mailcontent;
-            $originals = array('{FIRSTNAME}', '{LASTNAME}', '{FULLNAME}', '{COURSENAME}', '{SURVEYPRONAME}', '{SURVEYPROURL}');
-            if (empty($this->surveypro->anonymous)) {
-                $replacements = array($USER->firstname, $USER->lastname, $fullname, $COURSE->fullname, $surveyproname, $url);
-            } else {
-                $replacements = array($coveredattr, $coveredattr, $coveredattr, $COURSE->fullname, $surveyproname, $url);
-            }
-
-            $content = str_replace($originals, $replacements, $content);
-        } else {
-            $a = new \stdClass();
-            $a->username = empty($this->surveypro->anonymous) ? fullname($USER) : $coveredattr;
-            $a->surveyproname = $this->surveypro->name;
-            $a->title = get_string('reviewsubmissions', 'mod_surveypro');
-            $a->href = $CFG->wwwroot.'/mod/surveypro/view_submissions.php?s='.$this->surveypro->id;
-
-            $content = get_string('newsubmissionbody', 'mod_surveypro', $a);
-        }
-
-        return $content;
-    }
-
-    /**
      * Stop the page load with a warning because no submission is available.
      *
      * @return void
@@ -865,8 +794,7 @@ class view_form extends formbase {
     public function nomoresubmissions_stopexecution() {
         global $OUTPUT;
 
-        $tabpage = $this->get_tabpage();
-        if ($tabpage != SURVEYPRO_SUBMISSION_READONLY) {
+        if ($this->view != SURVEYPRO_READONLYRESPONSE) {
             // If $this->formdata is available, this means that the form was already displayed and submitted.
             // So it is not the time to verify the user is allowed to submit one more surveypro.
             if ($this->formdata) {
@@ -883,8 +811,8 @@ class view_form extends formbase {
                 $message = get_string('nomoresubmissionsallowed', 'mod_surveypro', $this->surveypro->maxentries);
                 echo $OUTPUT->notification($message, 'notifyproblem');
 
-                $whereparams = array('id' => $this->cm->id);
-                $continueurl = new \moodle_url('/mod/surveypro/view_submissions.php', $whereparams);
+                $paramurl = ['id' => $this->cm->id];
+                $continueurl = new \moodle_url('/mod/surveypro/view_submissions.php', $paramurl);
 
                 echo $OUTPUT->continue_button($continueurl);
                 echo $OUTPUT->footer();
@@ -901,9 +829,8 @@ class view_form extends formbase {
     public function add_readonly_browsing_buttons() {
         global $OUTPUT;
 
-        $tabpage = $this->get_tabpage();
-        if ($tabpage == SURVEYPRO_SUBMISSION_READONLY) {
-            $params = array();
+        if ($this->view == SURVEYPRO_READONLYRESPONSE) {
+            $params = [];
             $params['s'] = $this->surveypro->id;
             $params['submissionid'] = $this->get_submissionid();
             $params['view'] = SURVEYPRO_READONLYRESPONSE;
@@ -926,7 +853,7 @@ class view_form extends formbase {
                     $forwardbutton = new \single_button($url, get_string('nextformpage', 'mod_surveypro'), 'get', true);
                 }
 
-                $params = array('class' => 'buttons');
+                $params = ['class' => 'buttons'];
                 $secondleveldiv = \html_writer::tag('div', '', ['class' => 'd-flex']);
                 $firstleveldiv = \html_writer::tag('div', $secondleveldiv, ['class' => 'col-md-4']);
                 if (isset($backwardbutton) && isset($forwardbutton)) {
@@ -968,7 +895,7 @@ class view_form extends formbase {
         $dirtydata = (array)$this->formdata;
         $elementnames = array_keys($dirtydata);
 
-        $disposelist = array();
+        $disposelist = [];
         $olditemid = 0;
         foreach ($elementnames as $elementname) {
             if ($matches = utility_item::get_item_parts($elementname)) {
@@ -978,7 +905,7 @@ class view_form extends formbase {
                 // Drop them out.
                 $condition = false;
                 $condition = $condition || ($matches['prefix'] == SURVEYPRO_DONTSAVEMEPREFIX);
-                $condition = $condition || ($matches['type'] == SURVEYPRO_TYPEFORMAT);
+                $condition = $condition || ($matches['type'] == 'format');
                 if ($condition) {
                     continue; // To next foreach.
                 }
@@ -1036,7 +963,7 @@ class view_form extends formbase {
                     // Drop them out.
                     $condition = false;
                     $condition = $condition || ($matches['prefix'] == SURVEYPRO_DONTSAVEMEPREFIX);
-                    $condition = $condition || ($matches['type'] == SURVEYPRO_TYPEFORMAT);
+                    $condition = $condition || ($matches['type'] == 'format');
                     if ($condition) {
                         continue; // To next foreach.
                     }
@@ -1045,7 +972,7 @@ class view_form extends formbase {
                         unset($this->formdata->$elementname);
                         // If this datum was previously saved (when the item was not disabled)
                         // now I have to delete from database.
-                        $utilitylayoutman->delete_answers(array('submissionid' => $this->formdata->submissionid, 'itemid' => $itemid));
+                        $utilitylayoutman->delete_answers(['submissionid' => $this->formdata->submissionid, 'itemid' => $itemid]);
                     }
                 }
             }
@@ -1067,7 +994,7 @@ class view_form extends formbase {
         $caneditownsubmissions = has_capability('mod/surveypro:editownsubmissions', $this->context);
 
         if (($this->view == SURVEYPRO_READONLYRESPONSE) || ($this->view == SURVEYPRO_EDITRESPONSE)) {
-            $where = array('id' => $this->get_submissionid());
+            $where = ['id' => $this->get_submissionid()];
             if (!$submission = $DB->get_record('surveypro_submission', $where, '*', IGNORE_MISSING)) {
                 throw new \moodle_exception('incorrectaccessdetected', 'mod_surveypro');
             }
@@ -1161,8 +1088,8 @@ class view_form extends formbase {
                 break;
             case SURVEYPRO_READONLYRESPONSE:
                 // Event: submission_viewed.
-                $eventdata = array('context' => $this->context, 'objectid' => $this->surveypro->id);
-                $eventdata['other'] = array('view' => SURVEYPRO_READONLYRESPONSE);
+                $eventdata = ['context' => $this->context, 'objectid' => $this->surveypro->id];
+                $eventdata['other'] = ['view' => SURVEYPRO_READONLYRESPONSE];
                 $event = \mod_surveypro\event\submission_viewed::create($eventdata);
                 $event->trigger();
                 break;

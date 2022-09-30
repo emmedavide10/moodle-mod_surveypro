@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyprofield_character
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/character/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyprofield_character
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -67,15 +67,15 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: pattern.
         $fieldname = 'pattern';
-        $options = array();
+        $options = [];
         $options[SURVEYPROFIELD_CHARACTER_FREEPATTERN] = get_string('free', 'surveyprofield_character');
         $options[SURVEYPROFIELD_CHARACTER_EMAILPATTERN] = get_string('mail', 'surveyprofield_character');
         $options[SURVEYPROFIELD_CHARACTER_URLPATTERN] = get_string('url', 'surveyprofield_character');
         $options[SURVEYPROFIELD_CHARACTER_CUSTOMPATTERN] = get_string('custompattern', 'surveyprofield_character');
         $options[SURVEYPROFIELD_CHARACTER_REGEXPATTERN] = get_string('regex', 'surveyprofield_character');
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('select', $fieldname, '', $options);
-        $elementgroup[] = $mform->createElement('text', $fieldname.'text', '', array('size' => 55));
+        $elementgroup[] = $mform->createElement('text', $fieldname.'text', '', ['size' => 55]);
         $mform->addGroup($elementgroup, $fieldname.'_group', get_string($fieldname, 'surveyprofield_character'), ' ', false);
         // $mform->setDefault($fieldname, SURVEYPROFIELD_CHARACTER_FREEPATTERN);
         $mform->disabledIf($fieldname.'text', $fieldname, 'eq', SURVEYPROFIELD_CHARACTER_FREEPATTERN);

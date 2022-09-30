@@ -21,7 +21,7 @@ Feature: apply COLLES (Preferred and Actual) mastertemplate
     And I am on "To apply mastertemplate" course homepage
 
   @javascript
-  Scenario: apply COLLES (Preferred and Actual) master template
+  Scenario: apply COLLES (Preferred and Actual) mastertemplate
     Given I follow "To apply COLLES (Preferred and Actual)"
     And I set the field "Master templates" to "COLLES (Preferred and Actual)"
     And I press "Apply"

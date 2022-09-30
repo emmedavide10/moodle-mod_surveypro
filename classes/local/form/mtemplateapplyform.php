@@ -18,7 +18,7 @@
  * The class representing the "apply master template" form
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,13 +26,16 @@ namespace mod_surveypro\local\form;
 
 defined('MOODLE_INTERNAL') || die();
 
+use mod_surveypro\mastertemplate;
+
 require_once($CFG->dirroot.'/lib/formslib.php');
+require_once($CFG->libdir.'/adminlib.php');
 
 /**
  * The class representing the form to apply a master template
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mtemplateapplyform extends \moodleform {
@@ -47,27 +50,17 @@ class mtemplateapplyform extends \moodleform {
 
         // Get _customdata.
         // Useless: $mtemplateman = $this->_customdata->mtemplateman;.
-        $subform = $this->_customdata->subform;
-
-        if ($mtemplatepluginlist = get_plugin_list('surveyprotemplate')) {
-            $mtemplates = array();
-
-            foreach ($mtemplatepluginlist as $mtemplatename => $mtemplatepath) {
-                if (!get_config('surveyprotemplate_'.$mtemplatename, 'disabled')) {
-                    $mtemplates[$mtemplatename] = get_string('pluginname', 'surveyprotemplate_'.$mtemplatename);
-                }
-            }
-            asort($mtemplates);
-        }
+        $mtemplates = $this->_customdata->mtemplates;
+        $shortversion = $this->_customdata->shortversion;
 
         // Applymtemplate: mastertemplate.
         if (count($mtemplates)) {
             $fieldname = 'mastertemplate';
-            if ($subform) {
-                $elementgroup = array();
+            if ($shortversion) {
+                $elementgroup = [];
                 $elementgroup[] = $mform->createElement('select', $fieldname, get_string($fieldname, 'mod_surveypro'), $mtemplates);
                 $elementgroup[] = $mform->createElement('submit', $fieldname.'_button', get_string('apply', 'mod_surveypro'));
-                $mform->addGroup($elementgroup, $fieldname.'_group', get_string($fieldname, 'mod_surveypro'), array(' '), false);
+                $mform->addGroup($elementgroup, $fieldname.'_group', get_string($fieldname, 'mod_surveypro'), [' '], false);
                 $mform->addHelpButton($fieldname.'_group', $fieldname, 'surveypro');
             } else {
                 $mform->addElement('select', $fieldname, get_string($fieldname, 'mod_surveypro'), $mtemplates);
@@ -98,7 +91,8 @@ class mtemplateapplyform extends \moodleform {
 
         // Get _customdata.
         $mtemplateman = $this->_customdata->mtemplateman;
-        // Useless: $subform = $this->_customdata->subform;.
+        // Useless: $mtemplates = $this->_customdata->mtemplates;.
+        // Useless: $shortversion = $this->_customdata->shortversion;.
 
         $errors = parent::validation($data, $files);
 

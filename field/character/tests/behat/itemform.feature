@@ -13,7 +13,7 @@ Feature: test the use of character setup form
       | username | firstname | lastname | email                |
       | teacher1 | Teacher   | 1        | teacher1@nowhere.net |
     And the following "course enrolments" exist:
-      | user     | course         | role           |
+      | user     | course               | role           |
       | teacher1 | Character setup form | editingteacher |
     And the following "activities" exist:
       | activity  | name                      | intro                     | course               |

@@ -18,7 +18,7 @@
  * Surveypro class to manage userspercount report
  *
  * @package   surveyproreport_userspercount
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->libdir.'/tablelib.php');
  * The class to manage userspercount report
  *
  * @package   surveyproreport_userspercount
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report extends reportbase {
@@ -45,21 +45,49 @@ class report extends reportbase {
     public $outputtable = null;
 
     /**
+     * Returns if this report was created for student too.
+     *
+     * @return void
+     */
+    public function has_studentreport() {
+        return false;
+    }
+
+    /**
+     * Does the current report apply to the passed mastertemplates?
+     *
+     * @param string $mastertemplate
+     * @return void
+     */
+    public function report_applies_to($mastertemplate) {
+        return true;
+    }
+
+    /**
+     * Get if this report displays user names.
+     *
+     * @return boolean false
+     */
+    public function has_visibleusernames() {
+        return false;
+    }
+
+    /**
      * Setup_outputtable
      */
     public function setup_outputtable() {
         $this->outputtable = new \flexible_table('userspercount');
 
-        $paramurl = array('id' => $this->cm->id);
+        $paramurl = ['id' => $this->cm->id];
         $baseurl = new \moodle_url('/mod/surveypro/report/userspercount/view.php', $paramurl);
         $this->outputtable->define_baseurl($baseurl);
 
-        $tablecolumns = array();
+        $tablecolumns = [];
         $tablecolumns[] = 'userresponses';
         $tablecolumns[] = 'userscount';
         $this->outputtable->define_columns($tablecolumns);
 
-        $tableheaders = array();
+        $tableheaders = [];
         $tableheaders[] = get_string('userresponses', 'surveyproreport_userspercount');
         $tableheaders[] = get_string('users');
         $this->outputtable->define_headers($tableheaders);
@@ -108,7 +136,7 @@ class report extends reportbase {
         $userspercounts = $DB->get_recordset_sql($sql, $whereparams);
 
         foreach ($userspercounts as $userspercount) {
-            $tablerow = array();
+            $tablerow = [];
 
              // Count of responses.
             $tablerow[] = $userspercount->userresponses;
@@ -126,7 +154,7 @@ class report extends reportbase {
     /**
      * Get_submissions_sql
      *
-     * @return array($sql, $whereparams);
+     * @return [$sql, $whereparams];
      */
     public function get_submissions_sql() {
 
@@ -148,7 +176,7 @@ class report extends reportbase {
             $sql .= ' ORDER BY u.lastname ASC';
         }
 
-        return array($sql, $whereparams);
+        return [$sql, $whereparams];
     }
 
     /**

@@ -18,7 +18,7 @@
  * The class representing the export form
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * Class to manage the data export form
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submissionexportform extends \moodleform {
@@ -60,7 +60,7 @@ class submissionexportform extends \moodleform {
         if ($activityisgrouped) {
             if ($allgroups = groups_get_all_groups($COURSE->id)) {
                 $fieldname = 'groupid';
-                $options = array();
+                $options = [];
                 if (has_capability('moodle/site:accessallgroups', $context)) {
                     $options[] = get_string('allgroups');
                 } else {
@@ -77,9 +77,9 @@ class submissionexportform extends \moodleform {
 
         // Submissionexport: status.
         $fieldname = 'status';
-        $where = array('surveyproid' => $surveypro->id, 'status' => SURVEYPRO_STATUSINPROGRESS);
+        $where = ['surveyproid' => $surveypro->id, 'status' => SURVEYPRO_STATUSINPROGRESS];
         if ($DB->get_records('surveypro_submission', $where)) {
-            $options = array();
+            $options = [];
             $options[SURVEYPRO_STATUSCLOSED] = get_string('statusclosed', 'mod_surveypro');
             $options[SURVEYPRO_STATUSINPROGRESS] = get_string('statusinprogress', 'mod_surveypro');
             $options[SURVEYPRO_STATUSALL] = get_string('statusboth', 'mod_surveypro');
@@ -120,7 +120,7 @@ class submissionexportform extends \moodleform {
 
         // Submissionexport: downloadtype.
         $fieldname = 'downloadtype';
-        $pluginlist = array();
+        $pluginlist = [];
         $pluginlist[SURVEYPRO_DOWNLOADCSV] = get_string('downloadtocsv', 'mod_surveypro');
         $pluginlist[SURVEYPRO_DOWNLOADTSV] = get_string('downloadtotsv', 'mod_surveypro');
         $pluginlist[SURVEYPRO_DOWNLOADXLS] = get_string('downloadtoxls', 'mod_surveypro');
@@ -132,7 +132,7 @@ class submissionexportform extends \moodleform {
 
         // Submissionexport: outputstyle.
         $fieldname = 'outputstyle';
-        $elementgroup = array();
+        $elementgroup = [];
         $verbosestr = get_string('verbose', 'mod_surveypro');
         $a = get_string('downloadformat', 'mod_surveypro');
         $rawstr = get_string('raw', 'mod_surveypro', $a);

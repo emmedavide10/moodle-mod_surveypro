@@ -18,7 +18,7 @@
  * The class representing the out form
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * The class representing the surveypro form for the student
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class userform extends \moodleform {
@@ -59,7 +59,7 @@ class userform extends \moodleform {
         $userfirstpage = $this->_customdata->userfirstpage;
         $userlastpage = $this->_customdata->userlastpage;
         $overflowpage = $this->_customdata->overflowpage;
-        $tabpage = $this->_customdata->tabpage;
+        $view = $this->_customdata->view;
         $readonly = $this->_customdata->readonly; // I see a form (record) that is not mine.
         $preview = $this->_customdata->preview; // Are we in preview mode?
 
@@ -105,7 +105,7 @@ class userform extends \moodleform {
             }
 
             foreach ($itemseeds as $itemseed) {
-                if ($tabpage == SURVEYPRO_LAYOUT_PREVIEW) {
+                if ($view == SURVEYPRO_PREVIEW) {
                     $itemaschildisallowed = true;
                 } else {
                     // Is the current item allowed in this page?
@@ -137,7 +137,7 @@ class userform extends \moodleform {
                     if ($position == SURVEYPRO_POSITIONTOP) {
                         $itemname = $item->get_itemname().'_extrarow';
                         $content = $item->get_content();
-                        $option = array('class' => 'indent-'.$item->get_indent());
+                        $option = ['class' => 'indent-'.$item->get_indent()];
                         $mform->addElement('mod_surveypro_label', $itemname, $elementnumber, $content, $option);
 
                         $item->item_add_color_unifier($mform);
@@ -155,8 +155,8 @@ class userform extends \moodleform {
                             }
                         }
                         $content = '';
-                        $content .= \html_writer::start_tag('div', array('class' => 'fitem row'));
-                        $content .= \html_writer::start_tag('div', array('class' => 'fstatic fullwidth'));
+                        $content .= \html_writer::start_tag('div', ['class' => 'fitem row']);
+                        $content .= \html_writer::start_tag('div', ['class' => 'fstatic fullwidth']);
                         $content .= $questioncontent;
                         $content .= \html_writer::end_tag('div');
                         $content .= \html_writer::end_tag('div');
@@ -173,7 +173,7 @@ class userform extends \moodleform {
                         $item->item_add_color_unifier($mform);
 
                         $itemname = $item->get_itemname().'_note';
-                        $attributes = array('class' => 'indent-'.$item->get_indent().' label_static');
+                        $attributes = ['class' => 'indent-'.$item->get_indent().' label_static'];
                         $mform->addElement('mod_surveypro_label', $itemname, $notestr, $fullinfo, $attributes);
                     }
 
@@ -184,7 +184,7 @@ class userform extends \moodleform {
             }
             $itemseeds->close();
 
-            if ($tabpage != SURVEYPRO_LAYOUT_PREVIEW) {
+            if ($view != SURVEYPRO_PREVIEW) {
                 if (!empty($surveypro->captcha)) {
                     $mform->addElement('recaptcha', 'captcha_form_footer');
                 }
@@ -192,11 +192,11 @@ class userform extends \moodleform {
         }
 
         // Buttons.
-        $buttonlist = array();
+        $buttonlist = [];
         if ($formpage > $userfirstpage) {
             $buttonlist['prevbutton'] = get_string('previousformpage', 'mod_surveypro');
         }
-        if ($tabpage != SURVEYPRO_LAYOUT_PREVIEW) {
+        if ($view != SURVEYPRO_PREVIEW) {
             $pasuseresumesurvey = ($surveypro->pauseresume == SURVEYPRO_PAUSERESUMENOEMAIL);
             $pasuseresumesurvey = $pasuseresumesurvey || ($surveypro->pauseresume == SURVEYPRO_PAUSERESUMEEMAIL);
             if ($pasuseresumesurvey) {
@@ -204,7 +204,7 @@ class userform extends \moodleform {
             }
             if ($formpage == $userlastpage) {
                 if ($surveypro->history) {
-                    $where = array('id' => $submissionid);
+                    $where = ['id' => $submissionid];
                     $submissionstatus = $DB->get_field('surveypro_submission', 'status', $where, IGNORE_MISSING);
                     if ($submissionstatus === false) { // Submissions still does not exist.
                         $usesimplesavebutton = true;
@@ -234,7 +234,7 @@ class userform extends \moodleform {
         }
 
         if (count($buttonlist) > 1) {
-            $buttonarray = array();
+            $buttonarray = [];
             foreach ($buttonlist as $name => $label) {
                 $buttonarray[] = $mform->createElement('submit', $name, $label);
             }
@@ -254,14 +254,14 @@ class userform extends \moodleform {
     public function validation($data, $files) {
         if (isset($data['prevbutton']) || isset($data['pausebutton'])) {
             // Skip validation.
-            return array();
+            return [];
         }
 
         // $mform = $this->_form;
 
         // Get _customdata.
         $cm = $this->_customdata->cm;
-        // Useless: $tabpage = $this->_customdata->tabpage;.
+        // Useless: $view = $this->_customdata->view;.
         $surveypro = $this->_customdata->surveypro;
         // Useless: $submissionid = $this->_customdata->submissionid;.
         // Useless: $formpage = $this->_customdata->formpage;.
@@ -272,13 +272,13 @@ class userform extends \moodleform {
 
         if ($preview) {
             // Skip validation.
-            return array();
+            return [];
         }
 
         $errors = parent::validation($data, $files);
 
         // Validate an item only if it is enabled, alias: only if its content matches the parent-child constrain.
-        $warnings = array();
+        $warnings = [];
         $olditemid = 0;
         foreach ($data as $elementname => $content) {
             if ($matches = utility_item::get_item_parts($elementname)) {

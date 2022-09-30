@@ -18,19 +18,23 @@
  * The covermanager class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_surveypro;
 
+defined('MOODLE_INTERNAL') || die();
+
 use mod_surveypro\utility_layout;
+
+require_once($CFG->libdir.'/adminlib.php');
 
 /**
  * The class managing the page "cover" of the module
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class view_cover {
@@ -75,6 +79,7 @@ class view_cover {
 
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '..
 
+        $canalwaysseeowner = has_capability('mod/surveypro:alwaysseeowner', $this->context);
         $cansubmit = has_capability('mod/surveypro:submit', $this->context);
         $canmanageitems = has_capability('mod/surveypro:manageitems', $this->context);
         $canaccessreports = has_capability('mod/surveypro:accessreports', $this->context);
@@ -90,9 +95,15 @@ class view_cover {
 
         $riskyediting = ($this->surveypro->riskyeditdeadline > time());
         $hassubmissions = $utilitylayoutman->has_submissions();
-        $itemcount = $utilitylayoutman->layout_has_items(0, SURVEYPRO_TYPEFIELD, $canmanageitems, $canaccessreserveditems, true);
+        $itemcount = $utilitylayoutman->has_items(0, 'field', $canmanageitems, $canaccessreserveditems, true);
 
-        $messages = array();
+        if (!$itemcount) {
+            $message = get_string('noitemsfound', 'mod_surveypro');
+            echo $OUTPUT->notification($message, 'notifyproblem');
+            return;
+        }
+
+        $messages = [];
         $timenow = time();
 
         // User submitted responses.
@@ -104,10 +115,6 @@ class view_cover {
         $addnew = $utilitylayoutman->is_newresponse_allowed($next);
         // End of: is the button to add one more response going to be displayed?
 
-        if ($this->surveypro->intro) {
-            echo $OUTPUT->box(format_module_intro('surveypro', $this->surveypro, $this->cm->id), 'generalbox description', 'intro');
-        }
-
         // Number of elements.
         // If you can not manage items, you do not want to know their number.
         if ($itemcount && $canmanageitems) {
@@ -116,7 +123,7 @@ class view_cover {
             if ($canmanageitems) {
                 // If I $canmanageitems in $itemcount items counted were: visible + hidden.
                 $message .= ' ';
-                $visibleonly = $utilitylayoutman->layout_has_items(0, SURVEYPRO_TYPEFIELD, false, $canaccessreserveditems, true);
+                $visibleonly = $utilitylayoutman->has_items(0, 'field', false, $canaccessreserveditems, true);
                 $a = $itemcount - $visibleonly;
                 $message .= get_string('count_hiddenitems', 'mod_surveypro', $a);
             }
@@ -155,7 +162,7 @@ class view_cover {
         }
 
         $this->display_messages($messages, get_string('attemptinfo', 'mod_surveypro'));
-        $messages = array();
+        $messages = [];
         // End of: general info.
 
         if ($addnew) {
@@ -178,14 +185,11 @@ class view_cover {
                 if ($inprogress) {
                     $a = new \stdClass();
                     $a->inprogress = get_string('statusinprogress', 'mod_surveypro');
-                    $a->tabsubmissionspage2 = get_string('tabsubmissionspage2', 'mod_surveypro');
+                    $a->tabdataentrypage2 = get_string('tabdataentrypage2', 'mod_surveypro');
                     $message .= get_string('onlyfinalizationallowed', 'mod_surveypro', $a);
                 } else {
                     $message .= '.';
                 }
-                echo $OUTPUT->notification($message, 'notifyproblem');
-            } else if (!$itemcount) {
-                $message = get_string('noitemsfound', 'mod_surveypro');
                 echo $OUTPUT->notification($message, 'notifyproblem');
             }
         }
@@ -196,33 +200,29 @@ class view_cover {
         }
 
         // Begin of: report section.
-        $surveyproreportlist = get_plugin_list('surveyproreport');
-        $paramurlbase = array('id' => $this->cm->id);
-        foreach ($surveyproreportlist as $pluginname => $pluginpath) {
-            $classname = 'surveyproreport_'.$pluginname.'\report';
+        $surveyproreportlist = \core_component::get_plugin_list('surveyproreport');
+        $paramurlbase = ['id' => $this->cm->id];
+
+        foreach ($surveyproreportlist as $reportname => $pluginpath) {
+            $classname = 'surveyproreport_'.$reportname.'\report';
             $reportman = new $classname($this->cm, $this->context, $this->surveypro);
 
-            $reportappliesto = $reportman->report_applies_to();
-            if (($reportappliesto == ['each']) || in_array($this->surveypro->template, $reportappliesto)) {
-                if ($canaccessreports || ($reportman->has_student_report() && $canaccessownreports)) {
-                    if ($reportman->report_apply()) {
-                        if ($childreports = $reportman->has_childreports($canaccessreports)) {
-                            $reportname = get_string('pluginname', 'surveyproreport_'.$pluginname);
-                            $this->add_report_link($childreports, $pluginname, $messages, $reportname);
-                        } else {
-                            $url = new \moodle_url('/mod/surveypro/report/'.$pluginname.'/view.php', $paramurlbase);
-                            $a = new \stdClass();
-                            $a->href = $url->out();
-                            $a->reportname = get_string('pluginname', 'surveyproreport_'.$pluginname);
-                            $messages[] = get_string('runreport', 'mod_surveypro', $a);
-                        }
-                    }
+            if ($reportman->is_report_allowed($reportname)) {
+                if ($childrenreports = $reportman->has_childrenreports($canaccessreports)) {
+                    $reportlabel = get_string('pluginname', 'surveyproreport_'.$reportname);
+                    $this->add_report_link($childrenreports, $reportname, $messages, $reportlabel);
+                } else {
+                    $url = new \moodle_url('/mod/surveypro/report/'.$reportname.'/view.php', $paramurlbase);
+                    $a = new \stdClass();
+                    $a->href = $url->out();
+                    $a->reportname = get_string('pluginname', 'surveyproreport_'.$reportname);
+                    $messages[] = get_string('runreport', 'mod_surveypro', $a);
                 }
             }
         }
 
         $this->display_messages($messages, get_string('reportsection', 'mod_surveypro'));
-        $messages = array();
+        $messages = [];
         // End of: report section.
 
         // Begin of: user templates section.
@@ -247,7 +247,7 @@ class view_cover {
         }
 
         $this->display_messages($messages, get_string('utemplatessection', 'mod_surveypro'));
-        $messages = array();
+        $messages = [];
         // End of: user templates section.
 
         // Begin of: master templates section.
@@ -262,33 +262,33 @@ class view_cover {
         }
 
         $this->display_messages($messages, get_string('mtemplatessection', 'mod_surveypro'));
-        $messages = array();
+        $messages = [];
         // End of: master templates section.
     }
 
     /**
      * Recursive function to populate the $messages array for reports nested as much times as wanted
      *
-     * Uncomment lines of has_childreports method in surveyproreport_colles\report class of report/colles/classes/report.php file
+     * Uncomment lines of has_childrenreports method in surveyproreport_colles\report class of report/colles/classes/report.php file
      * to see this function in action.
      *
-     * @param string $childreports
-     * @param string $pluginname
+     * @param string $childrenreports
+     * @param string $reportname
      * @param array $messages
      * @param string $categoryname
      * @return void
      */
-    public function add_report_link($childreports, $pluginname, &$messages, $categoryname) {
+    public function add_report_link($childrenreports, $reportname, &$messages, $categoryname) {
         global $PAGE;
 
-        foreach ($childreports as $reportkey => $childparams) {
+        foreach ($childrenreports as $reportkey => $childparams) {
             $subreport = get_string($reportkey, 'surveyprotemplate_'.$this->surveypro->template);
             if (is_array(reset($childparams))) { // If the first element of $childparams is an array.
                 $categoryname .= ' > '.$subreport;
-                $this->add_report_link($childparams, $pluginname, $messages, $categoryname);
+                $this->add_report_link($childparams, $reportname, $messages, $categoryname);
             } else {
-                $childparams = array('s' => $this->cm->instance) + $childparams;
-                $url = new \moodle_url('/mod/surveypro/report/'.$pluginname.'/view.php', $childparams);
+                $childparams = ['s' => $this->cm->instance] + $childparams;
+                $url = new \moodle_url('/mod/surveypro/report/'.$reportname.'/view.php', $childparams);
                 $a = new \stdClass();
                 $a->href = $url->out();
                 $a->reportname = $categoryname.' > '.$subreport;
@@ -308,8 +308,8 @@ class view_cover {
         global $OUTPUT;
 
         if (count($messages)) {
-            echo \html_writer::start_tag('fieldset', array('class' => 'generalbox'));
-            echo \html_writer::start_tag('legend', array('class' => 'coverinfolegend'));
+            echo \html_writer::start_tag('fieldset', ['class' => 'generalbox']);
+            echo \html_writer::start_tag('legend', ['class' => 'coverinfolegend']);
             echo $strlegend;
             echo \html_writer::end_tag('legend');
             foreach ($messages as $message) {

@@ -18,7 +18,7 @@
  * Surveypro itembase class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +33,7 @@ use mod_surveypro\utility_submission;
  * The base class for items
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itembase {
@@ -59,7 +59,7 @@ class itembase {
     protected $itemid;
 
     /**
-     * @var string Type of the item. It can only be: SURVEYPRO_TYPEFIELD or SURVEYPRO_TYPEFORMAT
+     * @var string Type of the item. It can only be: 'field' or 'format'
      */
     protected $type;
 
@@ -121,7 +121,7 @@ class itembase {
     /**
      * @var array
      */
-    protected $fieldsusingformat = array('content' => SURVEYPRO_ITEMCONTENTFILEAREA);
+    protected $fieldsusingformat = ['content' => SURVEYPRO_ITEMCONTENTFILEAREA];
 
     /**
      * List of fields properties the surveypro creator will manage in the item definition form
@@ -193,7 +193,7 @@ class itembase {
                     WHERE i.id = :itemid';
         }
 
-        if ($record = $DB->get_record_sql($sql, array('itemid' => $itemid))) {
+        if ($record = $DB->get_record_sql($sql, ['itemid' => $itemid])) {
             foreach ($record as $option => $value) {
                 $this->{$option} = $value;
             }
@@ -202,7 +202,7 @@ class itembase {
 
             // Special care to fields with format.
             if ($fieldsusingformat = $this->get_fieldsusingformat()) {
-                $editoroptions = array('trusttext' => true, 'subdirs' => false, 'maxfiles' => -1, 'context' => $context);
+                $editoroptions = ['trusttext' => true, 'subdirs' => false, 'maxfiles' => -1, 'context' => $context];
                 foreach ($fieldsusingformat as $fieldname => $filearea) {
                     $this->{$fieldname} = file_rewrite_pluginfile_urls(
                        $this->{$fieldname}, 'pluginfile.php', $context->id,
@@ -284,7 +284,7 @@ class itembase {
         // Plugin and type are already onboard.
 
         // Checkboxes content.
-        $checkboxessettings = array('hidden', 'insearchform', 'reserved', 'hideinstructions', 'required', 'trimonsave');
+        $checkboxessettings = ['hidden', 'insearchform', 'reserved', 'hideinstructions', 'required', 'trimonsave'];
         foreach ($checkboxessettings as $checkboxessetting) {
             if ($this->insetupform[$checkboxessetting]) {
                 $record->{$checkboxessetting} = isset($record->{$checkboxessetting}) ? 1 : 0;
@@ -376,7 +376,7 @@ class itembase {
                     FROM {surveypro_item}
                     WHERE surveyproid = :surveyproid
                       AND sortindex > 0';
-            $whereparams = array('surveyproid' => $this->cm->instance);
+            $whereparams = ['surveyproid' => $this->cm->instance];
             $record->sortindex = 1 + $DB->count_records_sql($sql, $whereparams);
 
             // Itemid.
@@ -400,7 +400,7 @@ class itembase {
 
                 // Special care to "editors". Remember that content and contentformat are in plugin table.
                 if ($fieldsusingformat = $this->get_fieldsusingformat()) {
-                    $editoroptions = array('trusttext' => true, 'subdirs' => false, 'maxfiles' => -1, 'context' => $context);
+                    $editoroptions = ['trusttext' => true, 'subdirs' => false, 'maxfiles' => -1, 'context' => $context];
                     foreach ($fieldsusingformat as $fieldname => $filearea) {
                         $record = file_postupdate_standard_editor(
                                       $record, $fieldname, $editoroptions,
@@ -426,8 +426,8 @@ class itembase {
                 $transaction->allow_commit();
 
                 // Event: item_created.
-                $eventdata = array('context' => $context, 'objectid' => $itemid);
-                $eventdata['other'] = array('type' => $record->type, 'plugin' => $record->plugin, 'view' => SURVEYPRO_EDITITEM);
+                $eventdata = ['context' => $context, 'objectid' => $itemid];
+                $eventdata['other'] = ['type' => $record->type, 'plugin' => $record->plugin, 'view' => SURVEYPRO_EDITITEM];
                 $event = \mod_surveypro\event\item_created::create($eventdata);
                 $event->trigger();
             } catch (Exception $e) {
@@ -437,7 +437,7 @@ class itembase {
 
             if ($hassubmission) {
                 // Set to SURVEYPRO_STATUSINPROGRESS each already sent submission.
-                $whereparams = array('surveyproid' => $this->surveypro->id);
+                $whereparams = ['surveyproid' => $this->surveypro->id];
                 $utilitysubmissionman->submissions_set_status($whereparams, SURVEYPRO_STATUSINPROGRESS);
             }
         } else {
@@ -445,7 +445,7 @@ class itembase {
 
             // Special care to "editors".
             if ($fieldsusingformat = $this->get_fieldsusingformat()) {
-                $editoroptions = array('trusttext' => true, 'subdirs' => false, 'maxfiles' => -1, 'context' => $context);
+                $editoroptions = ['trusttext' => true, 'subdirs' => false, 'maxfiles' => -1, 'context' => $context];
                 foreach ($fieldsusingformat as $fieldname => $filearea) {
                     $record = file_postupdate_standard_editor(
                                   $record, $fieldname, $editoroptions,
@@ -494,8 +494,8 @@ class itembase {
                 $this->item_manage_chains($record->itemid, $oldhidden, $record->hidden, $oldreserved, $record->reserved);
 
                 // Event: item_modified.
-                $eventdata = array('context' => $context, 'objectid' => $record->itemid);
-                $eventdata['other'] = array('type' => $record->type, 'plugin' => $record->plugin, 'view' => SURVEYPRO_EDITITEM);
+                $eventdata = ['context' => $context, 'objectid' => $record->itemid];
+                $eventdata['other'] = ['type' => $record->type, 'plugin' => $record->plugin, 'view' => SURVEYPRO_EDITITEM];
                 $event = \mod_surveypro\event\item_modified::create($eventdata);
                 $event->trigger();
             } catch (Exception $e) {
@@ -534,7 +534,7 @@ class itembase {
         }
 
         // Property $this->itemeditingfeedback is going to be part of $returnurl in layout_itemsetup.php
-        // and there it will be send to layout_itemlist.php.
+        // and there it will be send to layout_itemslist.php.
         return $record->itemid;
     }
 
@@ -549,7 +549,7 @@ class itembase {
         global $DB;
 
         // If variable does not exist.
-        if ($this->type == SURVEYPRO_TYPEFORMAT) {
+        if ($this->type == 'format') {
             return;
         }
 
@@ -573,17 +573,17 @@ class itembase {
 
         // Get the list of used plugin.
         $utilitysubmissionman = new utility_submission($this->cm, $this->surveypro);
-        $pluginlist = $utilitysubmissionman->get_used_plugin_list(SURVEYPRO_TYPEFIELD);
+        $pluginlist = $utilitysubmissionman->get_used_plugin_list('field');
 
-        $usednames = array();
+        $usednames = [];
         foreach ($pluginlist as $plugin) {
-            $tablename = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$plugin;
+            $tablename = 'surveyprofield_'.$plugin;
             $sql = 'SELECT p.itemid, p.variable
                     FROM {surveypro_item} i
                       JOIN {'.$tablename.'} p ON p.itemid = i.id
                     WHERE ((i.surveyproid = :surveyproid)
                       AND (p.itemid <> :itemid))';
-            $whereparams = array('surveyproid' => (int)$record->surveyproid, 'itemid' => $itemid);
+            $whereparams = ['surveyproid' => (int)$record->surveyproid, 'itemid' => $itemid];
             $usednames += $DB->get_records_sql_menu($sql, $whereparams);
         }
 
@@ -688,7 +688,7 @@ class itembase {
             // because $item was loaded before last save, so $this->get_content_array(SURVEYPRO_VALUES, 'options')
             // will still return the previous values.
 
-            $childrenitems = $DB->get_records('surveypro_item', array('parentid' => $this->itemid), 'id', 'id, parentvalue');
+            $childrenitems = $DB->get_records('surveypro_item', ['parentid' => $this->itemid], 'id', 'id, parentvalue');
             foreach ($childrenitems as $childitem) {
                 $childparentvalue = $childitem->parentvalue;
 
@@ -713,7 +713,7 @@ class itembase {
         global $CFG, $DB;
 
         $surveyproid = $this->get_surveyproid();
-        $template = $DB->get_field('surveypro', 'template', array('id' => $surveyproid), MUST_EXIST);
+        $template = $DB->get_field('surveypro', 'template', ['id' => $surveyproid], MUST_EXIST);
         if (empty($template)) {
             return;
         }
@@ -919,7 +919,7 @@ class itembase {
         global $DB;
 
         $itemid = $this->itemid;
-        $childrenitemscount = $DB->count_records('surveypro_item', array('parentid' => $itemid));
+        $childrenitemscount = $DB->count_records('surveypro_item', ['parentid' => $itemid]);
 
         return ($childrenitemscount > 0);
     }
@@ -953,7 +953,7 @@ class itembase {
         $whereclause = 'a.content = :content_'.$itemid;
         $whereparam = $searchrestriction;
 
-        return array($whereclause, $whereparam);
+        return [$whereclause, $whereparam];
     }
 
     // MARK set.
@@ -964,7 +964,7 @@ class itembase {
      * (copied from moodle20/cohort/edit.php)
      *
      * Some examples:
-     * Each SURVEYPRO_ITEMFIELD has: $this->insetupform['content'] == true  and $fieldsusingformat == array('content')
+     * Each SURVEYPRO_ITEMFIELD has: $this->insetupform['content'] == true  and $fieldsusingformat == ['content']
      * Fieldset plugin          has: $this->insetupform['content'] == true  and $fieldsusingformat == null
      * Pagebreak plugin         has: $this->insetupform['content'] == false and $fieldsusingformat == null
      *
@@ -976,11 +976,32 @@ class itembase {
         }
 
         $context = \context_module::instance($this->cm->id);
-        $editoroptions = array('trusttext' => true, 'subdirs' => true, 'maxfiles' => -1, 'context' => $context);
+        // Do not pass 'trusttext' in order to get its default ('trusttext' => false)
+        // because 'noclean' is ignored if trusttext is enabled!
+        $editoroptions = ['noclean' => true, 'subdirs' => true, 'maxfiles' => -1, 'context' => $context];
         foreach ($fieldsusingformat as $fieldname => $filearea) {
             $this->{$fieldname.'trust'} = 1; // Is this really neede?
             file_prepare_standard_editor($this, $fieldname, $editoroptions, $context, 'mod_surveypro', $filearea, $this->itemid);
         }
+    }
+
+    /**
+     * Provide the label of the mform element.
+     *
+     * @return string The content of $elementlabel
+     */
+    public function get_elementlabel() {
+        if ($this->position == SURVEYPRO_POSITIONLEFT) {
+            if ($this->customnumber) {
+                $elementlabel = $this->include_customnumber_in_content();
+            } else {
+                $elementlabel = $this->get_content();
+            }
+        } else {
+            $elementlabel = '&nbsp;';
+        }
+
+        return $elementlabel;
     }
 
     // MARK get.
@@ -988,7 +1009,7 @@ class itembase {
     /**
      * Get course module.
      *
-     * @return the content of $cm property
+     * @return object The content of $cm property
      */
     public function get_cm() {
         return $this->cm;
@@ -1035,7 +1056,7 @@ class itembase {
             unset($data['surveypro']);
             unset($data['insetupform']);
         } else {
-            $data = array();
+            $data = [];
             $data['type'] = $this->type;
             $data['plugin'] = $this->plugin;
         }
@@ -1090,7 +1111,7 @@ class itembase {
      * @return the content of $content property
      */
     public function get_content() {
-        $options = array('overflowdiv' => false, 'allowid' => true, 'para' => false);
+        $options = ['overflowdiv' => false, 'allowid' => true, 'para' => false];
         return format_text($this->content, $this->contentformat, $options);
     }
 
@@ -1185,7 +1206,7 @@ class itembase {
             $value = '';
         }
 
-        return array($value, $label);
+        return [$value, $label];
     }
 
     /**
@@ -1221,7 +1242,7 @@ class itembase {
         $utilityitemman = new utility_item($this->cm, $this->surveypro);
         $options = $utilityitemman->multilinetext_to_array($this->{$field});
 
-        $values = array();
+        $values = [];
         foreach ($options as $option) {
             if (preg_match('~^(.*)'.SURVEYPRO_VALUELABELSEPARATOR.'(.*)$~', $option, $match)) {
                 $values[] = $match[$index];
@@ -1240,8 +1261,8 @@ class itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array();
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = [];
 
         return $fieldlist;
     }
@@ -1598,7 +1619,7 @@ EOS;
             return true;
         }
 
-        $where = array('submissionid' => $submissionid, 'itemid' => $this->itemid);
+        $where = ['submissionid' => $submissionid, 'itemid' => $this->itemid];
         $givenanswer = $DB->get_field('surveypro_answer', 'content', $where);
 
         return ($givenanswer === $childitemrecord->parentvalue);
@@ -1616,13 +1637,13 @@ EOS;
     public function userform_add_disabledif($mform) {
         global $DB;
 
-        if (!$this->parentid || ($this->type == SURVEYPRO_TYPEFORMAT)) {
+        if (!$this->parentid || ($this->type == 'format')) {
             return;
         }
 
         $fieldnames = $this->userform_get_root_elements_name();
 
-        $parentrestrictions = array();
+        $parentrestrictions = [];
 
         // If I am here this means I have a parent FOR SURE.
         // Instead of making one more query, I assign two variables manually.
@@ -1633,9 +1654,9 @@ EOS;
         $mypage = $this->get_formpage(); // Once and forever.
         do {
             // Take care!
-            // Even if (!$surveypro->newpageforchild) I can have all my ancestors into previous pages by adding pagebreaks manually.
-            // Because of this, I need to chech page numbers.
-            $where = array('id' => $currentitem->parentid);
+            // Even if (!$surveypro->newpageforchild) I can have all my ancestors into previous pages if I added pagebreaks manually.
+            // Because of this, I need to check page numbers.
+            $where = ['id' => $currentitem->parentid];
             $parentitem = $DB->get_record('surveypro_item', $where, 'parentid, parentvalue, formpage');
             $parentpage = $parentitem->formpage;
             if ($parentpage == $mypage) {
@@ -1660,7 +1681,7 @@ EOS;
             if ($displaydebuginfo) {
                 foreach ($disabilitationinfo as $parentinfo) {
                     if (is_array($parentinfo->content)) {
-                        $contentdisplayed = 'array('.implode(',', $parentinfo->content).')';
+                        $contentdisplayed = '['.implode(',', $parentinfo->content).']';
                     } else {
                         $contentdisplayed = '\''.$parentinfo->content.'\'';
                     }

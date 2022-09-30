@@ -88,55 +88,71 @@ Feature: Test colles report for courses divided into groups not all equipped wit
     And I am on the "Verify reports" "mod_surveypro > Colles Summary report" page logged in as teacher1
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."
 
     And I am on the "Verify reports" "mod_surveypro > Colles Scales report" page
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."
 
     And I am on the "Verify reports" "mod_surveypro > Colles Questions Relevance report" page
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."
 
     And I am on the "Verify reports" "mod_surveypro > Colles Questions Reflective thinking report" page
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."
 
     And I am on the "Verify reports" "mod_surveypro > Colles Questions Interactivity report" page
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."
 
     And I am on the "Verify reports" "mod_surveypro > Colles Questions Tutor support report" page
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."
 
     And I am on the "Verify reports" "mod_surveypro > Colles Questions Peer support report" page
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."
 
     And I am on the "Verify reports" "mod_surveypro > Colles Questions Interpretation report" page
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 1"
+    And I press "Reload"
     Then I should not see "No responses were found in this survey for enrolled students."
     And I set the field "id_groupid" to "Group 2"
+    And I press "Reload"
     Then I should see "No responses were found in this survey for enrolled students."

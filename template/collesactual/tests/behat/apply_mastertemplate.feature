@@ -21,7 +21,7 @@ Feature: apply COLLES (Actual) mastertemplate
     And I am on "To apply mastertemplate" course homepage
 
   @javascript
-  Scenario: apply COLLES (Actual) master template
+  Scenario: apply COLLES (Actual) mastertemplate
     Given I follow "To apply COLLES (Actual)"
     And I set the field "Master templates" to "COLLES (Actual)"
     And I press "Apply"

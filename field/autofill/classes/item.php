@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_autofill
  *
  * @package   surveyprofield_autofill
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/autofill/lib.php');
  * Class to manage each aspect of the autofill item
  *
  * @package   surveyprofield_autofill
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -186,7 +186,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'autofill';
 
         // Override the list of fields using format, whether needed.
@@ -272,7 +272,7 @@ class item extends itembase {
         // Nothing to do: they don't exist in this plugin.
 
         // 3. special management for autofill contents
-        $referencearray = array(''); // Take care: the first element is already on board.
+        $referencearray = ['']; // Take care: the first element is already on board.
         for ($i = 1; $i <= SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT_COUNT; $i++) {
             $referencearray[] = constant('SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT'.sprintf('%02d', $i));
         }
@@ -307,7 +307,7 @@ class item extends itembase {
 
         // 3. Set values corresponding to checkboxes.
         // Take care: 'required', 'trimonsave', 'hideinstructions' were already considered in get_common_settings.
-        $checkboxes = array('hiddenfield');
+        $checkboxes = ['hiddenfield'];
         foreach ($checkboxes as $checkbox) {
             $record->{$checkbox} = (isset($record->{$checkbox})) ? 1 : 0;
         }
@@ -353,8 +353,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote'];
 
         return $fieldlist;
     }
@@ -421,7 +421,7 @@ EOS;
         $whereclause = $DB->sql_like('a.content', ':content_'.$itemid, false);
         $whereparam = '%'.$searchrestriction.'%';
 
-        return array($whereclause, $whereparam);
+        return [$whereclause, $whereparam];
     }
 
     // MARK userform.
@@ -437,15 +437,7 @@ EOS;
     public function userform_mform_element($mform, $searchform, $readonly) {
         $starstr = get_string('star', 'mod_surveypro');
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_autofill_'.$this->sortindex;
 
@@ -459,7 +451,7 @@ EOS;
             $mform->setDefault($this->itemname, $value);
 
             if (!$this->hiddenfield) {
-                $attributes = array();
+                $attributes = [];
                 $attributes['id'] = $idprefix;
                 $attributes['class'] = 'indent-'.$this->indent.' autofill_text';
                 $attributes['disabled'] = 'disabled';
@@ -468,8 +460,8 @@ EOS;
                 $mform->setDefault($this->itemname.'_static', $value);
             }
         } else {
-            $attributes = array();
-            $elementgroup = array();
+            $attributes = [];
+            $elementgroup = [];
 
             $itemname = $this->itemname;
             $attributes['id'] = $idprefix;
@@ -536,7 +528,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -562,8 +554,8 @@ EOS;
         global $COURSE, $DB, $USER;
 
         if ($submissionid) {
-            $submission = $DB->get_record('surveypro_submission', array('id' => $submissionid), '*', MUST_EXIST);
-            $user = $DB->get_record('user', array('id' => $submission->userid));
+            $submission = $DB->get_record('surveypro_submission', ['id' => $submissionid], '*', MUST_EXIST);
+            $user = $DB->get_record('user', ['id' => $submission->userid]);
         } else {
             $user = $USER;
         }
@@ -632,7 +624,7 @@ EOS;
                         $label .= implode(', ', $usergroups[0]);
                         break;
                     case SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT10: // Usergroupname.
-                        $names = array();
+                        $names = [];
                         $usergroups = groups_get_user_groups($COURSE->id, $user->id);
                         foreach ($usergroups[0] as $groupid) {
                              $names[] = groups_get_group_name($groupid);
@@ -666,7 +658,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         $elementnames[] = $this->itemname;
         if (!$this->hiddenfield) {
             $elementnames[] = $this->itemname.'_static';

@@ -18,7 +18,7 @@
  * Starting page of the lateusers report.
  *
  * @package   surveyproreport_lateusers
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,17 +34,16 @@ $s = optional_param('s', 0, PARAM_INT);
 
 if (!empty($id)) {
     $cm = get_coursemodule_from_id('surveypro', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
 } else {
-    $surveypro = $DB->get_record('surveypro', array('id' => $s), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $surveypro->course), '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $s], '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $surveypro->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('surveypro', $surveypro->id, $course->id, false, MUST_EXIST);
 }
 $cm = cm_info::create($cm);
 
 $groupid = optional_param('groupid', 0, PARAM_INT);
-$edit = optional_param('edit', -1, PARAM_BOOL);
 
 require_course_login($course, false, $cm);
 $context = \context_module::instance($cm->id);
@@ -63,7 +62,7 @@ if ($showjumper) {
 
     $jumpercontent = $reportman->get_groupjumper_items();
 
-    $paramurl = array('id' => $cm->id);
+    $paramurl = ['id' => $cm->id];
     $formurl = new \moodle_url('/mod/surveypro/report/lateusers/view.php', $paramurl);
 
     $formparams = new \stdClass();
@@ -83,7 +82,7 @@ if ($showjumper) {
     // but in this report I look for users WITHOUT submissions.
     $formparams->addnotinanygroup = false;
     $formparams->jumpercontent = $jumpercontent;
-    $attributes = array('id' => 'surveypro_jumperform');
+    $attributes = ['id' => 'surveypro_jumperform'];
     $groupfilterform = new groupjumperform($formurl, $formparams, null, null, $attributes);
 
     $PAGE->requires->js_amd_inline("
@@ -96,42 +95,22 @@ if ($showjumper) {
 // End of: prepare params for the form.
 
 // Output starts here.
-$url = new \moodle_url('/mod/surveypro/report/lateusers/view.php', array('s' => $surveypro->id));
+$url = new \moodle_url('/mod/surveypro/report/lateusers/view.php', ['s' => $surveypro->id]);
 $PAGE->set_url($url);
 $PAGE->set_context($context);
 $PAGE->set_cm($cm);
 $PAGE->set_title($surveypro->name);
 $PAGE->set_heading($course->shortname);
-if (($edit != -1) and $PAGE->user_allowed_editing()) {
-    $USER->editing = $edit;
-}
-if ($PAGE->user_allowed_editing()) {
-    // Change URL parameter and block display string value depending on whether editing is enabled or not
-    if ($PAGE->user_is_editing()) {
-        $urlediting = 'off';
-        $strediting = get_string('blockseditoff');
-    } else {
-        $urlediting = 'on';
-        $strediting = get_string('blocksediton');
-    }
-    $url = new \moodle_url($CFG->wwwroot.'/mod/surveypro/report/lateusers/view.php', ['id' => $cm->id, 'edit' => $urlediting]);
-    $PAGE->set_button($OUTPUT->single_button($url, $strediting));
-}
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($surveypro->name), 2, null);
 
-// Render the activity information.
-$completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
-$activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
-echo $OUTPUT->activity_information($cm, $completiondetails, $activitydates);
+$tab = new tabs($cm, $context, $surveypro);
+$tab->draw_pages_bar(SURVEYPRO_TABREPORTS, 'lateusers');
 
-$surveyproreportlist = get_plugin_list('surveyproreport');
-$reportkey = array_search('lateusers', array_keys($surveyproreportlist));
-new tabs($cm, $context, $surveypro, SURVEYPRO_TABREPORTS, $reportkey);
+$reportman->prevent_direct_user_input();
 
 if ($showjumper) {
-    $groupfilterform->set_data(array('groupid' => $groupid));
+    $groupfilterform->set_data(['groupid' => $groupid]);
     $groupfilterform->display();
 }
 

@@ -18,7 +18,7 @@
  * Italian strings for surveypro
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,21 +35,25 @@ $string['surveyproname'] = 'Surveypro name';
 $string['surveyproname_help'] = 'Choose the name of this surveypro.';
 $string['surveypro'] = 'surveypro';
 
+$string['tabsubmissionsname'] = 'Inserimento';
+    $string['tabdataentrypage1'] = 'Stato';
+    $string['tabdataentrypage2'] = 'Raccolta dati';
+    $string['tabdataentrypage3'] = 'Nuovo inserimento';
+    $string['tabdataentrypage4'] = 'Modifica';
+    $string['tabdataentrypage5'] = 'Sola lettura';
+    $string['tabdataentrypage6'] = 'Ricerca';
+    $string['tabdataentrypage7'] = 'Rapporti';
+    $string['tabdataentrypage8'] = 'Importazione';
+    $string['tabdataentrypage9'] = 'Esportazione';
 $string['tablayoutname'] = 'Scheda';
-    $string['tabitemspage1'] = 'Anteprima';
-    $string['tabitemspage2'] = 'Elementi';
-    $string['tabitemspage3'] = 'Dettaglio elemento';
-    $string['tabitemspage4'] = 'Relazioni';
-$string['tabsubmissionsname'] = 'Indagine';
-    $string['tabsubmissionspage1'] = 'Stato';
-    $string['tabsubmissionspage2'] = 'Raccolta dati';
-    $string['tabsubmissionspage3'] = 'Nuovo inserimento';
-    $string['tabsubmissionspage4'] = 'Modifica';
-    $string['tabsubmissionspage5'] = 'Sola lettura';
-    $string['tabsubmissionspage6'] = 'Ricerca';
-    $string['tabsubmissionspage7'] = 'Rapporti';
-    $string['tabsubmissionspage8'] = 'Importazione';
-    $string['tabsubmissionspage9'] = 'Esportazione';
+    $string['tablayoutpage1'] = 'Anteprima';
+    $string['tablayoutpage2'] = 'Elementi';
+    $string['tablayoutpage3'] = 'Modifica elemento';
+    $string['tablayoutpage4'] = 'Relazioni';
+$string['tabtoolsname'] = 'Strumenti';
+    $string['tabtoolspage1'] = 'Importazione';
+    $string['tabtoolspage2'] = 'Esportazione';
+$string['tabreportname'] = 'Report';
 $string['tabutemplatename'] = 'Template utente';
     $string['tabutemplatepage1'] = 'Gestione';
     $string['tabutemplatepage2'] = 'Salva';
@@ -63,6 +67,7 @@ $string['abandoned_submission_deleted'] = 'Eliminata risposta abbandonata';
 $string['addnewsubmission'] = 'Nuova risposta';
 $string['answerisnoanswer'] = 'Risposta rifiutata';
 $string['answernotsubmitted'] = 'Risposta omessa';
+$string['apply'] = 'Applica';
 $string['applymastertemplates'] = '<a href="{$a}">Applica un master template</a>';
 $string['applyusertemplates'] = '<a href="{$a}">Applica un template utente</a>';
 $string['attemptinfo'] = 'Informazioni sull\'indagine e le risposte acquisite';
@@ -76,10 +81,15 @@ $string['content'] = 'Contentuto';
 $string['count_allitems'] = 'Questionario costituito da {$a} elementi.';
 $string['count_hiddenitems'] = '({$a} nascosti)';
 $string['count_pages'] = 'Distribuito su {$a} pagine.';
+$string['currentcategory'] = 'Questa categoria di corso';
+$string['currentcourse'] = 'Questo corso';
+$string['currentuser'] = 'Solo per me';
 $string['customnumber_help'] = 'Definisce un numero personalizzato per l\'elemento. Può essere un numero intero come "1" o una qualunque altra scelta come, per esempio: 1a, A, 1.1.a, #1, A, A.1... Si consideri la coerenza della numerazione è lasciata alla tua responsabilità. Per questo, si faccia sempre una doppia verifica qualora si scegliesse di modificare l\'ordine delle domande.';
 $string['customnumber'] = 'Numero dell\'elemento';
-$string['deleteallitems'] = 'Elimina tutti gli elementi';
+$string['deleteallitems'] = 'Cancella tutti gli elementi';
 $string['deleteallsubmissions'] = 'Cancella tutte le risposte';
+$string['deletehiddenitems'] = 'Cancella gli elementi nascosti';
+$string['deletevisibleitems'] = 'Cancella gli elementi visibili';
 $string['downloadpdf'] = 'Scarica in pdf';
 $string['downloadtocsv'] = 'valori separati da virgola';
 $string['downloadtotsv'] = 'valori separati da tabulatore';
@@ -117,6 +127,7 @@ $string['gotolist'] = 'Mostra la lista';
 $string['hassubmissions_alert_activitycompletion'] = '<br />La modifica degli elementi del sondaggio cambierà anche lo stato di completamento dell\'attività.<br />Sei stato avvisato.';
 $string['hassubmissions_alert'] = 'Questo sondaggio è stato già compilato almeno una volta.<br />Si procedera con estrema cautela e si apportino solo modifiche neutre per non compromettere la validità dell\'intero sondaggio.<br /><br />ATTENZIONE: Aggiungendo un nuovo elemento lo stato di ogni risposta già inviata verrà forzato a "in corso".';
 $string['hassubmissions_danger'] = '<br />Le risposte "in corso"...<ul><li>sono soggette a cancellazione in 4 ore se la pausa/ripresa non è consentita;</li><li>sono soggette a cancellazione nel numero di ore impostato nelle impostazioni di surveypro se la pausa/ripresa è consentita.</li></ul>';
+$string['hideallitems'] = 'Nascondi tutti gli elementi';
 $string['hidden_help'] = 'Nascondi questa domanda qualora sia ancora in fase di definizione o, comunque, non ancora pronta per comparire regolarmente nel questionario.';
 $string['hidden'] = 'Nascosta';
 $string['hideinstructions_help'] = 'Nasconde o mostra le istruzioni di compilazione. Queste indirizzano l\'utente a fornire la risposta attesa riducendo il tempo necesario alla compilazione del questionario.';
@@ -134,11 +145,11 @@ $string['manageusertemplates'] = '<a href="{$a}">Gestisci i template utente</a>'
 $string['maxentries'] = 'Numero massimo di risposte consentite';
 $string['nextformpage'] = 'Pagina successiva >>';
 $string['noanswer'] = 'Nessuna risposta';
-$string['noitemsfoundadmin'] = 'Questa indagine non contiene domande. Si usi il comando "{$a}" per aggiungerne qualcuna.';
+$string['noitemsfoundadmin'] = 'Questa indagine non contiene domande. Si usi la scheda "{$a}" per aggiungerne qualcuna.';
 $string['nomoreitems'] = 'In base alle risposte fornite non ci sono ulteriori domande da sottoporre.<br />Il tuo contributo è completo. Non ti resta che inviarlo{$a}.';
 $string['nomoresubmissionsallowed'] = 'Il massimo numero di {$a} risposte è stato raggiunto.<br />Non sono consentite nuove risposte';
 $string['note'] = 'Nota:';
-$string['onlyfinalizationallowed'] = ' ma solo la chiusura di quelle ancora "{$a->inprogress}" attraverso la pagina "{$a->tabsubmissionspage2}".';
+$string['onlyfinalizationallowed'] = ' ma solo la chiusura di quelle ancora "{$a->inprogress}" attraverso la pagina "{$a->tabdataentrypage2}".';
 $string['onlyreview'] = ' o rivederlo';
 $string['opened'] = 'Data di apertura';
 $string['outputstyle'] = 'Stile del file';
@@ -178,6 +189,7 @@ $string['revieworpause'] = ', rivederlo o metterlo in pausa';
 $string['runreport'] = '<a href="{$a->href}">Esegui il report {$a->reportname}</a>';
 $string['savemastertemplates'] = '<a href="{$a}">Salva un master template</a>';
 $string['saveusertemplates'] = '<a href="{$a}">Salva il template utente</a>';
+$string['showallitems'] = 'Mostra tutti gli elementi';
 $string['sortindex'] = 'Ordinamento';
 $string['statusclosed'] = 'chiusa';
 $string['statusinprogress'] = 'in corso';

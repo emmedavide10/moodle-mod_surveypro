@@ -23,7 +23,6 @@ Feature: include custom numbers into element question/content
       | field | boolean |
     And I log in as "teacher1"
     And I am on "Verify custom numbers" course homepage
-    And I follow "Verify custom numbers"
     And I follow "VerifyCN survey"
     And I follow "Layout"
     And I follow "edit_item_1"

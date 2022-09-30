@@ -18,7 +18,7 @@
  * Starting page for layout preview.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,11 +35,11 @@ $s = optional_param('s', 0, PARAM_INT);   // Surveypro instance id.
 
 if (!empty($id)) {
     $cm = get_coursemodule_from_id('surveypro', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
 } else {
-    $surveypro = $DB->get_record('surveypro', array('id' => $s), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $surveypro->course), '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $s], '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $surveypro->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('surveypro', $surveypro->id, $course->id, false, MUST_EXIST);
 }
 $cm = cm_info::create($cm);
@@ -47,7 +47,6 @@ $cm = cm_info::create($cm);
 $submissionid = optional_param('submissionid', 0, PARAM_INT);
 $formpage = optional_param('formpage', 1, PARAM_INT); // Form page number.
 $overflowpage = optional_param('overflowpage', 0, PARAM_INT); // Went the user to a overflow page?
-$edit = optional_param('edit', -1, PARAM_BOOL);
 
 require_course_login($course, false, $cm);
 $context = \context_module::instance($cm->id);
@@ -62,7 +61,7 @@ $utilitylayoutman = new utility_layout($cm, $surveypro);
 $utilitylayoutman->add_custom_css();
 
 // Begin of: define $user_form return url.
-$paramurl = array('id' => $cm->id);
+$paramurl = ['id' => $cm->id];
 $formurl = new \moodle_url('/mod/surveypro/layout_preview.php', $paramurl);
 // End of: define $user_form return url.
 
@@ -77,12 +76,12 @@ $formparams->formpage = $formpage; // The page of the form to select subset of f
 $formparams->userfirstpage = $previewman->get_userfirstpage(); // The user first page
 $formparams->userlastpage = $previewman->get_userlastpage(); // The user last page
 $formparams->overflowpage = $overflowpage; // Went the user to a overflow page?
-$formparams->tabpage = SURVEYPRO_LAYOUT_PREVIEW; // This is the page of the TAB-PAGE structure.
+$formparams->view = SURVEYPRO_PREVIEW; // This is the page of the TAB-PAGE structure.
 $formparams->readonly = false;
 $formparams->preview = true;
 // End of: prepare params for the form.
 
-$userform = new userform($formurl, $formparams, 'post', '', array('id' => 'userentry'));
+$userform = new userform($formurl, $formparams, 'post', '', ['id' => 'userentry']);
 
 // Begin of: manage form submission.
 if ($data = $userform->get_data()) {
@@ -111,7 +110,7 @@ if ($data = $userform->get_data()) {
 // End of: manage form submission.
 
 // Output starts here.
-$paramurl = array('s' => $surveypro->id);
+$paramurl = ['s' => $surveypro->id];
 if (!empty($submissionid)) {
     $paramurl['submissionid'] = $submissionid;
 }
@@ -121,31 +120,11 @@ $PAGE->set_context($context);
 $PAGE->set_cm($cm);
 $PAGE->set_title($surveypro->name);
 $PAGE->set_heading($course->shortname);
-if (($edit != -1) and $PAGE->user_allowed_editing()) {
-    $USER->editing = $edit;
-}
-if ($PAGE->user_allowed_editing()) {
-    // Change URL parameter and block display string value depending on whether editing is enabled or not
-    if ($PAGE->user_is_editing()) {
-        $urlediting = 'off';
-        $strediting = get_string('blockseditoff');
-    } else {
-        $urlediting = 'on';
-        $strediting = get_string('blocksediton');
-    }
-    $url = new \moodle_url($CFG->wwwroot.'/mod/surveypro/layout_preview.php', ['id' => $cm->id, 'edit' => $urlediting]);
-    $PAGE->set_button($OUTPUT->single_button($url, $strediting));
-}
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($surveypro->name), 2, null);
 
-// Render the activity information.
-$completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
-$activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
-echo $OUTPUT->activity_information($cm, $completiondetails, $activitydates);
-
-new tabs($cm, $context, $surveypro, SURVEYPRO_TABLAYOUT, SURVEYPRO_LAYOUT_PREVIEW);
+$tab = new tabs($cm, $context, $surveypro);
+$tab->draw_pages_bar(SURVEYPRO_TABLAYOUT, 'preview_page');
 
 $previewman->noitem_stopexecution();
 $previewman->message_preview_mode();

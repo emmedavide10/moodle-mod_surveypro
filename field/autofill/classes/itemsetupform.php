@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyprofield_autofill
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/autofill/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyprofield_autofill
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -62,7 +62,7 @@ class itemsetupform extends itemsetupbaseform {
             $index = sprintf('%02d', $i);
             $fieldname = 'element'.$index;
 
-            $elementgroup = array();
+            $elementgroup = [];
             $elementgroup[] = $mform->createElement('selectgroups', $fieldname.'select', '', $options);
             $elementgroup[] = $mform->createElement('text', $fieldname.'text', '');
             $mform->addGroup($elementgroup, $fieldname.'_group', get_string($fieldname, 'surveyprofield_autofill'), ' ', false);

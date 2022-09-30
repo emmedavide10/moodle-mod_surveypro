@@ -89,11 +89,11 @@ Feature: test the use of textarea setup form
     And I follow "edit_item_2"
     And I expand all fieldsets
     And I set the following fields to these values:
-      | Element number                 | II.b                                  |
-      | Hide filling instruction       | 1                                     |
-      | Variable                       | T2                                    |
-      | Use html editor                | 0                                     |
-      | Additional note                | One more additional note              |
+      | Element number                 | II.b                     |
+      | Hide filling instruction       | 1                        |
+      | Variable                       | T2                       |
+      | Use html editor                | 0                        |
+      | Additional note                | One more additional note |
     And I press "Save as new"
     And I follow "Preview" page in tab bar
     Then I should see "II.b: Write a short description of yourself"

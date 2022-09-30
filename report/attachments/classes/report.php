@@ -18,7 +18,7 @@
  * Surveypro class to manage attachment overview report
  *
  * @package   surveyproreport_attachments
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->libdir.'/tablelib.php');
  * The class to manage attachment overview report.
  *
  * @package   surveyproreport_attachments
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report extends reportbase {
@@ -45,15 +45,57 @@ class report extends reportbase {
     public $outputtable = null;
 
     /**
-     * Return if this report applies.
-     *
-     * true means: the report applies
-     * empty($this->surveypro->anonymous) means that reports applies ONLY IF the survey is not anonymous
-     *
-     * @return boolean
+     * @var int ID of the user related to report details
      */
-    public function report_apply() {
-        return (empty($this->surveypro->anonymous));
+    public $userid;
+
+    /**
+     * @var int ID of the item related to report details
+     */
+    public $itemid;
+
+    /**
+     * @var int ID of the saved suryey_submission
+     */
+    public $submissionid;
+
+    /**
+     * Class constructor.
+     *
+     * @param object $cm
+     * @param object $context
+     * @param object $surveypro
+     */
+    public function __construct($cm, $context, $surveypro) {
+        parent::__construct($cm, $context, $surveypro);
+    }
+
+    /**
+     * Returns if this report was created for student too.
+     *
+     * @return boolean false
+     */
+    public function has_studentreport() {
+        return false;
+    }
+
+    /**
+     * Does the current report apply to the passed mastertemplates?
+     *
+     * @param string $mastertemplate
+     * @return void
+     */
+    public function report_applies_to($mastertemplate) {
+        return true;
+    }
+
+    /**
+     * Get if this report displays user names.
+     *
+     * @return boolean false
+     */
+    public function has_visibleusernames() {
+        return true;
     }
 
     /**
@@ -62,20 +104,20 @@ class report extends reportbase {
     public function setup_outputtable() {
         $this->outputtable = new \flexible_table('attachmentslist');
 
-        $paramurl = array('id' => $this->cm->id);
+        $paramurl = ['id' => $this->cm->id];
         if ($this->groupid) {
             $paramurl['groupid'] = $this->groupid;
         }
         $baseurl = new \moodle_url('/mod/surveypro/report/attachments/view.php', $paramurl);
         $this->outputtable->define_baseurl($baseurl);
 
-        $tablecolumns = array();
+        $tablecolumns = [];
         $tablecolumns[] = 'picture';
         $tablecolumns[] = 'fullname';
         $tablecolumns[] = 'uploads';
         $this->outputtable->define_columns($tablecolumns);
 
-        $tableheaders = array();
+        $tableheaders = [];
         $tableheaders[] = '';
         $tableheaders[] = get_string('fullname');
         $tableheaders[] = get_string('uploads', 'surveyproreport_attachments');
@@ -130,16 +172,16 @@ class report extends reportbase {
         $usersubmissions = $DB->get_recordset_sql($sql, $whereparams);
 
         foreach ($usersubmissions as $usersubmission) {
-            $tablerow = array();
+            $tablerow = [];
 
             // Picture.
-            $tablerow[] = $OUTPUT->user_picture($usersubmission, array('courseid' => $COURSE->id));
+            $tablerow[] = $OUTPUT->user_picture($usersubmission, ['courseid' => $COURSE->id]);
 
             // User fullname.
             $userfullname = fullname($usersubmission);
-            $paramurl = array('id' => $usersubmission->id);
+            $paramurl = ['id' => $usersubmission->id];
             $url = new \moodle_url('/user/view.php', $paramurl);
-            $cellcontent = \html_writer::start_tag('a', array('title' => $userfullname, 'href' => $url));
+            $cellcontent = \html_writer::start_tag('a', ['title' => $userfullname, 'href' => $url]);
             $cellcontent .= $userfullname;
             $cellcontent .= \html_writer::end_tag('a');
             $cellcontent .= ' [id: '.$usersubmission->id.']';
@@ -148,12 +190,12 @@ class report extends reportbase {
 
             // Users with $usersubmission->submissionid == null have no submissions.
             if (!empty($usersubmission->submissionid)) {
-                $paramurl = array();
+                $paramurl = [];
                 $paramurl['s'] = $this->surveypro->id;
                 $paramurl['container'] = $usersubmission->id.'_'.$usersubmission->submissionid;
                 $url = new \moodle_url('/mod/surveypro/report/attachments/uploads.php', $paramurl);
                 $cellcontent = '('.$submissionidstr.': '.$usersubmission->submissionid.')&nbsp;';
-                $cellcontent .= \html_writer::start_tag('a', array('title' => $displayuploadsstr, 'href' => $url));
+                $cellcontent .= \html_writer::start_tag('a', ['title' => $displayuploadsstr, 'href' => $url]);
                 $cellcontent .= s($displayuploadsstr);
                 $cellcontent .= \html_writer::end_tag('a');
                 $tablerow[] = $cellcontent;
@@ -171,13 +213,13 @@ class report extends reportbase {
     /**
      * Get_submissions_sql
      *
-     * @return array($sql, $whereparams);
+     * @return [$sql, $whereparams];
      */
     public function get_submissions_sql() {
         global $COURSE, $DB;
 
         $userfieldsapi = \core_user\fields::for_userpic()->get_sql('u');
-        $whereparams = array();
+        $whereparams = [];
         $sql = 'SELECT s.id as submissionid'.$userfieldsapi->selects.'
                 FROM {user} u
                 JOIN {surveypro_submission} s ON s.userid = u.id';
@@ -191,7 +233,7 @@ class report extends reportbase {
             $sql .= ' ORDER BY u.lastname ASC, submissionid ASC';
         }
 
-        return array($sql, $whereparams);
+        return [$sql, $whereparams];
     }
 
     /**
@@ -211,7 +253,7 @@ class report extends reportbase {
     public function check_attachmentitems() {
         global $OUTPUT, $DB;
 
-        $params = array();
+        $params = [];
         $params['surveyproid'] = $this->surveypro->id;
         $params['plugin'] = 'fileupload';
         $attachmentitems = $DB->count_records('surveypro_item', $params);
@@ -225,13 +267,134 @@ class report extends reportbase {
     }
 
     /**
-     * Prevent direct user input.
+     * Set user id.
      *
+     * @param string $userid
      * @return void
      */
-    public function prevent_direct_user_input() {
-        if (!empty($this->surveypro->anonymous)) {
-            throw new \moodle_exception('incorrectaccessdetected', 'mod_surveypro');
+    public function set_userid($userid) {
+        $this->userid = $userid;
+    }
+
+    /**
+     * Set item id.
+     *
+     * @param string $itemid
+     * @return void
+     */
+    public function set_itemid($itemid) {
+        $this->itemid = $itemid;
+    }
+
+    /**
+     * Set submission id.
+     *
+     * @param string $submissionid
+     * @return void
+     */
+    public function set_submissionid($submissionid) {
+        $this->submissionid = $submissionid;
+    }
+
+    /**
+     * Display details of attachments for a given user and submission.
+     *
+     * @param int $submissionid
+     * @param int $itemid
+     * @return void
+     */
+    public function display_attachments($submissionid, $itemid) {
+        global $CFG, $DB, $OUTPUT;
+
+        $nofilesfound = get_string('nofilesfound', 'surveyproreport_attachments');
+
+        $submission = $DB->get_record('surveypro_submission', ['id' => $submissionid], '*', MUST_EXIST);
+        $user = $DB->get_record('user', ['id' => $submission->userid], '*', MUST_EXIST);
+
+        $layout = <<<EOS
+<div class="mform">
+    <!-- <fieldset class="hidden"> -->
+        <div>
+            <div class="fitem">
+                <div class="fitemtitle">
+                    <div class="fstaticlabel">
+                        <label>
+                            <strong>@@left@@</strong>
+                        </label>
+                    </div>
+                </div>
+                <div class="mod-indent info-indent-1">
+                </div>
+                <div class="felement fstatic info-indent">
+                    @@right@@
+                </div>
+            </div>
+        </div>
+    <!-- </fieldset> -->
+</div>
+EOS;
+
+        $left = get_string('fullnameuser');
+        $right = fullname($user);
+        if (isset($CFG->forcefirstname) || isset($CFG->forcelastname)) {
+            $right .= ' - id: '.$user->id;
         }
+        $output = str_replace('@@left@@', $left, $layout);
+        $output = str_replace('@@right@@', $right, $output);
+
+        $left = get_string('submissioninfo', 'surveyproreport_attachments');
+        $right = get_string('submissionid', 'surveyproreport_attachments').': '.$submission->id.'<br />';
+        $right .= get_string('timecreated', 'mod_surveypro').': '.userdate($submission->timecreated).'<br />';
+        if ($submission->timemodified) {
+            $right .= get_string('timemodified', 'mod_surveypro').': '.userdate($submission->timemodified);
+        } else {
+            $right .= get_string('timemodified', 'mod_surveypro').': '.get_string('never');
+        }
+
+        $output .= str_replace('@@left@@', $left, $layout);
+        $output = str_replace('@@right@@', $right, $output);
+
+        $whereparams = ['submissionid' => $submissionid, 'plugin' => 'fileupload'];
+        $sql = 'SELECT i.id, a.id as answerid, fu.content
+                FROM {surveypro_item} i
+                  JOIN {surveypro_answer} a ON a.itemid = i.id
+                  JOIN {surveyprofield_fileupload} fu ON fu.itemid = a.itemid
+                WHERE i.plugin = :plugin
+                  AND a.submissionid = :submissionid';
+        if ($itemid) {
+            $sql .= ' AND i.id = :itemid ';
+            $whereparams['itemid'] = $itemid;
+        }
+        $sql .= ' ORDER BY i.sortindex';
+
+        $items = $DB->get_records_sql($sql, $whereparams);
+
+        $fs = get_file_storage();
+        $component = 'surveyprofield_fileupload';
+        $filearea = 'fileuploadfiles';
+        foreach ($items as $item) {
+            if ($files = $fs->get_area_files($this->context->id, $component, $filearea, $item->answerid, 'timemodified', false)) {
+                foreach ($files as $file) {
+                    $filename = $file->get_filename();
+                    $iconimage = $OUTPUT->pix_icon(file_file_icon($file, 80), get_mimetype_description($file));
+
+                    $path = '/'.$this->context->id.'/surveyprofield_fileupload/'.$filearea.'/'.$item->answerid.'/'.$filename;
+                    $url = file_encode_url($CFG->wwwroot.'/pluginfile.php', $path);
+
+                    $left = $item->content;
+                    $right = '<a href="'.$url.'">'.$iconimage.'</a>';
+                    $right .= '<a href="'.$url.'">'.s($filename).'</a>';
+                    $output .= str_replace('@@left@@', $left, $layout);
+                    $output = str_replace('@@right@@', $right, $output);
+                }
+            } else {
+                $left = $item->content;
+                $right = $nofilesfound;
+                $output .= str_replace('@@left@@', $left, $layout);
+                $output = str_replace('@@right@@', $right, $output);
+            }
+        }
+
+        echo $output;
     }
 }

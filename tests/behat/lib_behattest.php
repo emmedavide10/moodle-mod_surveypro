@@ -18,7 +18,7 @@
  * Surveypro behat test library
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,12 +38,12 @@ function get_dummy_contents($type, $plugin) {
     $return->pluginid = 0;
     $return->type = $type;
     $return->plugin = $plugin;
-    $return->content_editor = array();
+    $return->content_editor = [];
     $return->content_editor['format'] = 1;
     $return->parentid = 0;
     $return->parentcontent = '';
 
-    if ($type == SURVEYPRO_TYPEFIELD) {
+    if ($type == 'field') {
         if ($plugin == 'age') {
             $return->content_editor['text'] = 'How old were you when you learned to ride a bike?';
             $return->contentformat = 1;
@@ -287,7 +287,7 @@ function get_dummy_contents($type, $plugin) {
         }
     }
 
-    if ($type == SURVEYPRO_TYPEFORMAT) {
+    if ($type == 'format') {
         if ($plugin == 'label') {
             $return->content_editor['text'] = 'Welcome to this new instance of surveypro';
             $return->indent = 0;

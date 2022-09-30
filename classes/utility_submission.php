@@ -18,7 +18,7 @@
  * Surveypro utility class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ use mod_surveypro\utility_submission;
  * The utility class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utility_submission {
@@ -62,7 +62,7 @@ class utility_submission {
         $this->cm = $cm;
         $this->context = \context_module::instance($cm->id);
         if (empty($surveypro)) {
-            $surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+            $surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
         }
         $this->surveypro = $surveypro;
     }
@@ -78,7 +78,7 @@ class utility_submission {
         global $DB;
 
         if (empty($whereparams)) {
-            $whereparams = array();
+            $whereparams = [];
         }
         // Just in case the call is missing the surveypro id, I add it.
         if (!array_key_exists('surveyproid', $whereparams)) {
@@ -128,7 +128,7 @@ class utility_submission {
     public function get_used_plugin_list($type='') {
         global $DB;
 
-        $whereparams = array();
+        $whereparams = [];
         $sql = 'SELECT plugin
                 FROM {surveypro_item}
                 WHERE surveyproid = :surveyproid';
@@ -158,7 +158,7 @@ class utility_submission {
             $userid = $USER->id;
         }
 
-        $groupusers = array();
+        $groupusers = [];
         if ($currentgroups = groups_get_all_groups($COURSE->id, $USER->id, $cm->groupingid)) {
             foreach ($currentgroups as $currentgroup) {
                 $groupusers += groups_get_members($currentgroup->id, 'u.id');

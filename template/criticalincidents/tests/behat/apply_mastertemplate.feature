@@ -21,7 +21,7 @@ Feature: apply CI mastertemplate
     And I am on "To apply mastertemplate" course homepage
 
   @javascript
-  Scenario: apply Critical Incidents master template
+  Scenario: apply Critical Incidents mastertemplate
     Given I follow "To apply Critical Incidents"
     And I set the field "Master templates" to "Critical Incidents"
     And I press "Apply"

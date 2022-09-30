@@ -18,7 +18,7 @@
  * Surveypro formbase class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ use mod_surveypro\utility_layout;
  * The base class representing the commom part of the item form
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class formbase {
@@ -252,13 +252,11 @@ class formbase {
         $canaccessreserveditems = has_capability('mod/surveypro:accessreserveditems', $this->context);
 
         $utilitylayoutman = new utility_layout($this->cm, $this->surveypro);
-        if (!$utilitylayoutman->layout_has_items(0, SURVEYPRO_TYPEFIELD, false, $canaccessreserveditems)) {
+        if (!$utilitylayoutman->has_items(0, 'field', false, $canaccessreserveditems)) {
             $canmanageitems = has_capability('mod/surveypro:manageitems', $this->context);
 
             if ($canmanageitems) {
-                $a = get_string('tablayoutname', 'mod_surveypro');
-                $a .= ' > ';
-                $a .= get_string('tabitemspage2', 'mod_surveypro');
+                $a = get_string('tablayoutpage2', 'mod_surveypro');
                 $message = get_string('noitemsfoundadmin', 'mod_surveypro', $a);
                 echo $OUTPUT->notification($message, 'notifyproblem');
             } else {
@@ -266,7 +264,7 @@ class formbase {
                 $message = get_string('noitemsfound', 'mod_surveypro');
                 echo $OUTPUT->container($message, 'notifyproblem');
 
-                $continueurl = new \moodle_url('/course/view.php', array('id' => $COURSE->id));
+                $continueurl = new \moodle_url('/course/view.php', ['id' => $COURSE->id]);
                 echo $OUTPUT->continue_button($continueurl);
             }
 
@@ -283,7 +281,7 @@ class formbase {
     public function get_prefill_data() {
         global $DB;
 
-        $prefill = array();
+        $prefill = [];
         if (empty($this->submissionid)) {
             return $prefill;
         }
@@ -291,12 +289,12 @@ class formbase {
         $canaccessreserveditems = has_capability('mod/surveypro:accessreserveditems', $this->context);
         $id = $this->surveypro->id;
         $page = $this->formpage;
-        list($where, $params) = surveypro_fetch_items_seeds($id, true, $canaccessreserveditems, null, SURVEYPRO_TYPEFIELD, $page);
+        list($where, $params) = surveypro_fetch_items_seeds($id, true, $canaccessreserveditems, null, 'field', $page);
         if ($itemseeds = $DB->get_recordset_select('surveypro_item', $where, $params, 'sortindex', 'id, type, plugin')) {
             foreach ($itemseeds as $itemseed) {
                 $item = surveypro_get_item($this->cm, $this->surveypro, $itemseed->id, $itemseed->type, $itemseed->plugin);
 
-                $where = array('submissionid' => $this->submissionid, 'itemid' => $item->get_itemid());
+                $where = ['submissionid' => $this->submissionid, 'itemid' => $item->get_itemid()];
                 $olduserdata = $DB->get_record('surveypro_answer', $where);
                 $singleprefill = $item->userform_set_prefill($olduserdata);
                 $prefill = array_merge($prefill, $singleprefill);

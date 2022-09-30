@@ -18,7 +18,7 @@
  * Surveypro surveyproformat info class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ use core\plugininfo\base, core_plugin_manager, moodle_url;
  * The mod_surveypro format plugin class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class surveyproformat extends base {
@@ -45,9 +45,9 @@ class surveyproformat extends base {
 
         $plugins = core_plugin_manager::instance()->get_installed_plugins('surveyproformat');
         if (!$plugins) {
-            return array();
+            return [];
         }
-        $installed = array();
+        $installed = [];
         foreach ($plugins as $plugin => $version) {
             $installed[] = 'surveyproformat_'.$plugin;
         }
@@ -62,7 +62,7 @@ class surveyproformat extends base {
             unset($plugins[$name]);
         }
 
-        $enabled = array();
+        $enabled = [];
         foreach ($plugins as $plugin => $version) {
             $enabled[$plugin] = $plugin;
         }
@@ -78,7 +78,7 @@ class surveyproformat extends base {
     public function is_uninstall_allowed() {
         global $DB;
 
-        return !$DB->record_exists('surveypro_item', array('type' => 'format', 'plugin' => $this->name));
+        return !$DB->record_exists('surveypro_item', ['type' => 'format', 'plugin' => $this->name]);
     }
 
     /**
@@ -87,7 +87,7 @@ class surveyproformat extends base {
      * @return moodle_url
      */
     public static function get_manage_url() {
-        return new \moodle_url('/mod/surveypro/adminmanageplugins.php', array('subtype' => 'surveyproformat'));
+        return new \moodle_url('/mod/surveypro/adminmanageplugins.php', ['subtype' => 'surveyproformat']);
     }
 
     /**

@@ -18,7 +18,7 @@
  * The utility_mform class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace mod_surveypro;
  * The class managing mform classes
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utility_mform {
@@ -42,11 +42,11 @@ class utility_mform {
         global $CFG;
 
         $basepath = $CFG->dirroot.'/mod/surveypro';
-        $types = array(SURVEYPRO_TYPEFIELD, SURVEYPRO_TYPEFORMAT);
 
+        $types = ['field', 'format'];
         foreach ($types as $type) {
-            $plugins = surveypro_get_plugin_list($type);
-            foreach ($plugins as $plugin) {
+            $plugins = \core_component::get_plugin_list('surveypro'.$type);
+            foreach ($plugins as $plugin => $unused) {
                 $filepath = $basepath.'/'.$type.'/'.$plugin.'/mform';
                 if (file_exists($filepath) && is_dir($filepath)) {
                     $classfiles = scandir($filepath);

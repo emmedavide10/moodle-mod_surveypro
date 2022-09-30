@@ -18,7 +18,7 @@
  * The class representing the form to choose the item to create
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * The class representing the form to choose the item to create
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemchooser extends \moodleform {
@@ -45,30 +45,31 @@ class itemchooser extends \moodleform {
     public function definition() {
         $mform = $this->_form;
 
-        // Selectitem: plugin.
         $fieldname = 'typeplugin';
-        // Take care! Here the plugin holds type and plugin both.
-        $fieldplugins = surveypro_get_plugin_list(SURVEYPRO_TYPEFIELD, true);
-        foreach ($fieldplugins as $k => $v) {
-            $fieldplugins[$k] = get_string('userfriendlypluginname', 'surveyprofield_'.$v);
+        $items = [];
+
+        // Fields plugin.
+        $plugins = \core_component::get_plugin_list('surveyprofield');
+        $elements = [];
+        foreach ($plugins as $plugin => $unused) {
+            $elements['field_'.$plugin] = get_string('userfriendlypluginname', 'surveyprofield_'.$plugin);
         }
-        asort($fieldplugins);
+        asort($elements);
+        $items[get_string('typefield', 'mod_surveypro')] = $elements;
 
-        $formatplugins = surveypro_get_plugin_list(SURVEYPRO_TYPEFORMAT, true);
-        foreach ($formatplugins as $k => $v) {
-            $formatplugins[$k] = get_string('userfriendlypluginname', 'surveyproformat_'.$v);
+        // Format plugin.
+        $plugins = \core_component::get_plugin_list('surveyproformat');
+        $elements = [];
+        foreach ($plugins as $plugin => $unused) {
+            $elements['format_'.$plugin] = get_string('userfriendlypluginname', 'surveyproformat_'.$plugin);
         }
-        asort($formatplugins);
+        asort($elements);
+        $items[get_string('typeformat', 'mod_surveypro')] = $elements;
 
-        $pluginlist = array(get_string('typefield', 'mod_surveypro') => $fieldplugins,
-                            get_string('typeformat', 'mod_surveypro') => $formatplugins);
-
-        $elementgroup = array();
-        $elementgroup[] = $mform->createElement('selectgroups', $fieldname, '', $pluginlist);
-        // $attributes = array('id' => 'type_plugin', 'class' => 'autosubmit ignoredirty');
-        // $elementgroup[] = $mform->createElement('selectgroups', $fieldname, '', $pluginlist, $attributes);
+        $elementgroup = [];
+        $elementgroup[] = $mform->createElement('selectgroups', $fieldname, '', $items);
         $elementgroup[] = $mform->createElement('submit', $fieldname.'_button', get_string('add'));
-        $mform->addGroup($elementgroup, $fieldname.'_group', get_string($fieldname, 'mod_surveypro'), array(' '), false);
+        $mform->addGroup($elementgroup, $fieldname.'_group', get_string($fieldname, 'mod_surveypro'), [' '], false);
         $mform->addHelpButton($fieldname.'_group', $fieldname, 'surveypro');
     }
 }

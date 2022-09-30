@@ -18,7 +18,7 @@
  * The searchmanager class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ use mod_surveypro\utility_item;
  * The class managing the search form for users
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class view_search {
@@ -76,7 +76,7 @@ class view_search {
      * @return mixed $searchquery if a search was requested, void otherwise
      */
     public function get_searchparamurl() {
-        $itemhelperinfo = array();
+        $itemhelperinfo = [];
         foreach ($this->formdata as $elementname => $content) {
             if ($matches = utility_item::get_item_parts($elementname)) {
                 // With the introduction of interactive fieldset...
@@ -85,7 +85,7 @@ class view_search {
                 // Drop them out.
                 $condition = false;
                 $condition = $condition || ($matches['prefix'] == SURVEYPRO_DONTSAVEMEPREFIX);
-                $condition = $condition || ($matches['type'] == SURVEYPRO_TYPEFORMAT);
+                $condition = $condition || ($matches['type'] == 'format');
                 if ($condition) {
                     // Multiselect are always submitted because, at least, they have SURVEYPRO_IGNOREMEVALUE.
                     continue;
@@ -106,7 +106,7 @@ class view_search {
             }
         }
 
-        $searchfields = array();
+        $searchfields = [];
         foreach ($itemhelperinfo as $iteminfo) {
             if (isset($iteminfo->contentperelement['ignoreme'])) {
                 if ($iteminfo->contentperelement['ignoreme']) {

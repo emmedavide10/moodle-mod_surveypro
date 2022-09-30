@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_numeric
  *
  * @package   surveyprofield_numeric
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/numeric/lib.php');
  * Class to manage each aspect of the numeric item
  *
  * @package   surveyprofield_numeric
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -141,7 +141,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'numeric';
 
         // Override the list of fields using format, whether needed.
@@ -310,8 +310,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote'];
 
         return $fieldlist;
     }
@@ -375,19 +375,11 @@ EOS;
     public function userform_mform_element($mform, $searchform, $readonly) {
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
         $starstr = get_string('star', 'mod_surveypro');
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_numeric_'.$this->sortindex;
 
-        $attributes = array();
+        $attributes = [];
         $attributes['id'] = $idprefix;
         $attributes['class'] = 'indent-'.$this->indent.' numeric_text';
 
@@ -411,7 +403,7 @@ EOS;
                 $mform->_required[] = $starplace;
             }
         } else {
-            $elementgroup = array();
+            $elementgroup = [];
             $elementgroup[] = $mform->createElement('text', $this->itemname, '', $attributes);
             $mform->setType($this->itemname, PARAM_RAW);
 
@@ -503,7 +495,7 @@ EOS;
 
         $haslowerbound = (strlen($this->lowerbound));
         $hasupperbound = (strlen($this->upperbound));
-        $arrayinstruction = array();
+        $arrayinstruction = [];
 
         if (!empty($this->signed)) {
             $arrayinstruction[] = get_string('restriction_hassign', 'surveyprofield_numeric');
@@ -580,7 +572,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -600,7 +592,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         $elementnames[] = $this->itemname;
 
         return $elementnames;

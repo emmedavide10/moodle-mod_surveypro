@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_rate
  *
  * @package   surveyprofield_rate
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/rate/lib.php');
  * Class to manage each aspect of the rate item
  *
  * @package   surveyprofield_rate
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -147,7 +147,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'rate';
 
         // Override the list of fields using format, whether needed.
@@ -200,7 +200,7 @@ class item extends itembase {
         // Begin of: plugin specific settings (eventually overriding general ones).
         // Set custom fields value as defined for this question plugin.
         // Drop empty rows and trim edging rows spaces from each textarea field.
-        $fieldlist = array('options', 'rates', 'defaultvalue');
+        $fieldlist = ['options', 'rates', 'defaultvalue'];
         $this->item_clean_textarea_fields($record, $fieldlist);
 
         // Set custom fields value as defined for this question plugin.
@@ -260,7 +260,7 @@ class item extends itembase {
 
         // 3. Set values corresponding to checkboxes.
         // Take care: 'required', 'trimonsave', 'hideinstructions' were already considered in get_common_settings.
-        $checkboxes = array('hideinstructions', 'differentrates');
+        $checkboxes = ['hideinstructions', 'differentrates'];
         foreach ($checkboxes as $checkbox) {
             $record->{$checkbox} = (isset($record->{$checkbox})) ? 1 : 0;
         }
@@ -294,7 +294,7 @@ class item extends itembase {
      * @return array of downloadformats
      */
     public function get_downloadformats() {
-        $options = array();
+        $options = [];
 
         $options[SURVEYPRO_ITEMSRETURNSVALUES] = get_string('returnvalues', 'surveyprofield_rate');
         $options[SURVEYPRO_ITEMRETURNSLABELS] = get_string('returnlabels', 'surveyprofield_rate');
@@ -318,8 +318,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote', 'options', 'rates', 'defaultvalue');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote', 'options', 'rates', 'defaultvalue'];
 
         return $fieldlist;
     }
@@ -395,18 +395,18 @@ EOS;
 
         if (($this->defaultoption == SURVEYPRO_INVITEDEFAULT)) {
             if ($this->style == SURVEYPROFIELD_RATE_USERADIO) {
-                $rates += array(SURVEYPRO_INVITEVALUE => get_string('choosedots'));
+                $rates += [SURVEYPRO_INVITEVALUE => get_string('choosedots')];
             } else {
-                $rates = array(SURVEYPRO_INVITEVALUE => get_string('choosedots')) + $rates;
+                $rates = [SURVEYPRO_INVITEVALUE => get_string('choosedots')] + $rates;
             }
         }
 
-        $attributes = array();
+        $attributes = [];
         if ($this->style == SURVEYPROFIELD_RATE_USERADIO) {
             foreach ($options as $row => $option) {
                 $attributes['class'] = 'indent-'.$this->indent.' rate_radio';
                 $uniquename = $this->itemname.'_'.$row;
-                $elementgroup = array();
+                $elementgroup = [];
                 foreach ($rates as $col => $rate) {
                     $attributes['id'] = $idprefix.'_'.$row.'_'.$col;
                     $elementgroup[] = $mform->createElement('mod_surveypro_radiobutton', $uniquename, '', $rate, $col, $attributes);
@@ -530,7 +530,7 @@ EOS;
 
         if (!empty($this->differentrates)) {
             $optionscount = count($this->get_content_array(SURVEYPRO_LABELS, 'options'));
-            $rates = array();
+            $rates = [];
             for ($i = 0; $i < $optionscount; $i++) {
                 $rates[] = $data[$this->itemname.'_'.$i];
             }
@@ -580,7 +580,7 @@ EOS;
         if (isset($answer['noanswer'])) {
             $olduseranswer->content = SURVEYPRO_NOANSWERVALUE;
         } else {
-            $return = array();
+            $return = [];
             foreach ($answer as $answeredrate) {
                 $return[] = $answeredrate;
             }
@@ -595,7 +595,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -643,11 +643,11 @@ EOS;
         }
 
         // Output.
-        // Here $answers is an array like: array(1,1,0,0).
+        // Here $answers is an array like: [1, 1, 0, 0].
         switch ($format) {
             case SURVEYPRO_ITEMSRETURNSVALUES:
                 $answers = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $content);
-                $output = array();
+                $output = [];
                 $labels = $this->get_content_array(SURVEYPRO_LABELS, 'options');
 
                 $rates = $this->get_content_array(SURVEYPRO_VALUES, 'rates');
@@ -659,7 +659,7 @@ EOS;
                 break;
             case SURVEYPRO_ITEMRETURNSLABELS:
                 $answers = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $content);
-                $output = array();
+                $output = [];
                 $labels = $this->get_content_array(SURVEYPRO_LABELS, 'options');
 
                 $rates = $this->get_content_array(SURVEYPRO_LABELS, 'rates');
@@ -688,7 +688,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
 
         $utilityitemman = new utility_item($this->cm, $this->surveypro);
         $options = $utilityitemman->multilinetext_to_array($this->options);

@@ -18,7 +18,7 @@
  * Surveypro templatebase class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace mod_surveypro;
  * The base class for templates
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class templatebase {
@@ -61,7 +61,7 @@ class templatebase {
     /**
      * @var array
      */
-    protected $langtree = array();
+    protected $langtree = [];
 
     /**
      * Class constructor.
@@ -255,15 +255,15 @@ class templatebase {
             debugging('Error at line '.__LINE__.' of '.__FILE__.'. '.$message , DEBUG_DEVELOPER);
         }
 
-        $fieldlist = array();
+        $fieldlist = [];
         if (empty($type) && empty($plugin)) {
             $installxml = $CFG->dirroot.'/mod/surveypro/db/install.xml';
             $targettable = 'surveypro_item';
-            $uselessfields = array('id', 'surveyproid', 'type', 'plugin', 'sortindex', 'formpage', 'timecreated', 'timemodified');
+            $uselessfields = ['id', 'surveyproid', 'type', 'plugin', 'sortindex', 'formpage', 'timecreated', 'timemodified'];
         } else {
             $installxml = $CFG->dirroot.'/mod/surveypro/'.$type.'/'.$plugin.'/db/install.xml';
             $targettable = 'surveypro'.$type.'_'.$plugin;
-            $uselessfields = array('id', 'itemid');
+            $uselessfields = ['id', 'itemid'];
 
             // Some plugins are missing the install.xml because they havn't attributes.
             if (!file_exists($installxml)) {
@@ -303,13 +303,13 @@ class templatebase {
      * @return versions of each field and format plugin
      */
     public static function get_subplugin_versions() {
-        $versions = array();
-        $types = array(SURVEYPRO_TYPEFIELD, SURVEYPRO_TYPEFORMAT);
+        $versions = [];
+        $types = ['field', 'format'];
 
         foreach ($types as $type) {
-            $plugins = surveypro_get_plugin_list($type, true);
+            $plugins = \core_component::get_plugin_list('surveypro'.$type);
             foreach ($plugins as $plugin => $unused) {
-                $versions[$plugin] = get_config('surveypro'.$plugin, 'version');
+                $versions[$type.'_'.$plugin] = get_config('surveypro'.$type.'_'.$plugin, 'version');
             }
         }
 

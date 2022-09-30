@@ -18,7 +18,7 @@
  * Surveypro reportbase class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,10 +28,10 @@ namespace mod_surveypro;
  * The base class representing a report
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class reportbase {
+abstract class reportbase {
 
     /**
      * @var object Course module object
@@ -54,6 +54,21 @@ class reportbase {
     public $groupid = 0;
 
     /**
+     * @var bool hasstudentreport
+     */
+    protected $hasstudentreport;
+
+    /**
+     * @var bool isapplicable
+     */
+    protected $isapplicable;
+
+    /**
+     * @var bool usesvisibleusernames
+     */
+    protected $usesvisibleusernames;
+
+    /**
      * Class constructor.
      *
      * @param object $cm
@@ -64,30 +79,9 @@ class reportbase {
         $this->cm = $cm;
         $this->context = $context;
         $this->surveypro = $surveypro;
-    }
-
-    /**
-     * Get the list of mastertemplates to which this report is applicable.
-     *
-     * If ruturns an empty array, each report is added to admin menu
-     * If returns a non empty array, only reports listed will be added to admin menu
-     *
-     * @return array
-     */
-    public function report_applies_to() {
-        return array('each');
-    }
-
-    /**
-     * Return if this report applies.
-     *
-     * true means: the report applies
-     * empty($this->surveypro->anonymous) means that reports applies ONLY IF the survey is not anonymous
-     *
-     * @return boolean
-     */
-    public function report_apply() {
-        return true;
+        $this->hasstudentreport = $this->has_studentreport();
+        $this->isapplicable = $this->report_applies_to($this->surveypro->template);
+        $this->usesvisibleusernames = $this->has_visibleusernames();
     }
 
     /**
@@ -95,22 +89,66 @@ class reportbase {
      *
      * @return boolean false
      */
-    public function has_student_report() {
-        return false;
-    }
+    abstract public function has_studentreport();
+
+    /**
+     * Does the current report apply to the passed mastertemplates?
+     *
+     * @param string $mastertemplate
+     * @return array
+     */
+    abstract public function report_applies_to($mastertemplate);
+
+    /**
+     * Does this report display user names.
+     *
+     * @return boolean false
+     */
+    abstract public function has_visibleusernames();
 
     /**
      * Get child reports.
      *
-     * @param bool $canaccessreports
      * @return boolean false
      */
-    public function has_childreports($canaccessreports) {
+    public function has_childrenreports() {
         return false;
     }
 
     /**
-     * Display a message if no submissions were provided
+     * Prevent direct user input.
+     *
+     * @return void
+     */
+    public function prevent_direct_user_input() {
+        if (!$this->is_report_allowed()) {
+            throw new \moodle_exception('incorrectaccessdetected', 'mod_surveypro');
+        }
+    }
+
+    /**
+     * Is the use of the current report allowed?
+     *
+     * @return bool $condition
+     */
+    public function is_report_allowed() {
+        $canaccessreports = has_capability('mod/surveypro:accessreports', $this->context);
+        $canalwaysseeowner = has_capability('mod/surveypro:alwaysseeowner', $this->context);
+        $canaccessownreports = has_capability('mod/surveypro:accessownreports', $this->context);
+
+        $condition = $canaccessreports;
+        $condition = $condition || ($canaccessownreports && $this->hasstudentreport);
+        $condition = $condition && $this->isapplicable;
+
+        // GDPR condition.
+        $othercondition = !$this->usesvisibleusernames || empty($this->surveypro->anonymous) || $canalwaysseeowner;
+        $condition = $condition && $othercondition;
+
+        return $condition;
+    }
+
+    /**
+     * Display a message if no submissions were provided.
      */
     public function nosubmissions_stop() {
         global $DB, $OUTPUT;
@@ -241,7 +279,7 @@ class reportbase {
      * get_middle_sql
      *
      * @param bool $actualrelation the kind of relation I need in the query
-     * @return array($sql, $whereparams);
+     * @return [$sql, $whereparams];
      */
     public function get_middle_sql($actualrelation=true) {
         global $COURSE;
@@ -249,7 +287,7 @@ class reportbase {
         $coursecontext = \context_course::instance($COURSE->id);
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', $coursecontext);
 
-        $whereparams = array();
+        $whereparams = [];
         if ($actualrelation) {
             $whereparams['surveyproid'] = $this->surveypro->id;
         } else {
@@ -282,7 +320,7 @@ class reportbase {
             }
         }
 
-        $conditions = array();
+        $conditions = [];
         foreach ($whereparams as $k => $v) {
             if ($v === null) {
                 $conditions[] = $k.' IS NULL';
@@ -302,6 +340,6 @@ class reportbase {
         }
 
         $whereparams = array_merge($whereparams, $eparams);
-        return array($sql, $whereparams);
+        return [$sql, $whereparams];
     }
 }

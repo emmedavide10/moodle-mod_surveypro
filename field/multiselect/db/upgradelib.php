@@ -18,6 +18,6 @@
  * Functions used by some stages of multiselect plugin upgrade
  *
  * @package   surveyprofield_multiselect
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -18,7 +18,7 @@
  * Starting page to display graphs of the colles report.
  *
  * @package   surveyproreport_colles
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,8 +32,8 @@ $id = required_param('id', PARAM_INT); // Course Module ID.
 $type = required_param('type', PARAM_ALPHA); // Report type.
 
 $cm = get_coursemodule_from_id('surveypro', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
 
 $groupid = optional_param('groupid', 0, PARAM_INT); // Group ID.
 $area = optional_param('area', 0, PARAM_INT);  // Report area.
@@ -56,6 +56,7 @@ $reportman->set_area($area);
 $reportman->set_groupid($groupid);
 
 $graph = new graph(SURVEYPROREPORT_COLLES_GWIDTH, SURVEYPROREPORT_COLLES_GHEIGHT);
+
 if ($type == 'summary') {
     $canaccessreports = has_capability('mod/surveypro:accessreports', $context);
     $canaccessownreports = has_capability('mod/surveypro:accessownreports', $context);
@@ -75,7 +76,7 @@ if ($type == 'summary') {
     $graph->y_tick_labels = $reportman->ylabels;
 
     // $graph1params.
-    $graph1params = array();
+    $graph1params = [];
     $graph1params['colour'] = 'ltblue';
     $graph1params['line'] = 'line';
     $graph1params['point'] = 'square';
@@ -87,7 +88,7 @@ if ($type == 'summary') {
     $graph->y_format['answers1'] = $graph1params;
 
     // $graph2params.
-    $graph2params = array();
+    $graph2params = [];
     $graph2params['colour'] = 'ltltblue';
     $graph2params['bar'] = 'fill';
     $graph2params['shadow_offset'] = 4;
@@ -149,16 +150,16 @@ if ($type == 'summary') {
     if ($reportman->template == 'collesactualpreferred') {
         if ($allowsingle && ($reportman->studenttrend1)) {
             // If the user hasn't general right but only canaccessownreports && submitted at least one response.
-            $graph->y_order = array('stdev1', 'answers1', 'stdev2', 'answers2', 'answers3', 'answers4');
+            $graph->y_order = ['stdev1', 'answers1', 'stdev2', 'answers2', 'answers3', 'answers4'];
         } else {
-            $graph->y_order = array('stdev1', 'answers1', 'stdev2', 'answers2');
+            $graph->y_order = ['stdev1', 'answers1', 'stdev2', 'answers2'];
         }
     } else {
         if ($allowsingle && ($reportman->studenttrend1)) {
             // If the user hasn't general right but only canaccessownreports && submitted at least one response.
-            $graph->y_order = array('stdev1', 'answers1', 'answers3');
+            $graph->y_order = ['stdev1', 'answers1', 'answers3'];
         } else {
-            $graph->y_order = array('stdev1', 'answers1');
+            $graph->y_order = ['stdev1', 'answers1'];
         }
     }
 
@@ -196,7 +197,7 @@ if ($type == 'scales') {
     $graph->y_tick_labels = $reportman->ylabels;
 
     // $graph1params.
-    $graph1params = array();
+    $graph1params = [];
     $graph1params['colour'] = 'ltblue';
     $graph1params['line'] = 'line';
     $graph1params['point'] = 'square';
@@ -208,7 +209,7 @@ if ($type == 'scales') {
     $graph->y_format['answers1'] = $graph1params;
 
     // $graph2params.
-    $graph2params = array();
+    $graph2params = [];
     $graph2params['colour'] = 'ltltblue';
     $graph2params['bar'] = 'fill';
     $graph2params['shadow_offset'] = 4;
@@ -240,9 +241,9 @@ if ($type == 'scales') {
 
         $graph->offset_relation['stdev2'] = 'answers2';
 
-        $graph->y_order = array('stdev1', 'answers1', 'stdev2', 'answers2');
+        $graph->y_order = ['stdev1', 'answers1', 'stdev2', 'answers2'];
     } else {
-        $graph->y_order = array('stdev1', 'answers1');
+        $graph->y_order = ['stdev1', 'answers1'];
     }
 
     $graph->parameter['bar_size'] = 0.15;
@@ -273,12 +274,13 @@ if ($type == 'questions') {
         $legendgraph1 = get_string($reportman->template, 'surveyproreport_colles');
     }
 
-    $graph->parameter['title'] = $reportman->graphtitle; // $item->content.
+    $graph->parameter['title'] = $reportman->graphtitle;
+    // $graph->parameter['title'] = 'Mamma ho perso l\'aereo'; // $item->content.
 
     $graph->x_data = $reportman->xlabels; // array('focus on interesting issues', 'important to my practice'...
 
     // $graph1params.
-    $graph1params = array();
+    $graph1params = [];
     $graph1params['colour'] = 'ltblue';
     $graph1params['bar'] = 'fill';
     $graph1params['legend'] = $legendgraph1;
@@ -298,9 +300,9 @@ if ($type == 'questions') {
         $graph->y_data['answers2'] = $reportman->trend2; // array(1.5, 2.5...
         $graph->y_format['answers2'] = $graph1params;
 
-        $graph->y_order = array('answers1', 'answers2');
+        $graph->y_order = ['answers1', 'answers2'];
     } else {
-        $graph->y_order = array('answers1');
+        $graph->y_order = ['answers1'];
     }
 
     $graph->parameter['legend'] = 'outside-top';

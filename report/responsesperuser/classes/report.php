@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Surveypro class to missing count report
+ * Surveypro class to to manage responsesperuser report
  *
  * @package   surveyproreport_responsesperuser
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->libdir.'/tablelib.php');
  * The class to missing count report
  *
  * @package   surveyproreport_responsesperuser
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report extends reportbase {
@@ -45,25 +45,53 @@ class report extends reportbase {
     public $outputtable = null;
 
     /**
+     * Returns if this report was created for student too.
+     *
+     * @return void
+     */
+    public function has_studentreport() {
+        return false;
+    }
+
+    /**
+     * Does the current report apply to the passed mastertemplates?
+     *
+     * @param string $mastertemplate
+     * @return void
+     */
+    public function report_applies_to($mastertemplate) {
+        return true;
+    }
+
+    /**
+     * Get if this report displays user names.
+     *
+     * @return boolean false
+     */
+    public function has_visibleusernames() {
+        return true;
+    }
+
+    /**
      * Setup_outputtable
      */
     public function setup_outputtable() {
         $this->outputtable = new \flexible_table('responsesperuser');
 
-        $paramurl = array('id' => $this->cm->id);
+        $paramurl = ['id' => $this->cm->id];
         if ($this->groupid) {
             $paramurl['groupid'] = $this->groupid;
         }
         $baseurl = new \moodle_url('/mod/surveypro/report/responsesperuser/view.php', $paramurl);
         $this->outputtable->define_baseurl($baseurl);
 
-        $tablecolumns = array();
+        $tablecolumns = [];
         $tablecolumns[] = 'picture';
         $tablecolumns[] = 'fullname';
         $tablecolumns[] = 'attempts';
         $this->outputtable->define_columns($tablecolumns);
 
-        $tableheaders = array();
+        $tableheaders = [];
         $tableheaders[] = '';
         $tableheaders[] = get_string('fullname');
         $tableheaders[] = get_string('submissions', 'mod_surveypro');
@@ -114,13 +142,13 @@ class report extends reportbase {
         $usersubmissions = $DB->get_recordset_sql($sql, $whereparams);
 
         foreach ($usersubmissions as $usersubmission) {
-            $tablerow = array();
+            $tablerow = [];
 
             // Picture.
-            $tablerow[] = $OUTPUT->user_picture($usersubmission, array('courseid' => $COURSE->id));
+            $tablerow[] = $OUTPUT->user_picture($usersubmission, ['courseid' => $COURSE->id]);
 
             // User fullname.
-            $paramurl = array('id' => $usersubmission->id, 'course' => $COURSE->id);
+            $paramurl = ['id' => $usersubmission->id, 'course' => $COURSE->id];
             $url = new \moodle_url('/user/view.php', $paramurl);
             $tablerow[] = '<a href="'.$url->out().'">'.fullname($usersubmission).'</a>';
 
@@ -137,7 +165,7 @@ class report extends reportbase {
     /**
      * Get_submissions_sql
      *
-     * @return array($sql, $whereparams);
+     * @return [$sql, $whereparams];
      */
     public function get_submissions_sql() {
         $userfieldsapi = \core_user\fields::for_userpic()->get_sql('u');
@@ -158,7 +186,7 @@ class report extends reportbase {
             $sql .= ' ORDER BY u.lastname ASC';
         }
 
-        return array($sql, $whereparams);
+        return [$sql, $whereparams];
     }
 
     /**

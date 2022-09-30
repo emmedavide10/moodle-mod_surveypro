@@ -18,7 +18,7 @@
  * English strings for surveypro
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,21 +35,23 @@ $string['surveyproname'] = 'Surveypro name';
 $string['surveyproname_help'] = 'Choose the name of this surveypro.';
 $string['surveypro'] = 'survey';
 
+$string['tabsubmissionsname'] = 'Data entry';
+    $string['tabdataentrypage1'] = 'Dashboard'; // Maybe 'Overview' is better?
+    $string['tabdataentrypage2'] = 'Responses';
+    $string['tabdataentrypage3'] = 'Insert';
+    $string['tabdataentrypage4'] = 'Edit';
+    $string['tabdataentrypage5'] = 'Read only';
+    $string['tabdataentrypage6'] = 'Search';
+    $string['tabdataentrypage7'] = 'Reports';
 $string['tablayoutname'] = 'Layout';
-    $string['tabitemspage1'] = 'Preview';
-    $string['tabitemspage2'] = 'Elements';
-    $string['tabitemspage3'] = 'Element setup';
-    $string['tabitemspage4'] = 'Branching validation';
-$string['tabsubmissionsname'] = 'Survey';
-    $string['tabsubmissionspage1'] = 'Dashboard'; // Maybe 'Overview' is better?
-    $string['tabsubmissionspage2'] = 'Responses';
-    $string['tabsubmissionspage3'] = 'Insert';
-    $string['tabsubmissionspage4'] = 'Edit';
-    $string['tabsubmissionspage5'] = 'Read only';
-    $string['tabsubmissionspage6'] = 'Search';
-    $string['tabsubmissionspage7'] = 'Reports';
-    $string['tabsubmissionspage8'] = 'Import';
-    $string['tabsubmissionspage9'] = 'Export';
+    $string['tablayoutpage1'] = 'Preview';
+    $string['tablayoutpage2'] = 'Elements';
+    $string['tablayoutpage3'] = 'Element setup';
+    $string['tablayoutpage4'] = 'Branching validation';
+$string['tabtoolsname'] = 'Tools';
+    $string['tabtoolspage1'] = 'Import';
+    $string['tabtoolspage2'] = 'Export';
+$string['tabreportname'] = 'Report';
 $string['tabutemplatename'] = 'User templates';
     $string['tabutemplatepage1'] = 'Manage';
     $string['tabutemplatepage2'] = 'Save';
@@ -90,7 +92,6 @@ $string['cannotsubmittooearly'] = 'The survey is still not open. You have to wai
 $string['cannotsubmittoolate'] = 'The survey has been closed on {$a}';
 $string['captcha_help'] = 'Add to this collectoin the captcha to increase the security.';
 $string['captcha'] = 'Add captcha';
-$string['category'] = 'Course category';
 $string['changeorder_title'] = 'Reorder';
 $string['closed'] = 'This survey closed at';
 $string['closedsubmissions'] = 'Closed responses';
@@ -140,12 +141,14 @@ $string['content'] = 'Content';
 $string['count_allitems'] = 'Survey built on {$a} elements.';
 $string['count_hiddenitems'] = '({$a} hidden)';
 $string['count_pages'] = 'Divided into {$a} pages.';
-$string['course'] = 'Course';
+$string['currentcategory'] = 'This course category';
+$string['currentcourse'] = 'This course';
 $string['currenttotemplate'] = 'Save current survey as master template in zip format.<br />To install a master template, unzip it to mod/surveypro/template/ and visit the notification page.';
+$string['currentuser'] = 'Only for me';
 $string['customnumber_header'] = '#';
 $string['customnumber_help'] = 'Use this field to give a custom number to the element. It may be a natural number like 1 or whatever you may need: 1a, A, 1.1.a, #1, A, A.1... Take in mind that you are responsible for the coherence of that numbers. Because of this take care if you plan to change the order of the elements.';
 $string['customnumber'] = 'Element number';
-$string['dataimport'] = 'Import data';
+$string['dataimport'] = 'Data import';
 $string['deleteabandoned_task'] = 'Deleting uncompleted submissions';
 $string['deleteallitems'] = 'Delete all elements';
 $string['deleteallsubmissions'] = 'Delete all responses';
@@ -298,7 +301,7 @@ $string['managesurveyproformatplugins'] = 'Manage format plugins';
 $string['managesurveyproreportplugins'] = 'Manage report plugins';
 $string['managesurveyprotemplateplugins'] = 'Manage template plugins';
 $string['manageusertemplates'] = '<a href="{$a}">Manage user templates</a>';
-$string['mastertemplate_help'] = 'Choose a master template like one of the classical ones provided by default or a custom one added to this instance of surveypro. The classical survey types are:<ul>
+$string['mastertemplate_help'] = 'Choose a master template like one of the classical ones provided by default or a custom one added to this instance of surveypro. The classicalmaster templates are:<ul>
 <li>ATTLS: Attitudes To Thinking and Learning Survey.<br />For more details, see the documentation on <a href="https://docs.moodle.org/31/en/Survey_settings#ATTLS_-_Attitudes_to_Thinking_and_Learning_Survey" name="ATTLS" title="ATTLS">ATTLS</a>.</li>
 <li>COLLES: Constructivist On-Line Learning Environment Survey.<br />For more details, see the documentation on <a href="https://docs.moodle.org/31/en/Survey_settings#COLLES_-_Constructivist_On-Line_Learning_Environment_Survey" name="COLLES" title="COLLES">COLLES</a>.</li>
 <li>CRITICAL INCIDENTS.<br />For more details, see the documentation on <a href="https://docs.moodle.org/31/en/Survey_settings#Critical_incidents" name="Critical incidents" title="Critical incidents">Critical incidents</a></li></ul>';
@@ -317,7 +320,7 @@ $string['missingitemtype'] = 'One or more items of the template are missing the 
 $string['missingitemversion'] = 'One or more items of the template is missing the version';
 $string['missingmandatory'] = 'Some mandatory answer of this response has not been found. Because of this, the overall response has been marked as "{$a}".<br />To fix this issue, please edit the response and review item contents page per page.';
 $string['missingvalidation'] = 'Some answers of this response have been found as unverified. Because of this, the overall response has been marked as "{$a}".<br />Your data is not necessarily incorrect but needs validation before definitive storage.<br />To fix this issue, please edit the response and review item contents page per page.';
-$string['module'] = 'This instance of survey';
+$string['module'] = 'This instance of {$a}';
 $string['modulesettinghdr'] = 'Surveypro settings';
 $string['mtemplatessection'] = 'Master templates section';
 $string['neverstartedemail'] = 'Email for not started survey';
@@ -329,7 +332,7 @@ $string['newsubmissionsubject'] = 'New response';
 $string['nextformpage'] = 'Next page >>';
 $string['noanswer'] = 'No answer';
 $string['noattachmentfound'] = 'Not any attachment has been found';
-$string['noitemsfound'] = 'This survey is still a work in progress.<br />Please try again later.';
+$string['noitemsfound'] = 'This survey is still a stub.<br />Please try again later.';
 $string['noitemsfoundadmin'] = 'This survey has no elements. Please add them from "{$a}".';
 $string['nomoreitems'] = 'On the basis of the answers provided, no more elements remain to display.<br />Your survey is over. You only need to submit{$a}.';
 $string['nomoresubmissionsallowed'] = 'The maximun number of {$a} responses has already been reached.<br />No new responses are allowed';
@@ -343,7 +346,7 @@ $string['notinsearchform_title'] = 'Not searchable item. Click to make it search
 $string['numinstances'] = 'Instances';
 $string['oneshotemail'] = 'One shot survey fill with reminder email';
 $string['oneshotnoemail'] = 'One shot survey fill without reminder email';
-$string['onlyfinalizationallowed'] = ' but only the finalization of those still "{$a->inprogress}" through the page "{$a->tabsubmissionspage2}".';
+$string['onlyfinalizationallowed'] = ' but only the finalization of those still "{$a->inprogress}" through the page "{$a->tabdataentrypage2}".';
 $string['onlyreserveditemhere'] = 'The current page holds only reserved elements you are not supposed to access';
 $string['onlyreview'] = ' or review';
 $string['opened'] = 'Opening time';
@@ -460,11 +463,11 @@ $string['surveypro:duplicateotherssubmissions'] = 'Duplicate responses from othe
 $string['surveypro:duplicateownsubmissions'] = 'Duplicate own responses';
 $string['surveypro:editotherssubmissions'] = 'Edit responses from other users';
 $string['surveypro:editownsubmissions'] = 'Edit own responses';
-$string['surveypro:exportdata'] = 'Export collected responses';
+$string['surveypro:exportresponses'] = 'Export collected responses';
 $string['surveypro:ignoremaxentries'] = 'Submissions are not limited by max entries setting';
-$string['surveypro:importdata'] = 'Import data';
+$string['surveypro:importresponses'] = 'Import collected responses';
 $string['surveypro:importusertemplates'] = 'Upload user templates';
-$string['surveypro:manageitems'] = 'Manage survey elements';
+$string['surveypro:manageitems'] = 'Manage elements';
 $string['surveypro:manageusertemplates'] = 'Manage user templates';
 $string['surveypro:preview'] = 'Preview a survey';
 $string['surveypro:savemastertemplates'] = 'Save master template';
@@ -507,7 +510,6 @@ $string['unixtime'] = 'unix time';
 $string['unlimited'] = 'Unlimited';
 $string['unreservable_title'] = 'Free access element. Unreservable.';
 $string['unsearchable_title'] = 'Not searchable item. Unsearchable.';
-$string['user'] = 'User';
 $string['usercanceled'] = 'Action canceled by the user';
 $string['userenrolled'] = 'User enrolled: 1';
 $string['usersenrolled'] = 'Users enrolled: {$a}';

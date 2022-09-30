@@ -5,15 +5,18 @@ Feature: Simple restore of a surveypro
   I make a simple restore of a course with two instances of surveypro
 
   @javascript @_file_upload
-  Scenario: Restore the demo course provided in fixtures
+  Scenario: Restore the demo course
     Given I log in as "admin"
-    And I am on site homepage
-    And I navigate to "Restore" in current page administration
-    And I press "Manage backup files"
+    Given I navigate to "Courses > Restore course" in site administration
     And I upload "mod/surveypro/tests/fixtures/demo_course-20160108.mbz" file to "Files" filemanager
-    And I press "Save changes"
-    And I restore "demo_course-20160108.mbz" backup into a new course using this options:
-    And I follow "Demo course"
+    And I press "Restore"
+    And I click on "Continue" "button"
+    And I set the field "restore-category-1" to "1"
+    And I click on "Continue" "button"
+    And I click on "Next" "button"
+    And I click on "Next" "button"
+    And I click on "Perform restore" "button"
+    And I click on "Continue" "button"
     Then I should see "\"age\" element"
     Then I should see "\"attachment\" element"
     Then I should see "\"autofill\" element"

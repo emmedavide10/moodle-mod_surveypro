@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyprofield_multiselect
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +36,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/multiselect/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyprofield_multiselect
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -55,7 +55,7 @@ class itemsetupform extends itemsetupbaseform {
         // Get _customdata.
         $item = $this->_customdata['item'];
 
-        $textareaoptions = array('wrap' => 'virtual', 'rows' => '10', 'cols' => '65');
+        $textareaoptions = ['wrap' => 'virtual', 'rows' => '10', 'cols' => '65'];
 
         // Item: options.
         $fieldname = 'options';
@@ -141,8 +141,8 @@ class itemsetupform extends itemsetupbaseform {
         $cleandefaultvalue = $utilityitemman->multilinetext_to_array($data['defaultvalue']);
 
         // Build $value array (I do not care about $label) starting from $cleanoptions.
-        $values = array();
-        $labels = array();
+        $values = [];
+        $labels = [];
 
         foreach ($cleanoptions as $option) {
             if (strpos($option, SURVEYPRO_VALUELABELSEPARATOR) === false) {

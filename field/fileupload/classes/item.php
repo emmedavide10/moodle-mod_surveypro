@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_fileupload
  *
  * @package   surveyprofield_fileupload
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/fileupload/lib.php');
  * Class to manage each aspect of the fileupload item
  *
  * @package   surveyprofield_fileupload
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -121,7 +121,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'fileupload';
 
         // Override the list of fields using format, whether needed.
@@ -234,8 +234,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote'];
 
         return $fieldlist;
     }
@@ -300,21 +300,13 @@ EOS;
         $fieldname = $this->itemname.'_filemanager';
 
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_fileupload_'.$this->sortindex;
 
         $filetypes = array_map('trim', explode(',', $this->filetypes));
 
-        $attributes = array();
+        $attributes = [];
         $attributes['id'] = $idprefix;
         $attributes['class'] = 'indent-'.$this->indent.' fileupload_filemanager'; // Does not work: MDL-28194.
         $attributes['maxbytes'] = $this->maxbytes;
@@ -372,7 +364,7 @@ EOS;
         if (!empty($answer)) {
             $context = \context_module::instance($this->cm->id);
 
-            $attributes = array();
+            $attributes = [];
             $attributes['maxbytes'] = $this->maxbytes;
             $attributes['accepted_types'] = $this->filetypes;
             $attributes['subdirs'] = false;
@@ -391,7 +383,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -401,7 +393,7 @@ EOS;
         $fieldname = $this->itemname.'_filemanager';
 
         $draftitemid = 0;
-        $attributes = array();
+        $attributes = [];
         $attributes['maxbytes'] = $this->maxbytes;
         $attributes['accepted_types'] = $this->filetypes;
         $attributes['subdirs'] = false;
@@ -427,7 +419,7 @@ EOS;
 
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, 'surveyprofield_fileupload', 'fileuploadfiles', $answer->id);
-        $filename = array();
+        $filename = [];
         foreach ($files as $file) {
             if ($file->is_directory()) {
                 continue;
@@ -444,7 +436,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         $elementnames[] = $this->itemname.'_filemanager';
 
         return $elementnames;

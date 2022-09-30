@@ -18,7 +18,7 @@
  * This file contains the surveyproformat_label
  *
  * @package   surveyproformat_label
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/format/label/lib.php');
  * Class to manage each aspect of the label item
  *
  * @package   surveyproformat_label
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -91,7 +91,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFORMAT;
+        $this->type = 'format';
         $this->plugin = 'label';
 
         // Override the list of fields using format, whether needed.
@@ -165,7 +165,7 @@ class item extends itembase {
 
         // 3. Set values corresponding to checkboxes.
         // Take care: 'required', 'trimonsave', 'hideinstructions' were already considered in get_common_settings.
-        $checkboxes = array('fullwidth');
+        $checkboxes = ['fullwidth'];
         foreach ($checkboxes as $checkbox) {
             $record->{$checkbox} = (isset($record->{$checkbox})) ? 1 : 0;
         }
@@ -217,8 +217,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'leftlabel');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'leftlabel'];
 
         return $fieldlist;
     }
@@ -290,8 +290,8 @@ EOS;
 
         if ($this->fullwidth) {
             $content = '';
-            $content .= \html_writer::start_tag('div', array('class' => 'fitem'));
-            $content .= \html_writer::start_tag('div', array('class' => 'fstatic fullwidth label_static'));
+            $content .= \html_writer::start_tag('div', ['class' => 'fitem']);
+            $content .= \html_writer::start_tag('div', ['class' => 'fstatic fullwidth label_static']);
             $content .= $this->get_content();
             $content .= \html_writer::end_tag('div');
             $content .= \html_writer::end_tag('div');
@@ -300,7 +300,7 @@ EOS;
             $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
             $elementnumber = $this->customnumber ? $this->customnumber.$labelsep : '';
             $elementlabel = $elementnumber.$this->leftlabel;
-            $attributes = array();
+            $attributes = [];
             $attributes['class'] = 'indent-'.$this->indent.' label_static';
             $mform->addElement('mod_surveypro_label', $this->itemname, $elementlabel, $this->get_content(), $attributes);
         }
@@ -325,7 +325,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         return $prefill;
     }
@@ -347,7 +347,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
 
         if (empty($this->fullwidth)) {
             $elementnames[] = $this->itemname;

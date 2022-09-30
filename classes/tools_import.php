@@ -18,7 +18,7 @@
  * The importmanager class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,10 +31,10 @@ use mod_surveypro\local\form\submissionimportform;
  * The class importing data from CSV
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class view_import {
+class tools_import {
 
     /**
      * @var object Course module object
@@ -79,7 +79,7 @@ class view_import {
     /**
      * @var array itemhelperinfo
      */
-    private $itemhelperinfo = array();
+    private $itemhelperinfo = [];
 
     /**
      * @var int The dafault status of the submission to import
@@ -105,7 +105,7 @@ class view_import {
      * @return void
      */
     public function trigger_event() {
-        $eventdata = array('context' => $this->context, 'objectid' => $this->surveypro->id);
+        $eventdata = ['context' => $this->context, 'objectid' => $this->surveypro->id];
         $event = \mod_surveypro\event\all_submissions_exported::create($eventdata);
         $event->trigger();
     }
@@ -153,7 +153,7 @@ class view_import {
         global $DB;
 
         // First step: make the list of each fileupload items of this surveypro.
-        $where = array('surveyproid' => $this->surveypro->id);
+        $where = ['surveyproid' => $this->surveypro->id];
         $sql = 'SELECT p.itemid, p.variable
                 FROM {surveypro_item} i
                   JOIN {surveyprofield_fileupload} p ON p.itemid = i.id
@@ -201,8 +201,8 @@ class view_import {
      * @return mixed error object or bool false
      */
     public function are_children_orphans($surveyheaders) {
-        $orphansheader = array();
-        $missingheader = array();
+        $orphansheader = [];
+        $missingheader = [];
         foreach ($this->itemhelperinfo as $k => $itemhelper) {
             // Is this item a child?
             if (!empty($itemhelper->parentid)) {
@@ -502,20 +502,20 @@ class view_import {
 
         // Get the list of used plugin.
         $utilitysubmissionman = new utility_submission($this->cm, $this->surveypro);
-        $pluginlist = $utilitysubmissionman->get_used_plugin_list(SURVEYPRO_TYPEFIELD);
+        $pluginlist = $utilitysubmissionman->get_used_plugin_list('field');
 
-        $requireditems = array();
-        $surveyheaders = array();
+        $requireditems = [];
+        $surveyheaders = [];
         $surveyheaders[SURVEYPRO_OWNERIDLABEL] = SURVEYPRO_OWNERIDLABEL;
         $surveyheaders[SURVEYPRO_TIMECREATEDLABEL] = SURVEYPRO_TIMECREATEDLABEL;
         $surveyheaders[SURVEYPRO_TIMEMODIFIEDLABEL] = SURVEYPRO_TIMEMODIFIEDLABEL;
 
-        $whereparams = array('surveyproid' => $this->surveypro->id);
+        $whereparams = ['surveyproid' => $this->surveypro->id];
         foreach ($pluginlist as $plugin) {
-            $classname = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$plugin.'\item';
+            $classname = 'surveyprofield_'.$plugin.'\item';
             $canbemandatory = $classname::item_uses_mandatory_dbfield();
 
-            $tablename = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$plugin;
+            $tablename = 'surveyprofield_'.$plugin;
             $fieldname = ($canbemandatory) ? ', p.required' : '';
             $sql = 'SELECT p.itemid, p.variable'.$fieldname.'
                     FROM {surveypro_item} i
@@ -540,7 +540,7 @@ class view_import {
             }
         }
 
-        return array($surveyheaders, $requireditems);
+        return [$surveyheaders, $requireditems];
     }
 
     /**
@@ -585,10 +585,10 @@ class view_import {
      * @return array $nonmatchingheaders
      */
     public function get_columntoitemid($foundheaders, $surveyheaders) {
-        $this->columntoitemid = array();
+        $this->columntoitemid = [];
 
-        $nonmatchingheaders = array();
-        $this->environmentheaders = array();
+        $nonmatchingheaders = [];
+        $this->environmentheaders = [];
 
         foreach ($foundheaders as $k => $foundheader) {
             $key = array_search($foundheader, $surveyheaders);
@@ -622,7 +622,7 @@ class view_import {
      * @return $optionscountpercol ($optionscountpercol is available only for items using positional answer)
      */
     public function buil_item_helpers() {
-        $optionscountpercol = array(); // Elements only for items saving position to db.
+        $optionscountpercol = []; // Elements only for items saving position to db.
         foreach ($this->columntoitemid as $col => $itemid) {
             if (preg_match('/'.SURVEYPRO_IMPFORMATSUFFIX.'$/', $itemid)) {
                 continue;
@@ -658,7 +658,7 @@ class view_import {
             $itemhelper->parentid = $item->get_parentid();
             $itemhelper->parentvalue = $item->get_parentvalue();
 
-            $classname = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$itemhelper->plugin.'\item';
+            $classname = 'surveyprofield_'.$itemhelper->plugin.'\item';
             $itemhelper->usescontentformat = $classname::response_uses_format();
             $this->itemhelperinfo[$col] = $itemhelper;
 
@@ -818,7 +818,7 @@ class view_import {
 
         // Begin of: DOES EACH RECORD provide a valid value?
         // Start here a looooooooong list of validations against founded values, record per record.
-        $submissionsperuser = array();
+        $submissionsperuser = [];
         $this->cir->init();
         while ($csvrow = $this->cir->next()) {
             foreach ($foundheaders as $col => $unused) {
@@ -943,7 +943,7 @@ class view_import {
         }
 
         // Create helper $contentformattocol.
-        $contentformattocol = array();
+        $contentformattocol = [];
         foreach ($this->columntoitemid as $col => $itemid) {
             if (preg_match('/'.SURVEYPRO_IMPFORMATSUFFIX.'$/', $itemid)) {
                 $contentformattocol[$itemid] = $col;
@@ -974,8 +974,8 @@ class view_import {
 
         // F I N A L L Y   I M P O R T .
         // Init csv import helper.
-        $gooduserids = array();
-        $baduserids = array();
+        $gooduserids = [];
+        $baduserids = [];
 
         $this->cir->init();
         while ($csvrow = $this->cir->next()) {
@@ -1001,7 +1001,7 @@ class view_import {
                 }
                 if (!isset($record->userid)) {
                     // Ok, make one more query! GRRRR.
-                    if ($DB->record_exists('user', array('id' => $userid))) {
+                    if ($DB->record_exists('user', ['id' => $userid])) {
                         $gooduserids[] = $userid;
                         $record->userid = $userid;
                     } else {
@@ -1079,7 +1079,7 @@ class view_import {
             $completion->update_state($this->cm, COMPLETION_INCOMPLETE);
         }
 
-        $eventdata = array('context' => $this->context, 'objectid' => $this->surveypro->id);
+        $eventdata = ['context' => $this->context, 'objectid' => $this->surveypro->id];
         $event = \mod_surveypro\event\submissions_imported::create($eventdata);
         $event->trigger();
     }

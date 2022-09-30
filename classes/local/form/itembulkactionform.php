@@ -18,7 +18,7 @@
  * The class representing the bulkaction form
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * Class to manage the form for bulk action performed agains items
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itembulkactionform extends \moodleform {
@@ -46,7 +46,7 @@ class itembulkactionform extends \moodleform {
         $mform = $this->_form;
 
         $fieldname = 'bulkaction';
-        $options = array();
+        $options = [];
         $options[SURVEYPRO_NOACTION] = get_string('choosedots');
         $options[SURVEYPRO_HIDEALLITEMS] = get_string('hideallitems', 'mod_surveypro');
         $options[SURVEYPRO_SHOWALLITEMS] = get_string('showallitems', 'mod_surveypro');
@@ -54,7 +54,7 @@ class itembulkactionform extends \moodleform {
         $options[SURVEYPRO_DELETEVISIBLEITEMS] = get_string('deletevisibleitems', 'mod_surveypro');
         $options[SURVEYPRO_DELETEHIDDENITEMS] = get_string('deletehiddenitems', 'mod_surveypro');
 
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('select', $fieldname, null, $options);
         $elementgroup[] = $mform->createElement('submit', 'button', get_string('go'));
         $mform->addElement('group', $fieldname.'_group', get_string($fieldname, 'surveypro'), $elementgroup, ' ', false);

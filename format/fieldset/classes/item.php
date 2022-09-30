@@ -18,7 +18,7 @@
  * This file contains the surveyproformat_fieldset
  *
  * @package   surveyproformat_fieldset
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/format/fieldset/lib.php');
  * Class to manage each aspect of the fieldset item
  *
  * @package   surveyproformat_fieldset
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -64,11 +64,11 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFORMAT;
+        $this->type = 'format';
         $this->plugin = 'fieldset';
 
         // Override the list of fields using format, whether needed.
-        $this->fieldsusingformat = array();
+        $this->fieldsusingformat = [];
 
         // Other element specific properties.
         // No properties here.
@@ -161,8 +161,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content'];
 
         return $fieldlist;
     }
@@ -237,7 +237,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         return $prefill;
     }
@@ -259,7 +259,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         $elementnames[] = $this->itemname;
 
         return $elementnames;

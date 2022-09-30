@@ -18,7 +18,7 @@
  * Surveypro user item utility class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace mod_surveypro;
  * The utility_useritem class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utility_item {
@@ -60,7 +60,7 @@ class utility_item {
         $this->cm = $cm;
         $this->context = \context_module::instance($cm->id);
         if (empty($surveypro)) {
-            $surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+            $surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
         }
         $this->surveypro = $surveypro;
     }
@@ -82,7 +82,7 @@ class utility_item {
         $textareacontent = preg_replace('~\n\n+~', "\n", $textareacontent);
 
         if (!strlen($textareacontent)) {
-            return array();
+            return [];
         }
 
         // Build the array.
@@ -160,7 +160,7 @@ class utility_item {
         $regex = '~';
         $regex .= '(?P<prefix>'.SURVEYPRO_ITEMPREFIX.'|'.SURVEYPRO_PLACEHOLDERPREFIX.'|'.SURVEYPRO_DONTSAVEMEPREFIX.')';
         $regex .= '_';
-        $regex .= '(?P<type>'.SURVEYPRO_TYPEFIELD.'|'.SURVEYPRO_TYPEFORMAT.')';
+        $regex .= '(?P<type>field|format)';
         $regex .= '_';
         $regex .= '(?P<plugin>[^_]+)';
         $regex .= '_';

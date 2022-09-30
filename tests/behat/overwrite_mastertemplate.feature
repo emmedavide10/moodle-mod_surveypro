@@ -1,11 +1,11 @@
 @mod @mod_surveypro
-Feature: verify the deletion of old items works as expected during master templates replacement
-  In order to verify the overwrite of master templates
+Feature: verify the deletion of old items works as expected during mastertemplates replacement
+  In order to verify the overwrite of mastertemplates
   As a teacher
   I need apply mastertemplates one over the previous
 
   @javascript
-  Scenario: deletion of old items works as expected when apply master templates
+  Scenario: deletion of old items works as expected when apply mastertemplates
     Given the following "courses" exist:
       | fullname                 | shortname                | category | groupmode |
       | Overwrite mastertemplate | Overwrite mastertemplate | 0        | 0         |
@@ -16,11 +16,11 @@ Feature: verify the deletion of old items works as expected during master templa
       | user     | course                   | role           |
       | teacher1 | Overwrite mastertemplate | editingteacher |
     And the following "activities" exist:
-      | activity  | name                          | intro                                | course                   |
-      | surveypro | To overwrite master templates | To test overwrite of master template | Overwrite mastertemplate |
+      | activity  | name                         | intro                               | course                   |
+      | surveypro | To overwrite mastertemplates | To test overwrite of mastertemplate | Overwrite mastertemplate |
     And I log in as "teacher1"
     And I am on "Overwrite mastertemplate" course homepage
-    And I follow "To overwrite master templates"
+    And I follow "To overwrite mastertemplates"
 
     And I set the field "mastertemplate" to "ATTLS (20 item version)"
     And I press "Apply"
@@ -29,7 +29,7 @@ Feature: verify the deletion of old items works as expected during master templa
     And I follow "Elements" page in tab bar
     And I press "Yes"
 
-    When I am on the "To overwrite master templates" "mod_surveypro > Master templates Apply" page
+    When I am on the "To overwrite mastertemplates" "mod_surveypro > Master templates Apply" page
     And I set the field "mastertemplate" to "COLLES (Preferred and Actual)"
     And I press "Apply"
     Then I should see "I prefer that my learning focuses on issues that interest me."
@@ -38,7 +38,7 @@ Feature: verify the deletion of old items works as expected during master templa
     And I follow "Elements" page in tab bar
     And I press "Yes"
 
-    When I am on the "To overwrite master templates" "mod_surveypro > Master templates Apply" page
+    When I am on the "To overwrite mastertemplates" "mod_surveypro > Master templates Apply" page
     And I set the field "mastertemplate" to "COLLES (Actual)"
     And I press "Apply"
     Then I should see "In this online unit"
@@ -47,7 +47,7 @@ Feature: verify the deletion of old items works as expected during master templa
     And I follow "Elements" page in tab bar
     And I press "Yes"
 
-    When I am on the "To overwrite master templates" "mod_surveypro > Master templates Apply" page
+    When I am on the "To overwrite mastertemplates" "mod_surveypro > Master templates Apply" page
     And I set the field "mastertemplate" to "COLLES (Preferred)"
     And I press "Apply"
     Then I should see "In this online unit"
@@ -56,7 +56,7 @@ Feature: verify the deletion of old items works as expected during master templa
     And I follow "Elements" page in tab bar
     And I press "Yes"
 
-    When I am on the "To overwrite master templates" "mod_surveypro > Master templates Apply" page
+    When I am on the "To overwrite mastertemplates" "mod_surveypro > Master templates Apply" page
     And I set the field "mastertemplate" to "Critical Incidents"
     And I press "Apply"
     Then I should see "While thinking about recent events in this class, answer the questions below."

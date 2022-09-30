@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_select
  *
  * @package   surveyprofield_select
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/select/lib.php');
  * Class to manage each aspect of the select item
  *
  * @package   surveyprofield_select
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -132,7 +132,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'select';
 
         // Override the list of fields using format, whether needed.
@@ -183,7 +183,7 @@ class item extends itembase {
 
         // Begin of: plugin specific settings (eventually overriding general ones).
         // Drop empty rows and trim edging rows spaces from each textarea field.
-        $fieldlist = array('options');
+        $fieldlist = ['options'];
         $this->item_clean_textarea_fields($record, $fieldlist);
 
         // Set custom fields value as defined for this question plugin.
@@ -251,7 +251,7 @@ class item extends itembase {
      */
     public function item_list_constraints() {
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        $constraints = array();
+        $constraints = [];
 
         $values = $this->get_content_array(SURVEYPRO_VALUES, 'options');
         $optionstr = get_string('option', 'surveyprofield_select');
@@ -284,7 +284,7 @@ class item extends itembase {
      * @return array of downloadformats
      */
     public function get_downloadformats() {
-        $options = array();
+        $options = [];
 
         $options[SURVEYPRO_ITEMSRETURNSVALUES] = get_string('returnvalues', 'surveyprofield_select');
         $options[SURVEYPRO_ITEMRETURNSLABELS] = get_string('returnlabels', 'surveyprofield_select');
@@ -308,8 +308,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote', 'options', 'labelother', 'defaultvalue');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote', 'options', 'labelother', 'defaultvalue'];
 
         return $fieldlist;
     }
@@ -382,8 +382,8 @@ EOS;
         $parentcontents = array_unique($utilityitemman->multilinetext_to_array($childparentcontent));
         $values = $this->get_content_array(SURVEYPRO_VALUES, 'options');
 
-        $childparentvalue = array();
-        $labels = array();
+        $childparentvalue = [];
+        $labels = [];
         foreach ($parentcontents as $parentcontent) {
             $key = array_search($parentcontent, $values);
             if ($key !== false) {
@@ -422,7 +422,7 @@ EOS;
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue);
         $actualcount = count($parentvalues);
 
-        $childparentcontent = array();
+        $childparentcontent = [];
         $key = array_search('>', $parentvalues);
         if ($key !== false) {
             for ($i = 0; $i < $key; $i++) {
@@ -499,15 +499,7 @@ EOS;
      */
     public function userform_mform_element($mform, $searchform, $readonly) {
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_select_'.$this->sortindex;
 
@@ -515,10 +507,10 @@ EOS;
         $labels = $this->get_content_array(SURVEYPRO_LABELS, 'options');
         if (!$searchform) {
             if ($this->defaultoption == SURVEYPRO_INVITEDEFAULT) {
-                $labels = array(SURVEYPRO_INVITEVALUE => get_string('choosedots')) + $labels;
+                $labels = [SURVEYPRO_INVITEVALUE => get_string('choosedots')] + $labels;
             }
         } else {
-            $labels = array(SURVEYPRO_IGNOREMEVALUE => '') + $labels;
+            $labels = [SURVEYPRO_IGNOREMEVALUE => ''] + $labels;
         }
         if (!empty($this->labelother)) {
             list($othervalue, $otherlabel) = $this->get_other();
@@ -529,13 +521,13 @@ EOS;
         }
         // End of: element values.
 
-        $attributes = array();
+        $attributes = [];
         $attributes['id'] = $idprefix;
         $attributes['class'] = 'indent-'.$this->indent.' select_select';
         if (!$this->labelother) {
             $mform->addElement('select', $this->itemname, $elementlabel, $labels, $attributes);
         } else {
-            $elementgroup = array();
+            $elementgroup = [];
             $elementgroup[] = $mform->createElement('select', $this->itemname, '', $labels, $attributes);
 
             $attributes['id'] = $idprefix.'_text';
@@ -624,7 +616,7 @@ EOS;
      * @return array
      */
     public function userform_get_parent_disabilitation_info($childparentvalue) {
-        $disabilitationinfo = array();
+        $disabilitationinfo = [];
 
         $parentvalues = explode(SURVEYPRO_DBMULTICONTENTSEPARATOR, $childparentvalue); // 1;1;0;.
 
@@ -712,7 +704,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -796,7 +788,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         if (!$this->labelother) {
             $elementnames[] = $this->itemname;
         } else {

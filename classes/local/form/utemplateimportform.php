@@ -18,7 +18,7 @@
  * The class representing the "import user template" form
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * The class representing the form to import a user template
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utemplateimportform extends \moodleform {
@@ -47,11 +47,11 @@ class utemplateimportform extends \moodleform {
 
         // Get _customdata.
         $utemplateman = $this->_customdata->utemplateman;
-        $attributes = $this->_customdata->filemanageroptions;
 
         // Templateimport: importfile.
         // Here I use filemanager because I can even upload more than one usertemplate at once.
         $fieldname = 'importfile';
+        $attributes = $utemplateman->get_filemanager_options();
         $mform->addElement('filemanager', $fieldname.'_filemanager', get_string($fieldname, 'mod_surveypro'), null, $attributes);
         $mform->addRule($fieldname.'_filemanager', null, 'required');
 
@@ -62,10 +62,11 @@ class utemplateimportform extends \moodleform {
 
         // Templateimport: sharinglevel.
         $fieldname = 'sharinglevel';
-        $options = array();
-
-        $options = $utemplateman->get_sharinglevel_options();
-
+        $contexts = $utemplateman->get_sharingcontexts();
+        $options = [];
+        foreach ($contexts as $k => $context) {
+            $options[$k] = $utemplateman->contextlevel_to_scontextlabel($context->contextlevel);
+        }
         $mform->addElement('select', $fieldname, get_string($fieldname, 'mod_surveypro'), $options);
         $mform->addHelpButton($fieldname, $fieldname, 'surveypro');
         $mform->setDefault($fieldname, CONTEXT_SYSTEM);
@@ -87,7 +88,6 @@ class utemplateimportform extends \moodleform {
 
         // Get _customdata.
         $utemplateman = $this->_customdata->utemplateman;
-        // Useless: $attributes = $this->_customdata->filemanager_options;.
 
         $errors = parent::validation($data, $files);
 
@@ -101,7 +101,7 @@ class utemplateimportform extends \moodleform {
             return $errors;
         }
 
-        $importedfiles = array();
+        $importedfiles = [];
         foreach ($draftfiles as $file) {
             $xmlfilename = $file->get_filename();
             $importedfiles[] = $xmlfilename;
@@ -120,18 +120,17 @@ class utemplateimportform extends \moodleform {
             }
         }
 
-        // Set $debug = true; if you want to always stop to see where the xml template is buggy.
+        // Set $debug = true; if you want to always stop execution to see where the xml template is buggy.
         $debug = false;
         if ($debug) {
             $errors['importfile_filemanager'] = 'All is fine here!';
             return $errors;
         }
 
-        // Get all template files in the specified context.
-        $contextid = $utemplateman->get_contextid_from_sharinglevel($data['sharinglevel']);
-        $componentfiles = $utemplateman->get_available_templates($contextid);
+        // Get all template files at specified level.
+        $contextfiles = $utemplateman->get_utemplates_per_contextlevel($data['sharinglevel']);
 
-        foreach ($componentfiles as $xmlfile) {
+        foreach ($contextfiles as $xmlfile) {
             $filename = $xmlfile->get_filename();
             if (in_array($filename, $importedfiles)) {
                 if (isset($data['overwrite'])) {

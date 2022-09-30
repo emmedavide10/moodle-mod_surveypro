@@ -39,16 +39,6 @@ table#validaterelations {
     width: 100%;
 }
 
-table#manageitems .plugin,
-table#sortitems .plugin,
-table#validaterelations .plugin {
-    text-align: center;
-}
-
-table#manageitems .hide {
-    display: none;
-}
-
 table#manageitems td.plugin,
 table#sortitems td.plugin,
 table#validaterelations td.plugin {
@@ -57,10 +47,10 @@ table#validaterelations td.plugin {
     vertical-align: middle;
 }
 
-table#manageitems td.plugin span.pluginicon,
-table#sortitems td.plugin span.pluginicon,
-table#validaterelations td.plugin span.pluginicon {
-    padding: .2em;
+table#manageitems .plugin,
+table#sortitems .plugin,
+table#validaterelations .plugin {
+    text-align: center;
 }
 
 table#manageitems td.sortindex,
@@ -68,9 +58,24 @@ table#sortitems td.sortindex,
 table#validaterelations td.sortindex {
     min-width: 2.5em;
     padding: 0.5em;
-    text-align: right;
+    text-align: center;
     white-space: nowrap;
     vertical-align: middle;
+}
+
+table#manageitems .hide {
+    display: none;
+}
+
+table#validaterelations td.customnumber {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+table#manageitems td.plugin span.pluginicon,
+table#sortitems td.plugin span.pluginicon,
+table#validaterelations td.plugin span.pluginicon {
+    padding: .2em;
 }
 
 table#manageitems td.parentitem,
@@ -139,9 +144,17 @@ table#sortitems td.availability i.icon {
     margin-right: .2em;
 }
 
+table#validaterelations td.status {
+    text-align: center;
+    padding: 0.5em;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
 table#manageitems td.actions,
 table#sortitems td.actions,
 table#validaterelations td.actions {
+    text-align: center;
     padding: 0.5em;
     white-space: nowrap;
     vertical-align: middle;

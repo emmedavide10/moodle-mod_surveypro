@@ -18,7 +18,7 @@
  * Surveypro class to manage frequency report
  *
  * @package   surveyproreport_frequency
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->libdir.'/tablelib.php');
  * The class to manage frequency report
  *
  * @package   surveyproreport_frequency
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report extends reportbase {
@@ -45,6 +45,34 @@ class report extends reportbase {
     public $outputtable = null;
 
     /**
+     * Returns if this report was created for student too.
+     *
+     * @return void
+     */
+    public function has_studentreport() {
+        return false;
+    }
+
+    /**
+     * Does the current report apply to the passed mastertemplates?
+     *
+     * @param string $mastertemplate
+     * @return void
+     */
+    public function report_applies_to($mastertemplate) {
+        return true;
+    }
+
+    /**
+     * Get if this report displays user names.
+     *
+     * @return boolean false
+     */
+    public function has_visibleusernames() {
+        return false;
+    }
+
+    /**
      * Setup_outputtable
      *
      * @param int $itemid
@@ -53,18 +81,18 @@ class report extends reportbase {
     public function setup_outputtable($itemid) {
         $this->outputtable = new \flexible_table('frequency');
 
-        $paramurl = array('id' => $this->cm->id);
+        $paramurl = ['id' => $this->cm->id];
         $paramurl['itemid'] = $itemid;
         $baseurl = new \moodle_url('/mod/surveypro/report/frequency/view.php', $paramurl);
         $this->outputtable->define_baseurl($baseurl);
 
-        $tablecolumns = array();
+        $tablecolumns = [];
         $tablecolumns[] = 'content';
         $tablecolumns[] = 'absolute';
         $tablecolumns[] = 'percentage';
         $this->outputtable->define_columns($tablecolumns);
 
-        $tableheaders = array();
+        $tableheaders = [];
         $tableheaders[] = get_string('content', 'surveyproreport_frequency');
         $tableheaders[] = get_string('absolute', 'surveyproreport_frequency');
         $tableheaders[] = get_string('percentage', 'surveyproreport_frequency');
@@ -101,9 +129,9 @@ class report extends reportbase {
 
         $where = 'surveyproid = :surveyproid AND type = :type AND reserved = :reserved AND hidden = :hidden AND plugin <> :plugin';
 
-        $params = array();
+        $params = [];
         $params['surveyproid'] = $this->surveypro->id;
-        $params['type'] = SURVEYPRO_TYPEFIELD;
+        $params['type'] = 'field';
         $params['reserved'] = 0;
         $params['hidden'] = 0;
         $params['plugin'] = 'textarea';
@@ -111,7 +139,7 @@ class report extends reportbase {
         $countfields = $DB->count_records_select('surveypro_item', $where, $params);
         if (!$countfields) {
             echo $OUTPUT->box(get_string('textareasarenotallowed', 'surveyproreport_frequency'));
-            $url = new \moodle_url('/mod/surveypro/view_submissions.php', array('s' => $this->surveypro->id));
+            $url = new \moodle_url('/mod/surveypro/view_submissions.php', ['s' => $this->surveypro->id]);
             echo $OUTPUT->continue_button($url);
             echo $OUTPUT->footer();
             die();
@@ -149,7 +177,7 @@ class report extends reportbase {
 
         $decimalseparator = get_string('decsep', 'langconfig');
         foreach ($answers as $answer) {
-            $tablerow = array();
+            $tablerow = [];
 
             // Answer.
             $itemvalue = new \stdClass();
@@ -174,12 +202,12 @@ class report extends reportbase {
      * Get_submissions_sql
      *
      * @param int $itemid
-     * @return array($sql, $whereparams);
+     * @return [$sql, $whereparams];
      */
     public function get_submissions_sql($itemid) {
         global $COURSE, $DB;
 
-        $whereparams = array();
+        $whereparams = [];
         $sql = 'SELECT '.$DB->sql_compare_text('a.content', 255).', MIN(a.id) as id, COUNT(a.id) as absolute
                 FROM {user} u
                     JOIN {surveypro_submission} s ON s.userid = u.id
@@ -200,14 +228,14 @@ class report extends reportbase {
             $sql .= ' ORDER BY '.$DB->sql_compare_text('a.content', 255);
         }
 
-        return array($sql, $whereparams);
+        return [$sql, $whereparams];
     }
 
     /**
      * Get_answercount_sql
      *
      * @param int $itemid
-     * @return array($sql, $whereparams);
+     * @return [$sql, $whereparams];
      */
     public function get_answercount_sql($itemid) {
         global $COURSE, $DB;
@@ -223,7 +251,7 @@ class report extends reportbase {
         $sql .= ' AND a.itemid = :itemid';
         $whereparams['itemid'] = $itemid;
 
-        return array($sql, $whereparams);
+        return [$sql, $whereparams];
     }
 
     /**
@@ -254,14 +282,14 @@ class report extends reportbase {
         if (empty($CFG->gdversion)) {
             echo '('.get_string('gdneed').')';
         } else {
-            $imgparams = array();
+            $imgparams = [];
             $imgparams['class'] = 'resultgraph';
             $imgparams['height'] = SURVEYPROREPORT_FREQUENCY_GHEIGHT;
             $imgparams['width'] = SURVEYPROREPORT_FREQUENCY_GWIDTH;
             $imgparams['src'] = $graphurl;
             $imgparams['alt'] = get_string('pluginname', 'surveyproreport_frequency');
 
-            $content = \html_writer::start_tag('div', array('class' => 'centerpara'));
+            $content = \html_writer::start_tag('div', ['class' => 'centerpara']);
             $content .= \html_writer::empty_tag('img', $imgparams);
             $content .= \html_writer::end_tag('div');
             echo $content;

@@ -45,153 +45,82 @@ Feature: verify urls really redirect to existing pages
       | field  | time        |
 
   @javascript
-  Scenario: select each available link as a teacher
+  Scenario: test links as teacher
     Given I log in as "teacher1"
     And I am on "Test links course" course homepage
     And I follow "sPro test links"
-    #
-    # Layout TAB
-    #
-    # Layout -> Preview
-    And I navigate to "Layout > Preview" in current page administration
 
-    # Layout -> Elements
-    And I follow "Elements" page in tab bar
-    # Layout -> Elements: table headers
-    And I click on "Element" "link" in the ".plugin" "css_element"
-    And I click on "Order" "link" in the ".sortindex" "css_element"
-    And I click on "Branching" "link" in the ".parentitem" "css_element"
-    And I click on "Page" "link" in the ".formpage" "css_element"
-
-    # Layout -> Elements
-    And I navigate to "Layout > Elements" in current page administration
-
-    #
-    # Survey TAB
-    #
-    And I follow "Survey"
-    # Survey -> Dashboard
-    # This step used to be 'And I follow "Dashboard"', but "Dashboard" is found 4 times in the page
-    # so I use a custom "home made" behat call.
+    # Surveypro
+    And I navigate to "Surveypro" in current page administration
     And I follow "Dashboard" page in tab bar
-    # Survey -> Dashboard: Reports section
-    And I follow "Run Attachments overview report"
-    # return home
-    And I follow "Survey" page in tab bar
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Run Late users report"
-    # return home
-    And I follow "Survey" page in tab bar
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Run Frequency distribution report"
-    # return home
-    And I follow "Survey" page in tab bar
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Run Responses per user report"
-    # return home
-    And I follow "Survey" page in tab bar
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Run Users per count of responses report"
-    # return home
-    And I follow "Survey" page in tab bar
-    And I follow "Dashboard" page in tab bar
-
-    # Survey -> Dashboard: User templates section
-    And I follow "Manage user templates"
-    # return home
-    And I follow "Survey"
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Save user templates"
-    # return home
-    And I follow "Survey"
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Import user templates"
-    # return home
-    And I follow "Survey"
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Apply user templates"
-    # return home
-    And I follow "Survey"
-    And I follow "Dashboard" page in tab bar
-
-    # Survey -> Dashboard: Master templates section
-    And I follow "Save master templates"
-    # return home
-    And I follow "Survey"
-    And I follow "Dashboard" page in tab bar
-
-    And I follow "Apply master templates"
-    # return home
-    And I follow "Survey"
-    And I follow "Dashboard" page in tab bar
-
-    # Survey -> Responses
     And I follow "Responses" page in tab bar
 
-    # Survey -> Import
-    And I navigate to "Survey > Import" in current page administration
+    # Layout
+    And I navigate to "Layout" in current page administration
+    And I follow "Preview" page in tab bar
+    And I follow "Elements" page in tab bar
 
-    # Survey -> Export
-    And I navigate to "Survey > Export" in current page administration
+    # Tools
+    And I navigate to "Tools" in current page administration
+    And I follow "Import" page in tab bar
+    And I follow "Export" page in tab bar
 
-    #
-    # User templates TAB
-    #
-    # User templates -> Manage
-    And I navigate to "User templates > Manage" in current page administration
-    # User templates: pages
+    # Report
+    And I navigate to "Report" in current page administration
+    And I follow "Attachments overview" page in tab bar
+    And I follow "Frequency distribution" page in tab bar
+    And I follow "Late users" page in tab bar
+    And I follow "Responses per user" page in tab bar
+    And I follow "Users per count of responses" page in tab bar
+
+    # User templates
+    And I navigate to "User templates" in current page administration
+    And I follow "Manage" page in tab bar
     And I follow "Save" page in tab bar
     And I follow "Import" page in tab bar
     And I follow "Apply" page in tab bar
-    # User templates -> Save
-    And I navigate to "User templates > Save" in current page administration
-    # User templates -> Import
-    And I navigate to "User templates > Import" in current page administration
-    # User templates -> Apply
-    And I navigate to "User templates > Apply" in current page administration
 
-    #
-    # Master templates TAB
-    #
-    # Master templates -> Save
-    And I navigate to "Master templates > Save" in current page administration
-    # Master templates: pages
+    # Master templates
+    And I navigate to "Master templates" in current page administration
+    And I follow "Save" page in tab bar
     And I follow "Apply" page in tab bar
-    And I navigate to "Master templates > Apply" in current page administration
 
-    #
-    # Report TAB
-    #
-    # Report -> Attachments overview
-    And I navigate to "Report > Attachments overview" in current page administration
+    # Surveypro > dashboard
+    # Reports section
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Run Attachments overview report"
 
-    # Report -> Late users
-    And I follow "sPro test links"
-    And I navigate to "Report > Late users" in current page administration
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Run Frequency distribution report"
 
-    # Report -> Frequency distribution
-    And I follow "sPro test links"
-    And I navigate to "Report > Frequency distribution" in current page administration
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Run Late users report"
 
-    # Report -> Responses per user
-    And I follow "sPro test links"
-    And I navigate to "Report > Responses per user" in current page administration
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Run Responses per user report"
 
-    # Report -> Users per count of responses
-    And I follow "sPro test links"
-    And I navigate to "Report > Users per count of responses" in current page administration
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Run Users per count of responses report"
+
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Manage user templates"
+
+    # User templates section
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Manage"
+    And I follow "Save"
+    And I follow "Import"
+    And I follow "Apply"
+
+    # Master templates section
+    And I navigate to "Surveypro" in current page administration
+    And I follow "Save"
+    And I follow "Apply"
 
   @javascript
-  Scenario: select each available link as a student
+  Scenario: test links as student
     Given I log in as "student1"
     And I am on "Test links course" course homepage
     And I follow "sPro test links"
     And I follow "Dashboard" page in tab bar
-    And I follow "Responses"
+    And I follow "Responses" page in tab bar

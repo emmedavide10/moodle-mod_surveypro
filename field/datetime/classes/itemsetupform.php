@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyprofield_datetime
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +36,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/datetime/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyprofield_datetime
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -60,7 +60,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: step.
         $fieldname = 'step';
-        $options = array();
+        $options = [];
         $options[1] = get_string('oneminute', 'surveyprofield_datetime');
         $options[5] = get_string('fiveminutes', 'surveyprofield_datetime');
         $options[10] = get_string('tenminutes', 'surveyprofield_datetime');
@@ -73,10 +73,10 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: defaultoption.
         $fieldname = 'defaultoption';
-        $separator = array(' ', ' ', ', ', ':');
+        $separator = [' ', ' ', ', ', ':'];
         $daysrange = range(1, 31);
         $days = array_combine($daysrange, $daysrange);
-        $months = array();
+        $months = [];
         for ($i = 1; $i <= 12; $i++) {
             $months[$i] = userdate(gmmktime(12, 0, 0, $i, 1, 2000), "%B", 0); // January, February, March...
         }
@@ -92,7 +92,7 @@ class itemsetupform extends itemsetupbaseform {
         $invitedefaultstr = get_string('invitedefault', 'mod_surveypro');
         $likelaststr = get_string('likelast', 'mod_surveypro');
         $noanswerstr = get_string('noanswer', 'mod_surveypro');
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $customdefaultstr, SURVEYPRO_CUSTOMDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $currentdatetimedefaultstr, SURVEYPRO_TIMENOWDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $invitedefaultstr, SURVEYPRO_INVITEDEFAULT);
@@ -104,7 +104,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: defaultvalue.
         $fieldname = 'defaultvalue';
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('select', $fieldname.'day', '', $days);
         $elementgroup[] = $mform->createElement('select', $fieldname.'month', '', $months);
         $elementgroup[] = $mform->createElement('select', $fieldname.'year', '', $years);
@@ -131,7 +131,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: lowerbound.
         $fieldname = 'lowerbound';
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('select', $fieldname.'day', '', $days);
         $elementgroup[] = $mform->createElement('select', $fieldname.'month', '', $months);
         $elementgroup[] = $mform->createElement('select', $fieldname.'year', '', $years);
@@ -147,7 +147,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: upperbound.
         $fieldname = 'upperbound';
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('select', $fieldname.'day', '', $days);
         $elementgroup[] = $mform->createElement('select', $fieldname.'month', '', $months);
         $elementgroup[] = $mform->createElement('select', $fieldname.'year', '', $years);

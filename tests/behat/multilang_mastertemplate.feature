@@ -35,7 +35,6 @@ Feature: verify multilang in mastertemplates
     And I log out
 
     # Force English for UI.
-    And I follow "English (en)" in the language menu
     And I log in as "teacher1"
     And I am on site homepage
     And I follow "Multilang mastertemplate"
@@ -70,17 +69,15 @@ Feature: verify multilang in mastertemplates
     And I log out
 
     # Force Italiano for UI.
-    And I follow "Italiano (it)" in the language menu
-    # Take care: you are in Italian now and "Log in" has been replaced by "Login"
-    And I follow "Login"
-    And I set the following fields to these values:
-      | Username | student1 |
-      | Password | student1 |
-    And I press "Login"
+    And I log in as "student1"
+    And I follow "Preference" in the user menu
+    And I follow "Preferred language"
+    And I set the field "Preferred language" to "Italiano ‎(it)‎"
+    And I press "Save changes"
 
     And I am on site homepage
     And I follow "Multilang mastertemplate"
-    When I follow "Multilang in ATTLS"
+    And I follow "Multilang in ATTLS"
     And I press "Nuova risposta"
     Then I should see "Atteggiamenti nei Confronti del Pensare e dell'Imparare"
 
@@ -106,8 +103,3 @@ Feature: verify multilang in mastertemplates
     And I follow "Multilang in Critical Incidents"
     And I press "Nuova risposta"
     Then I should see "In classe in quale momento sei più partecipe come studente?"
-
-    # Set again language to English to make "I log out" successfull.
-    And I follow "English (en)" in the language menu
-
-    And I log out

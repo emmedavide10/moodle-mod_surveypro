@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyprofield_radiobutton
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +36,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/radiobutton/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyprofield_radiobutton
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -55,7 +55,7 @@ class itemsetupform extends itemsetupbaseform {
         // Get _customdata.
         $item = $this->_customdata['item'];
 
-        $textareaoptions = array('wrap' => 'virtual', 'rows' => '10', 'cols' => '65');
+        $textareaoptions = ['wrap' => 'virtual', 'rows' => '10', 'cols' => '65'];
 
         // Item: options.
         $fieldname = 'options';
@@ -66,7 +66,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: labelother.
         $fieldname = 'labelother';
-        $attributes = array('maxlength' => '64', 'size' => '50');
+        $attributes = ['maxlength' => '64', 'size' => '50'];
         $mform->addElement('text', $fieldname, get_string($fieldname, 'surveyprofield_radiobutton'), $attributes);
         $mform->addHelpButton($fieldname, $fieldname, 'surveyprofield_radiobutton');
         $mform->setType($fieldname, PARAM_TEXT);
@@ -76,7 +76,7 @@ class itemsetupform extends itemsetupbaseform {
         $customdefaultstr = get_string('customdefault', 'surveyprofield_radiobutton');
         $invitedefaultstr = get_string('invitedefault', 'mod_surveypro');
         $noanswerstr = get_string('noanswer', 'mod_surveypro');
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $customdefaultstr, SURVEYPRO_CUSTOMDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $invitedefaultstr, SURVEYPRO_INVITEDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $noanswerstr, SURVEYPRO_NOANSWERDEFAULT);
@@ -86,7 +86,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: defaultvalue.
         $fieldname = 'defaultvalue';
-        $elementgroup = array();
+        $elementgroup = [];
         $mform->addElement('text', $fieldname, '');
         $mform->disabledIf($fieldname, 'defaultoption', 'neq', SURVEYPRO_CUSTOMDEFAULT);
         $mform->setType($fieldname, PARAM_RAW);
@@ -101,7 +101,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: adjustment.
         $fieldname = 'adjustment';
-        $options = array();
+        $options = [];
         $options[SURVEYPRO_HORIZONTAL] = get_string('horizontal', 'surveyprofield_radiobutton');
         $options[SURVEYPRO_VERTICAL] = get_string('vertical', 'surveyprofield_radiobutton');
         $mform->addElement('select', $fieldname, get_string($fieldname, 'surveyprofield_radiobutton'), $options);
@@ -136,8 +136,8 @@ class itemsetupform extends itemsetupbaseform {
         $cleandefaultvalue = isset($data['defaultvalue']) ? trim($data['defaultvalue']) : '';
 
         // Build $value and $label arrays starting from $cleanoptions and $cleanlabelother.
-        $values = array();
-        $labels = array();
+        $values = [];
+        $labels = [];
 
         foreach ($cleanoptions as $option) {
             if (strpos($option, SURVEYPRO_VALUELABELSEPARATOR) === false) {

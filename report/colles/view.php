@@ -18,7 +18,7 @@
  * Starting page of the colles report.
  *
  * @package   surveyproreport_colles
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,24 +29,24 @@ use surveyproreport_colles\groupjumperform;
 require_once(dirname(dirname(dirname(dirname(dirname(__FILE__))))).'/config.php');
 require_once($CFG->dirroot.'/mod/surveypro/report/colles/lib.php');
 require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir.'/adminlib.php');
 
 $id = optional_param('id', 0, PARAM_INT);
 $s = optional_param('s', 0, PARAM_INT);
 
 if (!empty($id)) {
     $cm = get_coursemodule_from_id('surveypro', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
 } else {
-    $surveypro = $DB->get_record('surveypro', array('id' => $s), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $surveypro->course), '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $s], '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $surveypro->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('surveypro', $surveypro->id, $course->id, false, MUST_EXIST);
 }
 $cm = cm_info::create($cm);
 
 $type = optional_param('type', 'summary', PARAM_ALPHA);  // Type of graph.
-$area = optional_param('area', false, PARAM_INT);  // Area ID.
-$edit = optional_param('edit', -1, PARAM_BOOL);
+$area = optional_param('area', 0, PARAM_INT);            // Area for 'question' graph.
 $groupid = optional_param('groupid', false, PARAM_INT);  // Group ID.
 
 require_course_login($course, false, $cm);
@@ -66,34 +66,22 @@ $reportman->set_groupid($groupid);
 
 // Begin of: define $mform return url.
 $showjumper = $reportman->is_groupjumper_needed();
-if ($showjumper) {
-    $canaccessallgroups = has_capability('moodle/site:accessallgroups', $context);
+$canaccessallgroups = has_capability('moodle/site:accessallgroups', $context);
+$jumpercontent = $reportman->get_groupjumper_items();
 
-    $jumpercontent = $reportman->get_groupjumper_items();
+$paramurl = ['id' => $cm->id];
+$formurl = new \moodle_url('/mod/surveypro/report/colles/view.php', $paramurl);
 
-    $paramurl = array('id' => $cm->id);
-    $paramurl['type'] = $type;
-    $paramurl['area'] = $area;
-    $formurl = new \moodle_url('/mod/surveypro/report/colles/view.php', $paramurl);
-
-    $formparams = new \stdClass();
-    $formparams->canaccessallgroups = $canaccessallgroups;
-    $formparams->addnotinanygroup = $reportman->add_notinanygroup();
-    $formparams->jumpercontent = $jumpercontent;
-    $attributes = array('id' => 'surveypro_jumperform');
-    $groupfilterform = new groupjumperform($formurl, $formparams, null, null, $attributes);
-
-    $PAGE->requires->js_amd_inline("
-    require(['jquery'], function($) {
-        $('#id_groupid').change(function() {
-            $('#surveypro_jumperform').submit();
-        });
-    });");
-}
+$formparams = new \stdClass();
+$formparams->showjumper = $showjumper;
+$formparams->canaccessallgroups = $canaccessallgroups;
+$formparams->addnotinanygroup = $reportman->add_notinanygroup();
+$formparams->jumpercontent = $jumpercontent;
+$groupfilterform = new groupjumperform($formurl, $formparams);
 // End of: prepare params for the form.
 
 // Output starts here.
-$paramurl = array('s' => $surveypro->id, 'type' => $type);
+$paramurl = ['s' => $surveypro->id, 'type' => $type];
 if ( ($type == 'questions') && ($area !== false) ) { // Area can be zero.
     $paramurl['area'] = $area;
 }
@@ -104,45 +92,28 @@ $PAGE->set_context($context);
 $PAGE->set_cm($cm);
 $PAGE->set_title($surveypro->name);
 $PAGE->set_heading($course->shortname);
-if (($edit != -1) and $PAGE->user_allowed_editing()) {
-    $USER->editing = $edit;
-}
-if ($PAGE->user_allowed_editing()) {
-    // Change URL parameter and block display string value depending on whether editing is enabled or not
-    if ($PAGE->user_is_editing()) {
-        $urlediting = 'off';
-        $strediting = get_string('blockseditoff');
-    } else {
-        $urlediting = 'on';
-        $strediting = get_string('blocksediton');
-    }
-    $url = new \moodle_url($CFG->wwwroot.'/mod/surveypro/report/colles/view.php', ['id' => $cm->id, 'edit' => $urlediting]);
-    $PAGE->set_button($OUTPUT->single_button($url, $strediting));
-}
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($surveypro->name), 2, null);
+$tab = new tabs($cm, $context, $surveypro);
+$tab->draw_pages_bar(SURVEYPRO_TABREPORTS, 'colles');
 
-// Render the activity information.
-$completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
-$activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
-echo $OUTPUT->activity_information($cm, $completiondetails, $activitydates);
-
-$surveyproreportlist = get_plugin_list('surveyproreport');
-$reportkey = array_search('colles', array_keys($surveyproreportlist));
-new tabs($cm, $context, $surveypro, SURVEYPRO_TABREPORTS, $reportkey);
-
-$reportman->nosubmissions_stop();
+$reportman->prevent_direct_user_input();
 
 // Begin of: manage form submission.
-if ( $showjumper && ($fromform = $groupfilterform->get_data()) ) {
-    $reportman->set_groupid($fromform->groupid);
+if ($fromform = $groupfilterform->get_data()) {
+    $type = isset($fromform->type_area['type']) ? $fromform->type_area['type'] : 'summary';
+    $area = isset($fromform->type_area['area']) ? $fromform->type_area['area'] : 1;
+    if ($showjumper) {
+        $reportman->set_groupid($fromform->groupid);
+    }
 }
 // End of: manage form submission.
 
-if ($showjumper) {
-    $groupfilterform->display();
-}
+$preset = ['type_area[type]' => $type, 'type_area[area]' => $area];
+$groupfilterform->set_data($preset);
+$groupfilterform->display();
+
+$reportman->nosubmissions_stop();
 
 switch ($type) {
     case 'summary':
@@ -153,10 +124,6 @@ switch ($type) {
         break;
     case 'questions':
         $reportman->output_questionsdata($area);
-        break;
-    case 'question':
-    case 'students':
-    case 'student':
         break;
 }
 

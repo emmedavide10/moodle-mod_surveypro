@@ -21,7 +21,7 @@ Feature: apply ATTLS (20 item version) mastertemplate
     And I am on "To apply mastertemplate" course homepage
 
   @javascript
-  Scenario: apply ATTLS (20 item version) master template
+  Scenario: apply ATTLS (20 item version) mastertemplate
     Given I follow "To apply ATTLS"
     And I set the field "Master templates" to "ATTLS (20 item version)"
     And I press "Apply"

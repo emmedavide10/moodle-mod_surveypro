@@ -62,10 +62,9 @@ class restore_surveypro_activity_task extends restore_activity_task {
      * @return array
      */
     public static function define_decode_contents() {
-        $contents = array();
-
-        $contents[] = new restore_decode_content('surveypro', array('intro'), 'surveypro');
-        // $contents[] = new restore_decode_content('surveypro', array('thankspage'), 'surveypro');
+        $contents = [];
+        $contents[] = new restore_decode_content('surveypro', ['intro'], 'surveypro');
+        // $contents[] = new restore_decode_content('surveypro', ['thankspage'], 'surveypro');
 
         return $contents;
     }
@@ -75,8 +74,7 @@ class restore_surveypro_activity_task extends restore_activity_task {
      * to the activity to be executed by the link decoder
      */
     public static function define_decode_rules() {
-        $rules = array();
-
+        $rules = [];
         $rules[] = new restore_decode_rule('SURVEYPROVIEWBYID', '/mod/surveypro/view.php?id=$1', 'course_module');
         $rules[] = new restore_decode_rule('SURVEYPROINDEX', '/mod/surveypro/index.php?id=$1', 'course');
 
@@ -90,8 +88,7 @@ class restore_surveypro_activity_task extends restore_activity_task {
      * of {@see restore_log_rule} objects
      */
     public static function define_restore_log_rules() {
-        $rules = array();
-
+        $rules = [];
         $rules[] = new restore_log_rule('surveypro', 'add', 'view.php?id={course_module}', '{surveypro}');
         $rules[] = new restore_log_rule('surveypro', 'update', 'view.php?id={course_module}', '{surveypro}');
         $rules[] = new restore_log_rule('surveypro', 'view', 'view.php?id={course_module}', '{surveypro}');
@@ -113,11 +110,8 @@ class restore_surveypro_activity_task extends restore_activity_task {
      * activity level. All them are rules not linked to any module instance (cmid = 0)
      */
     public static function define_restore_log_rules_for_course() {
-        $rules = array();
-
-        // Fix old wrong uses (missing extension).
-        $rules[] = new restore_log_rule('surveypro', 'view all', 'index?id={course}', null,
-                                        null, null, 'index.php?id={course}');
+        $rules = [];
+        $rules[] = new restore_log_rule('surveypro', 'view all', 'index?id={course}', null, null, null, 'index.php?id={course}');
         $rules[] = new restore_log_rule('surveypro', 'view all', 'index.php?id={course}', null);
 
         return $rules;

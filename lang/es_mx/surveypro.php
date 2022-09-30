@@ -18,7 +18,7 @@
  * Spanish/Mexican strings for surveypro
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,20 +36,20 @@ $string['surveyproname_help'] = 'Elegir el nombre de este surveypro.';
 $string['surveypro'] = 'survey';
 
 $string['tablayoutname'] = 'Diseño';
-    $string['tabitemspage1'] = 'Previsualización';
-    $string['tabitemspage2'] = 'Elementos';
-    $string['tabitemspage3'] = 'Configuración de elemento';
-    $string['tabitemspage4'] = 'Validación ramificada';
+    $string['tablayoutpage1'] = 'Previsualización';
+    $string['tablayoutpage2'] = 'Elementos';
+    $string['tablayoutpage3'] = 'Configuración de elemento';
+    $string['tablayoutpage4'] = 'Validación ramificada';
 $string['tabsubmissionsname'] = 'Survey';
-    $string['tabsubmissionspage1'] = 'Tablero'; // Maybe 'Overview' is better?
-    $string['tabsubmissionspage2'] = 'Respuestas';
-    $string['tabsubmissionspage3'] = 'Insertar';
-    $string['tabsubmissionspage4'] = 'Editar';
-    $string['tabsubmissionspage5'] = 'Solo lectura';
-    $string['tabsubmissionspage6'] = 'Buscar';
-    $string['tabsubmissionspage7'] = 'Reportes';
-    $string['tabsubmissionspage8'] = 'Importar';
-    $string['tabsubmissionspage9'] = 'Exportar';
+    $string['tabdataentrypage1'] = 'Tablero'; // Maybe 'Overview' is better?
+    $string['tabdataentrypage2'] = 'Respuestas';
+    $string['tabdataentrypage3'] = 'Insertar';
+    $string['tabdataentrypage4'] = 'Editar';
+    $string['tabdataentrypage5'] = 'Solo lectura';
+    $string['tabdataentrypage6'] = 'Buscar';
+    $string['tabdataentrypage7'] = 'Reportes';
+    $string['tabdataentrypage8'] = 'Importar';
+    $string['tabdataentrypage9'] = 'Exportar';
 $string['tabutemplatename'] = 'Plantillas del usuario';
     $string['tabutemplatepage1'] = 'Gestionar';
     $string['tabutemplatepage2'] = 'Guardar';
@@ -88,7 +88,6 @@ $string['cannotsubmittooearly'] = 'La encuesta aun no está abierta. Usted tiene
 $string['cannotsubmittoolate'] = 'La encuesta se ha cerrado en {$a}';
 $string['captcha_help'] = 'Añadirle a esta colección el CAPTCHA para aumentar la seguridad.';
 $string['captcha'] = 'Añadir CAPTCHA';
-$string['category'] = 'Categoría de curso';
 $string['changeorder_title'] = 'Reordenar';
 $string['closed'] = 'Esta encuesta cerró en';
 $string['closedsubmissions'] = 'Respuestas cerradas';
@@ -136,8 +135,9 @@ $string['content'] = 'Contenido';
 $string['count_allitems'] = 'Encuesta construida en {$a} elementos.';
 $string['count_hiddenitems'] = '({$a} ocultos)';
 $string['count_pages'] = 'Dividida en {$a} páginas.';
-$string['course'] = 'Curso';
 $string['crontask'] = 'Trabajos de mantenimiento de Surveypro';
+$string['currentcategory'] = 'Categoría de curso';
+$string['currentcourse'] = 'Curso';
 $string['currenttotemplate'] = 'Guardar encuesta actual como plantilla maestra en formato ZIP.<br />Para instalar una plantilla maestra, descomprímala a mod/surveypro/template/ y visite la página de notificaciones.';
 $string['customnumber_header'] = '#';
 $string['customnumber_help'] = 'Use este campo para darle un número personalizado al elemento. Puede ser un número natural como 1 o cualquier otro que Usted necesite: 1a, A, 1.1.a, #1, A, A.1... Tome en cuenta que Usted es responsable por la coherencia de esos números. Debido a esto, tenga cuidado si Usted planea cambiar el orden de los elementos.';
@@ -435,9 +435,9 @@ $string['surveypro:duplicateotherssubmissions'] = 'Duplicar respuestas de otros 
 $string['surveypro:duplicateownsubmissions'] = 'Duplicar respuestas propias';
 $string['surveypro:editotherssubmissions'] = 'Editar respuestas de otros usuarios';
 $string['surveypro:editownsubmissions'] = 'Editar respuestas propias';
-$string['surveypro:exportdata'] = 'Exportar respuestas recolectadas';
+$string['surveypro:exportresponses'] = 'Exportar respuestas recolectadas';
 $string['surveypro:ignoremaxentries'] = 'Los envíos no están limitados por la configuración de máximas entradas';
-$string['surveypro:importdata'] = 'Importar datos';
+$string['surveypro:importresponses'] = 'Importar datos';
 $string['surveypro:importusertemplates'] = 'Subir plantillas de usuario';
 $string['surveypro:manageitems'] = 'Gestionar elementos de encuesta';
 $string['surveypro:manageusertemplates'] = 'Gestionar plantillas de usuario';
@@ -481,7 +481,6 @@ $string['unixtime'] = 'hora Unix';
 $string['unlimited'] = 'Ilimitados';
 $string['unreservable_title'] = 'elemento de acceso libre.No-reservable.';
 $string['unsearchable_title'] = 'Ítem no buscable. In-buscable';
-$string['user'] = 'Usuario';
 $string['usercanceled'] = 'Acción cancelada por el usuario';
 $string['userstyle_help'] = 'Añada aquí una o más hojas de estilo en cascada (css) que quiera aplicar a esta encuesta.';
 $string['userstyle'] = 'Hoja de estilo personalizada';

@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_age
  *
  * @package   surveyprofield_age
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/age/lib.php');
  * Class to manage each aspect of the age item
  *
  * @package   surveyprofield_age
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -156,7 +156,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values..
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'age';
 
         // Override the list of fields using format, whether needed.
@@ -371,7 +371,7 @@ class item extends itembase {
      * @return void
      */
     public function get_composite_fields() {
-        return array('defaultvalue', 'lowerbound', 'upperbound');
+        return ['defaultvalue', 'lowerbound', 'upperbound'];
     }
 
     /**
@@ -380,8 +380,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote'];
 
         return $fieldlist;
     }
@@ -452,21 +452,13 @@ EOS;
         $strnoanswer = get_string('noanswer', 'mod_surveypro');
 
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_age_'.$this->sortindex;
 
         // Begin of: element values.
-        $years = array();
-        $months = array();
+        $years = [];
+        $months = [];
         if (!$searchform) {
             if ($this->defaultoption == SURVEYPRO_INVITEDEFAULT) {
                 $years[SURVEYPRO_INVITEVALUE] = get_string('inviteyear', 'surveyprofield_age');
@@ -487,8 +479,8 @@ EOS;
         // End of: element values.
 
         // Begin of: mform element.
-        $elementgroup = array();
-        $attributes = array();
+        $elementgroup = [];
+        $attributes = [];
 
         $itemname = $this->itemname.'_year';
         $attributes['id'] = $idprefix.'_year';
@@ -708,7 +700,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -763,7 +755,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array($this->itemname.'_group');
+        $elementnames = [$this->itemname.'_group'];
 
         return $elementnames;
     }

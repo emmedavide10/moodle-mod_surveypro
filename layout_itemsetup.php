@@ -18,7 +18,7 @@
  * Starting page for item setup.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,16 +28,17 @@ use mod_surveypro\utility_submission;
 use mod_surveypro\tabs;
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+
 $id = optional_param('id', 0, PARAM_INT); // Course_module id.
 $s = optional_param('s', 0, PARAM_INT);   // Surveypro instance id.
 
 if (!empty($id)) {
     $cm = get_coursemodule_from_id('surveypro', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
 } else {
-    $surveypro = $DB->get_record('surveypro', array('id' => $s), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $surveypro->course), '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $s], '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $surveypro->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('surveypro', $surveypro->id, $course->id, false, MUST_EXIST);
 }
 $cm = cm_info::create($cm);
@@ -64,6 +65,8 @@ $utilitylayoutman = new utility_layout($cm, $surveypro);
 $hassubmissions = $utilitylayoutman->has_submissions();
 
 $layoutman = new layout_itemsetup($cm, $context, $surveypro);
+echo '$typeplugin = '.$typeplugin.'<br />';
+
 if (!empty($typeplugin)) {
     $layoutman->set_typeplugin($typeplugin);
 } else {
@@ -110,18 +113,18 @@ $item->set_editor();
 // End of: get item.
 
 // Begin of: define $itemform return url.
-$paramurl = array('id' => $cm->id);
+$paramurl = ['id' => $cm->id];
 $formurl = new \moodle_url('/mod/surveypro/layout_itemsetup.php', $paramurl);
 // End of: define $itemform return url.
 
 // Begin of: prepare params for the form.
 $classname = 'surveyprofield_'.$itemplugin.'\itemsetupform';
-$itemform = new $classname($formurl, array('item' => $item), null, null, array('id' => 'itemsetup'));
+$itemform = new $classname($formurl, ['item' => $item], null, null, ['id' => 'itemsetup']);
 // End of: prepare params for the form.
 
 // Begin of: manage form submission.
 if ($itemform->is_cancelled()) {
-    $returnurl = new \moodle_url('/mod/surveypro/layout_itemlist.php', $paramurl);
+    $returnurl = new \moodle_url('/mod/surveypro/layout_itemslist.php', $paramurl);
     redirect($returnurl);
 }
 
@@ -138,14 +141,14 @@ if ($fromform = $itemform->get_data()) {
     $item = surveypro_get_item($cm, $surveypro, $itemid, $item->get_type(), $item->get_plugin());
     $item->item_update_childrenparentvalue();
 
-    $paramurl = array('id' => $cm->id, 'iefeedback' => $feedback);
-    $returnurl = new \moodle_url('/mod/surveypro/layout_itemlist.php', $paramurl);
+    $paramurl = ['id' => $cm->id, 'iefeedback' => $feedback];
+    $returnurl = new \moodle_url('/mod/surveypro/layout_itemslist.php', $paramurl);
     redirect($returnurl);
 }
 // End of: manage form submission.
 
 // Output starts here.
-$paramurl = array('id' => $cm->id);
+$paramurl = ['id' => $cm->id];
 $paramurl['itemid'] = $itemid;
 $paramurl['type'] = $layoutman->get_type();
 $paramurl['plugin'] = $layoutman->get_plugin();
@@ -158,14 +161,9 @@ $PAGE->set_title($surveypro->name);
 $PAGE->set_heading($course->shortname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($surveypro->name), 2, null);
 
-// Render the activity information.
-$completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
-$activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
-echo $OUTPUT->activity_information($cm, $completiondetails, $activitydates);
-
-new tabs($cm, $context, $surveypro, SURVEYPRO_TABLAYOUT, SURVEYPRO_LAYOUT_ITEMSETUP);
+$tab = new tabs($cm, $context, $surveypro);
+$tab->draw_pages_bar(SURVEYPRO_TABLAYOUT, 'itemsetup_page');
 
 $utilitysubmissionman = new utility_submission($cm, $surveypro);
 if ($hassubmissions) {

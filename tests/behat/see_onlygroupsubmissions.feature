@@ -1,11 +1,11 @@
 @mod @mod_surveypro
-Feature: test students can see submissions from their groupmates
-  In order to test that students can only see submissions from their groupmates
+Feature: test students can see submissions only from their groups
+  In order to test that students can only see submissions from their groups
   As student1 and student2 and student3
   I fill a surveypro and go to see responses
 
   @javascript
-  Scenario: test each student can only see submissions from his/her groupmates
+  Scenario: submissions only from the same group
     Given the following "courses" exist:
       | fullname                   | shortname          | category | groupmode |
       | Course divided into groups | Only from my group | 0        | 0         |
@@ -37,11 +37,14 @@ Feature: test students can see submissions from their groupmates
     And I log in as "teacher1"
     And I am on "Course divided into groups" course homepage
     And I turn editing mode on
-    And I add a "Surveypro" to section "1" and I fill the form with:
-      | Name        | Get only my group submission                                  |
-      | Description | Test each student can only see submissions from his/her group |
-      | Group mode  | Separate groups                                               |
-    And I follow "Get only my group submission"
+    # And I add a "Surveypro" and I fill the form with:
+    And I add a "Surveypro" to section "1"
+    And I set the following fields to these values:
+      | Name        | Get only my group submission                            |
+      | Description | Test students can only see submissions from their group |
+      | Group mode  | Separate groups                                         |
+    And I press "Save and display"
+    And I turn editing mode off
 
     And I set the field "typeplugin" to "Text (short)"
     And I press "Add"

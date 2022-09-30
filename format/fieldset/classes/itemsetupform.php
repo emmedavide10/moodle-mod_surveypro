@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyproformat_fieldset
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/format/fieldset/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyproformat_fieldset
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -61,7 +61,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: defaultstatus.
         $fieldname = 'defaultstatus';
-        $options = array();
+        $options = [];
         $options[] = get_string('forceclosed', 'surveyproformat_fieldset');
         $options[] = get_string('forceopened', 'surveyproformat_fieldset');
         $options[] = get_string('moodledefault', 'surveyproformat_fieldset');

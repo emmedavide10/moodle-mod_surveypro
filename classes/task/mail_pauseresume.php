@@ -18,7 +18,7 @@
  * A scheduled task for surveypro cron.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/lib.php');
  * The main schedule task for the surveypro module.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mail_pauseresume extends crontaskbase {
@@ -79,7 +79,7 @@ class mail_pauseresume extends crontaskbase {
                 $context = \context_module::instance($cm->id);
 
                 // Search for users with in progress surveypro.
-                $whereparams = array();
+                $whereparams = [];
                 $submissiontable = 'SELECT userid, surveyproid
                                     FROM {surveypro_submission} ss
                                     WHERE ss.surveyproid = :surveyproid

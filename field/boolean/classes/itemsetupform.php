@@ -18,7 +18,7 @@
  * Surveypro pluginform class.
  *
  * @package   surveyprofield_boolean
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/boolean/lib.php');
  * The class representing the plugin form
  *
  * @package   surveyprofield_boolean
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class itemsetupform extends itemsetupbaseform {
@@ -56,7 +56,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: style.
         $fieldname = 'style';
-        $options = array();
+        $options = [];
         $options[SURVEYPROFIELD_BOOLEAN_USERADIOH] = get_string('useradioh', 'surveyprofield_boolean');
         $options[SURVEYPROFIELD_BOOLEAN_USERADIOV] = get_string('useradiov', 'surveyprofield_boolean');
         $options[SURVEYPROFIELD_BOOLEAN_USESELECT] = get_string('usemenu', 'surveyprofield_boolean');
@@ -70,7 +70,7 @@ class itemsetupform extends itemsetupbaseform {
         $customdefaultstr = get_string('customdefault', 'surveyprofield_boolean');
         $invitedefaultstr = get_string('invitedefault', 'mod_surveypro');
         $noanswerstr = get_string('noanswer', 'mod_surveypro');
-        $elementgroup = array();
+        $elementgroup = [];
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $customdefaultstr, SURVEYPRO_CUSTOMDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $invitedefaultstr, SURVEYPRO_INVITEDEFAULT);
         $elementgroup[] = $mform->createElement('radio', $fieldname, '', $noanswerstr, SURVEYPRO_NOANSWERDEFAULT);
@@ -80,7 +80,7 @@ class itemsetupform extends itemsetupbaseform {
 
         // Item: defaultvalue.
         $fieldname = 'defaultvalue';
-        $options = array('1' => get_string('yes'), '0' => get_string('no'));
+        $options = ['1' => get_string('yes'), '0' => get_string('no')];
         $mform->addElement('select', $fieldname, null, $options);
         $mform->disabledIf($fieldname, 'defaultoption', 'neq', SURVEYPRO_CUSTOMDEFAULT);
 

@@ -70,7 +70,7 @@ you will be forced to edit and save a copy of it in order to preserve the histor
 The email will only advise about response from the user, not about its content and without sender details.
 • More notifications: Some additional email addresses to notify about new responses. Addresses are supposed to be one per row.
 • Thanks web page: The html code of the web page the user get at each response closing time.
-• Deadline of risky modification session: Allow users permitted to manage survey elements to force modifications of this survey even once already answered.
+• Deadline of risky modification session: Allow users permitted to manage survey elements to force modifications even for surveys already answered.
 
 A list of "elements" are available to create the surveypro.
 This list of "elements" is divided into: "fields" and "format" elements.
@@ -158,3 +158,35 @@ Relevant not so common features:
     -> a lot of examples among tests/fixtures/usertemplate describing each possible use of each core elements
 
 How to create a surveypro
+1) limit the number of responses of the users
+2) send to enrolled users a reminder email if they are late
+3) send the user response by email to roles or specific email
+4) save to database not the label of the checkbox or of the select but the corresponding value
+5) get positional answer from checkbox answers at export time
+6) allow the user to say "to this mandatory question, my answer is: `I don't answer`" that corresponds to what we say "I have the answer but I don't want to share it with you"
+7) export the surveypro answers in different formats
+8) verify if your surveypro has "well defined" relations
+9) share your borning surveypro in XML with your partners by email
+10) allow users to pause/resume a surverpro
+11) drop abandoned responses
+11) allow the users to change their response BUT forcing them to save the modified response to a new one in order to preserve the history of what they did?
+12) add notes (filling instructions) for each item.
+13) have mandatory or optional questions
+14) define the format of short text items. email? url? even regulars expressions are allowed
+15) define the name of the variable to get it in the exported file
+16) define a custom question number (3 or 3.a or whatever you may like)
+17) indent questions to let you better understand the general behaviour of the surveypro
+18) hide items that are still in progress or that you still don't know if you want to have them into your surveypro or not
+19) reorder items
+20) duplicate an item to save time
+21) search among submitted responses choosing the items to search for
+22) create relational databases once your surveypro are exported
+23) create parent child relations
+24) limit the minimum and the maximum year at surveypro level in order to reduce typos at input time
+25) limit the input range of each item at item level
+26) have COLLES built using radio buttons OR select items
+27) develop your own new type of question, format
+28) use builtin reports (or develop the one you like more)
+29) translate your super important surveypro in a mastertempalete and create a clone of your super important surveypro in few clicks
+30) have a surveypro from your mastertemplate that is AT THE SAME TIME in English for you and in Italian for me? You see it in English and I see THE SAME URL in Italian. THE SAME URL means, the same database collecting our responses.
+31) open a period of risk in which "what should not be allowed" is allowed. To explain it better: a surveypro is online. Users started to submit their responses. I found an error. I need to correct it but... take care: if you edit an already submitted surveypro you risk to make a mess. What happens to answers if you add or drop an item? What happen to answers if you change the number or the content of the options of a select? Well it is really dangerous BUT if you know what you are doing and you really need to make changes (I did it only once in 10 years) you can ask to surveypro a "risky modification period" in which you are allowed to do what, generally, you shouldn't do.

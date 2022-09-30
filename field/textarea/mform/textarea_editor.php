@@ -20,7 +20,7 @@
  * HTML class for a editor type element
  *
  * @package   surveyprofield_textarea
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,7 +38,7 @@ require_once($CFG->libdir.'/form/editor.php');
  * HTML class for a editor type element
  *
  * @package   surveyprofield_textarea
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class surveypromform_textarea_editor extends \MoodleQuickForm_editor {
@@ -93,11 +93,11 @@ class surveypromform_textarea_editor extends \MoodleQuickForm_editor {
      *
      * @return html of the frozen element
      */
-    public function getFrozenHtml() {
+    public function getFrozenHtml(): string {
         $complexvalue = $this->getValue();
         $value = strlen($complexvalue['text']) ? $complexvalue['text'] : '&nbsp;';
 
-        $class = array();
+        $class = [];
         $class['id'] = $this->getAttribute('id');
         $class['name'] = $this->getAttribute('name');
         if (empty($this->_attributes['class'])) {

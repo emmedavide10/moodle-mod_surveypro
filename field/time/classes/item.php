@@ -18,7 +18,7 @@
  * This file contains the surveyprofield_time
  *
  * @package   surveyprofield_time
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +34,7 @@ require_once($CFG->dirroot.'/mod/surveypro/field/time/lib.php');
  * Class to manage each aspect of the time item
  *
  * @package   surveyprofield_time
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class item extends itembase {
@@ -171,7 +171,7 @@ class item extends itembase {
         parent::__construct($cm, $surveypro, $itemid, $getparentcontent);
 
         // List of properties set to static values.
-        $this->type = SURVEYPRO_TYPEFIELD;
+        $this->type = 'field';
         $this->plugin = 'time';
 
         // Override the list of fields using format, whether needed.
@@ -339,7 +339,7 @@ class item extends itembase {
      * @return void
      */
     public function get_composite_fields() {
-        return array('defaultvalue', 'lowerbound', 'upperbound');
+        return ['defaultvalue', 'lowerbound', 'upperbound'];
     }
 
     /**
@@ -348,7 +348,7 @@ class item extends itembase {
      * @return array of downloadformats
      */
     public function get_downloadformats() {
-        $options = array();
+        $options = [];
         $timenow = time();
 
         for ($i = 1; $i < 3; $i++) {
@@ -375,8 +375,8 @@ class item extends itembase {
      * @return array of felds
      */
     public function get_multilang_fields() {
-        $fieldlist = array();
-        $fieldlist[$this->plugin] = array('content', 'extranote');
+        $fieldlist = [];
+        $fieldlist[$this->plugin] = ['content', 'extranote'];
 
         return $fieldlist;
     }
@@ -442,21 +442,13 @@ EOS;
         global $DB, $USER;
 
         $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '.
-        if ($this->position == SURVEYPRO_POSITIONLEFT) {
-            if ($this->customnumber) {
-                $elementlabel = $this->include_customnumber_in_content();
-            } else {
-                $elementlabel = $this->get_content();
-            }
-        } else {
-            $elementlabel = '&nbsp;';
-        }
+        $elementlabel = $this->get_elementlabel();
 
         $idprefix = 'id_surveypro_field_time_'.$this->sortindex;
 
         // Begin of: element values.
-        $hours = array();
-        $minutes = array();
+        $hours = [];
+        $minutes = [];
         if (!$searchform) {
             if ($this->defaultoption == SURVEYPRO_INVITEDEFAULT) {
                 $hours[SURVEYPRO_INVITEVALUE] = get_string('invitehour', 'surveyprofield_time');
@@ -488,8 +480,8 @@ EOS;
         // End of: element values.
 
         // Begin of: mform element.
-        $attributes = array();
-        $elementgroup = array();
+        $attributes = [];
+        $elementgroup = [];
 
         $itemname = $this->itemname.'_hour';
         $attributes['id'] = $idprefix.'_hour';
@@ -501,7 +493,7 @@ EOS;
         $attributes['class'] = 'time_select';
         $elementgroup[] = $mform->createElement('select', $itemname, '', $minutes, $attributes);
 
-        $separator = array(':');
+        $separator = [':'];
         if ($this->required) {
             if (!$searchform) {
                 $mform->addGroup($elementgroup, $this->itemname.'_group', $elementlabel, $separator, false);
@@ -565,9 +557,9 @@ EOS;
             case SURVEYPRO_LIKELASTDEFAULT:
                 // Look for the last submission I made.
                 $sql = 'userid = :userid ORDER BY timecreated DESC LIMIT 1';
-                $where = array('userid' => $USER->id);
+                $where = ['userid' => $USER->id];
                 $mylastsubmissionid = $DB->get_field_select('surveypro_submission', 'id', $sql, $where, IGNORE_MISSING);
-                $where = array('itemid' => $this->itemid, 'submissionid' => $mylastsubmissionid);
+                $where = ['itemid' => $this->itemid, 'submissionid' => $mylastsubmissionid];
                 if ($time = $DB->get_field('surveypro_answer', 'content', $where, IGNORE_MISSING)) {
                     $timearray = self::item_split_unix_time($time, false);
                 } else { // As in standard default.
@@ -759,7 +751,7 @@ EOS;
      * @return associative array with disaggregate element values
      */
     public function userform_set_prefill($fromdb) {
-        $prefill = array();
+        $prefill = [];
 
         if (!$fromdb) { // Param $fromdb may be boolean false for not existing data.
             return $prefill;
@@ -825,7 +817,7 @@ EOS;
      * @return array
      */
     public function userform_get_root_elements_name() {
-        $elementnames = array();
+        $elementnames = [];
         $elementnames[] = $this->itemname.'_group';
 
         return $elementnames;

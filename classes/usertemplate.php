@@ -18,7 +18,7 @@
  * Surveypro usertemplate class.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ use mod_surveypro\templatebase;
  * The class representing a user template
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class usertemplate extends templatebase {
@@ -101,7 +101,7 @@ class usertemplate extends templatebase {
      * @return $filemanageroptions
      */
     public function get_filemanager_options() {
-        $templateoptions = array();
+        $templateoptions = [];
         $templateoptions['accepted_types'] = '.xml';
         $templateoptions['maxbytes'] = 0;
         $templateoptions['maxfiles'] = -1;
@@ -112,120 +112,158 @@ class usertemplate extends templatebase {
     }
 
     /**
-     * Get context id from sharing level.
+     * Get the list of each user template file.
      *
-     * It follows how $sharinglevel is formed:
-     *
-     *       $parts[0]    |   $parts[1]
-     *  ----------------------------------
-     *     CONTEXT_SYSTEM | 0
-     *  CONTEXT_COURSECAT | $category->id
-     *     CONTEXT_COURSE | $COURSE->id
-     *     CONTEXT_MODULE | $cm->id
-     *       CONTEXT_USER | $USER->id
-     *
-     * @param string $sharinglevel
-     * @return int $context->id
+     * @param int $acontextid Context that we are looking for
+     * @return array
      */
-    public function get_contextid_from_sharinglevel($sharinglevel='') {
-        if (empty($sharinglevel)) {
-            $sharinglevel = $this->formdata->sharinglevel;
+    public function get_xmlfiles_list($acontextid=null) {
+        $utemplates = [];
+
+        $contexts = $this->get_sharingcontexts();
+        // I am allowed to "see" usertemplates if they belong to one of my parent contextid
+        // or if their uid is $USER->id
+        foreach ($contexts as $context) {
+            $contextid = $context->id;
+            if (is_null($acontextid) || ($contextid == $acontextid)) {
+                $xmlfiles = $this->get_utemplates_per_contextlevel($contextid);
+                if (count($xmlfiles)) {
+                    foreach ($xmlfiles as $xmlfile) {
+                        // $utemplates[$contextlabel][] = $xmlfile;
+                        $utemplates[$context->contextlevel][] = $xmlfile;
+                    }
+                }
+            }
         }
+        asort($utemplates);
 
-        $parts = explode('_', $sharinglevel);
-        $contextlevel = $parts[0];
-        $contextid = $parts[1];
-
-        if (!isset($parts[0]) || !isset($parts[1])) {
-            $a = new \stdClass();
-            $a->sharinglevel = $sharinglevel;
-            $a->methodname = 'get_contextid_from_sharinglevel';
-            throw new \moodle_exception('wrong_sharinglevel_found', 'mod_surveypro', null, $a);
-        }
-
-        switch ($contextlevel) {
-            case CONTEXT_USER:
-                $context = \context_user::instance($contextid);
-                break;
-            case CONTEXT_MODULE:
-                $context = \context_module::instance($contextid);
-                break;
-            case CONTEXT_COURSE:
-                $context = \context_course::instance($contextid);
-                break;
-            case CONTEXT_COURSECAT:
-                $context = \context_coursecat::instance($contextid);
-                break;
-            case CONTEXT_SYSTEM:
-                $context = \context_system::instance();
-                break;
-            default:
-                $message = 'Unexpected $contextlevel = '.$contextlevel;
-                debugging('Error at line '.__LINE__.' of '.__FILE__.'. '.$message , DEBUG_DEVELOPER);
-        }
-
-        return $context->id;
+        return $utemplates;
     }
 
     /**
-     * Get context string from sharing level.
+     * Get the list of ech user template.
      *
-     * @param int $contextlevel
-     * @return string $contextstring
+     * As far as I know this method is never called
+     *
+     * @param int $acontextid Context that we are looking for
+     * @return array
      */
-    public function get_contextstring_from_sharinglevel($contextlevel) {
-        // Depending on the context level the component can be:
-        // -> system, -> category, -> course, -> module, -> user.
-        switch ($contextlevel) {
-            case CONTEXT_SYSTEM:
-                $contextstring = 'system';
-                break;
-            case CONTEXT_COURSECAT:
-                $contextstring = 'category';
-                break;
-            case CONTEXT_COURSE:
-                $contextstring = 'course';
-                break;
-            case CONTEXT_MODULE:
-                $contextstring = 'module';
-                break;
-            case CONTEXT_USER:
-                $contextstring = 'user';
-                break;
-            default:
-                $message = 'Unexpected $contextlevel = '.$contextlevel;
-                debugging('Error at line '.__LINE__.' of '.__FILE__.'. '.$message , DEBUG_DEVELOPER);
+    public function get_utemplates_names($acontextid=null) {
+        $xmlfiles = $this->get_xmlfiles_list($acontextid);
+        $items = [];
+        foreach ($xmlfiles as $contextid => $xmlfile) {
+            $contextlabel = $this->contextlevel_to_scontextlabel($contextid);
+            foreach ($xmlfiles[$contextid] as $xmlfile) {
+                $items[] = $xmlfile->get_filename();
+            }
         }
+        asort($items);
 
-        return $contextstring;
+        return $items;
     }
 
     /**
-     * Get sharing level options.
+     * Get the content of the user template drop down menu.
+     *
+     * @return array
+     */
+    public function get_utemplates_items() {
+        $xmlfiles = $this->get_xmlfiles_list();
+
+        $items = [];
+        foreach ($xmlfiles as $contextid => $unused) {
+            $contextlabel = $this->contextlevel_to_scontextlabel($contextid);
+            foreach ($xmlfiles[$contextid] as $xmlfile) {
+                $xmlid = $xmlfile->get_id();
+                $filename = $xmlfile->get_filename();
+                $items[$contextid.'_'.$xmlid] = '('.$contextlabel.') '.$filename;
+            }
+        }
+        asort($items);
+
+        return $items;
+    }
+
+    /**
+     * Get the content of the user template drop down menu.
+     *
+     * @return array
+     */
+    public function get_utemplates_count() {
+        $xmlfiles = $this->get_xmlfiles_list();
+
+        $utemplatescount = 0;
+        foreach ($xmlfiles as $contextid => $unused) {
+            $utemplatescount += count($xmlfiles[$contextid]);
+        }
+
+        return $utemplatescount;
+    }
+
+    /**
+     * Get sharing level contexta.
      *
      * @return $options
      */
-    public function get_sharinglevel_options() {
+    public function get_sharingcontexts() {
         global $USER;
 
-        $labelsep = get_string('labelsep', 'langconfig'); // Separator usually is ': '..
-
-        $options = array();
-        $options[CONTEXT_USER.'_'.$USER->id] = get_string('user').$labelsep.fullname($USER);
-
         $parentcontexts = $this->context->get_parent_contexts();
-        foreach ($parentcontexts as $context) {
-            if (has_capability('mod/surveypro:saveusertemplates', $this->context)) {
-                $options[$context->contextlevel.'_'.$context->instanceid] = $context->get_context_name();
+
+        $usercontext = \context_module::instance($this->cm->id);
+        $usercontextid = $usercontext->id;
+        $parentcontexts[$usercontextid] = $usercontext;
+
+        $usercontext = \context_user::instance($USER->id);
+        $usercontextid = $usercontext->id;
+        $parentcontexts[$usercontextid] = $usercontext;
+
+        return $parentcontexts;
+    }
+
+    /**
+     * Gets an array of all of the templates that users have saved to the site.
+     *
+     * Few explanation to better understand.
+     * Asking for sharingcontexts I get the list of parentcontexts AND the usercontext.
+     * Each single context has a "context level" (50 for courses, 40 for categories, 10 for system, 30 for user).
+     * There are A LOT of contexts having "context level" == 50. One context per each course.
+     * The context of the course where I am in has:
+     * contextlevel = 50 (of course) AND id = another number, for instance, 79.
+     * 79 is the ID of the context of the course I am in, but 79 is NOT the ID of the course I am in.
+
+     * When I ask for usertemplates saved at course level, I want to get all the usertemplates of MY COURSE
+     * and not all the usetemplates of EACH COURSE in this instance of moodle.
+     * This is why I ask for $this->get_utemplates_per_contextlevel($context->id);
+     * and NOT for $this->get_utemplates_per_contextlevel($context->contextlevel).
+
+     * @param int $contextid Context that we are looking for
+     * @return array $templates
+     */
+    public function get_utemplates_per_contextlevel($contextid) {
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($contextid, 'mod_surveypro', SURVEYPRO_TEMPLATEFILEAREA, 0, 'sortorder', false);
+        if (empty($files)) {
+            return [];
+        }
+
+        $templates = [];
+        foreach ($files as $file) {
+            if ($file->get_component() == 'user') {
+                $fileallowed = has_capability('mod/surveypro:applyusertemplates', $this->context);
+                $fileallowed = $fileallowed || ($file->userid == $USER->id);
+                if ($fileallowed) {
+                    break;
+                }
+            } else {
+                $fileallowed = true;
+            }
+            if ($fileallowed) {
+                $templates[] = $file;
             }
         }
 
-        $context = \context_system::instance();
-        if (has_capability('mod/surveypro:saveusertemplates', $this->context)) {
-            $options[CONTEXT_SYSTEM.'_0'] = get_string('site');
-        }
-
-        return $options;
+        return $templates;
     }
 
     /**
@@ -257,25 +295,116 @@ class usertemplate extends templatebase {
     }
 
     /**
-     * Gets an array of all of the templates that users have saved to the site.
+     * Create the tool to sort usertemplates in the table.
      *
-     * @param int $contextid Context that we are looking for
-     * @return array $templates
+     * @param array $templates
+     * @param string $usersort
+     * @return void
      */
-    public function get_available_templates($contextid) {
+    private function get_virtual_table($templates, $usersort) {
+        // Original table per columns: originaltablepercols.
+        $templatenamecol = [];
+        $sharinglevelcol = [];
+        $creationdatecol = [];
+        $xmlfileidcol = [];
+        foreach ($templates as $template) {
+            $templatenamecol[] = $template->filename;
+            $sharinglevelcol[] = $template->sharingcontext;
+            $creationdatecol[] = $template->timecreated;
+            $xmlfileidcol[] = $template->fileid;
+        }
+        $originaltablepercols = [$templatenamecol, $sharinglevelcol, $creationdatecol, $xmlfileidcol];
 
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($contextid, 'mod_surveypro', SURVEYPRO_TEMPLATEFILEAREA, 0, 'sortorder', false);
-        if (empty($files)) {
-            return array();
+        // Original table per rows: originaltableperrows.
+        $originaltableperrows = [];
+        foreach ($templatenamecol as $k => $unused) {
+            $tablerow = [];
+            $tablerow['templatename'] = $templatenamecol[$k];
+            $tablerow['sharinglevel'] = $sharinglevelcol[$k];
+            $tablerow['creationdate'] = $creationdatecol[$k];
+            $tablerow['xmlfileid'] = $xmlfileidcol[$k];
+
+            $originaltableperrows[] = $tablerow;
         }
 
-        $templates = array();
-        foreach ($files as $file) {
-            $templates[] = $file;
+        // Add orderpart.
+        $orderparts = explode(', ', $usersort);
+        $orderparts = str_replace('templatename', '0', $orderparts);
+        $orderparts = str_replace('sharinglevel', '1', $orderparts);
+        $orderparts = str_replace('timecreated', '2', $orderparts);
+
+        // Include $fieldindex and $sortflag.
+        $fieldindex = [0, 0, 0];
+        $sortflag = [SORT_ASC, SORT_ASC, SORT_ASC];
+        foreach ($orderparts as $k => $orderpart) {
+            $pair = explode(' ', $orderpart);
+            $fieldindex[$k] = (int)$pair[0];
+            $sortflag[$k] = ($pair[1] == 'ASC') ? SORT_ASC : SORT_DESC;
         }
 
-        return $templates;
+        array_multisort($originaltablepercols[$fieldindex[0]], $sortflag[0],
+                        $originaltablepercols[$fieldindex[1]], $sortflag[1],
+                        $originaltablepercols[$fieldindex[2]], $sortflag[2], $originaltableperrows);
+
+        return $originaltableperrows;
+    }
+
+    // MARK other.
+
+    /**
+     * Delete usertemplate.
+     *
+     * @return void
+     */
+    public function delete_utemplate() {
+        global $OUTPUT;
+
+        if ($this->action != SURVEYPRO_DELETEUTEMPLATE) {
+            return;
+        }
+
+        if ($this->confirm == SURVEYPRO_UNCONFIRMED) {
+            // Ask for confirmation.
+            $a = $this->get_utemplate_name();
+            $message = get_string('confirm_delete1utemplate', 'mod_surveypro', $a);
+            $optionsbase = ['s' => $this->surveypro->id, 'act' => SURVEYPRO_DELETEUTEMPLATE];
+
+            $optionsyes = $optionsbase;
+            $optionsyes['cnf'] = SURVEYPRO_CONFIRMED_YES;
+            $optionsyes['fid'] = $this->utemplateid;
+            $urlyes = new \moodle_url('/mod/surveypro/utemplate_manage.php', $optionsyes);
+            $buttonyes = new \single_button($urlyes, get_string('yes'));
+
+            $optionsno = $optionsbase;
+            $optionsno['cnf'] = SURVEYPRO_CONFIRMED_NO;
+            $urlno = new \moodle_url('/mod/surveypro/utemplate_manage.php', $optionsno);
+            $buttonno = new \single_button($urlno, get_string('no'));
+
+            echo $OUTPUT->confirm($message, $buttonyes, $buttonno);
+            echo $OUTPUT->footer();
+            die();
+        }
+
+        if ($this->confirm == SURVEYPRO_CONFIRMED_YES) {
+            // Put the name in the gobal vaiable, to remember it for the log.
+            $this->templatename = $this->get_utemplate_name();
+
+            $fs = get_file_storage();
+            $xmlfile = $fs->get_file_by_id($this->utemplateid);
+            $a = $xmlfile->get_filename();
+            $xmlfile->delete();
+
+            $this->trigger_event('usertemplate_deleted');
+
+            // Feedback.
+            $message = get_string('feedback_delete1utemplate', 'mod_surveypro', $a);
+            echo $OUTPUT->notification($message, 'notifymessage');
+        }
+
+        if ($this->confirm == SURVEYPRO_CONFIRMED_NO) {
+            $message = get_string('usercanceled', 'mod_surveypro');
+            echo $OUTPUT->notification($message, 'notifymessage');
+        }
     }
 
     /**
@@ -329,7 +458,7 @@ class usertemplate extends templatebase {
         global $DB;
 
         $pluginversion = self::get_subplugin_versions();
-        $where = array('surveyproid' => $this->surveypro->id);
+        $where = ['surveyproid' => $this->surveypro->id];
         if ($visiblesonly) {
             $where['hidden'] = '0';
         }
@@ -357,7 +486,7 @@ class usertemplate extends templatebase {
                     $parentid = $item->get_parentid();
                     if ($parentid) {
                         // Store the sortindex of the parent instead of its id, because at restore time parentid will change.
-                        $whereparams = array('id' => $parentid);
+                        $whereparams = ['id' => $parentid];
                         $sortindex = $DB->get_field('surveypro_item', 'sortindex', $whereparams, MUST_EXIST);
                         $val = $item->get_parentvalue();
 
@@ -450,7 +579,7 @@ class usertemplate extends templatebase {
             case SURVEYPRO_IGNOREITEMS:
                 break;
             case SURVEYPRO_HIDEALLITEMS:
-                $whereparams = array('surveyproid' => $this->surveypro->id);
+                $whereparams = ['surveyproid' => $this->surveypro->id];
                 $utilitylayoutman->items_set_visibility($whereparams, 0);
 
                 $utilitylayoutman->reset_items_pages();
@@ -458,11 +587,11 @@ class usertemplate extends templatebase {
                 break;
             case SURVEYPRO_DELETEALLITEMS:
                 $utilitylayoutman = new utility_layout($this->cm);
-                $whereparams = array('surveyproid' => $this->surveypro->id);
+                $whereparams = ['surveyproid' => $this->surveypro->id];
                 $utilitylayoutman->delete_items($whereparams);
                 break;
             case SURVEYPRO_DELETEVISIBLEITEMS:
-                $whereparams = array('surveyproid' => $this->surveypro->id);
+                $whereparams = ['surveyproid' => $this->surveypro->id];
                 $whereparams['hidden'] = 0;
                 $utilitylayoutman->delete_items($whereparams);
 
@@ -470,7 +599,7 @@ class usertemplate extends templatebase {
 
                 break;
             case SURVEYPRO_DELETEHIDDENITEMS:
-                $whereparams = array('surveyproid' => $this->surveypro->id);
+                $whereparams = ['surveyproid' => $this->surveypro->id];
                 $whereparams['hidden'] = 1;
                 $utilitylayoutman->delete_items($whereparams);
 
@@ -486,8 +615,8 @@ class usertemplate extends templatebase {
         // Now actually add items from template.
         $this->add_items_from_template();
 
-        $paramurl = array('s' => $this->surveypro->id);
-        $redirecturl = new \moodle_url('/mod/surveypro/layout_itemlist.php', $paramurl);
+        $paramurl = ['s' => $this->surveypro->id];
+        $redirecturl = new \moodle_url('/mod/surveypro/layout_itemslist.php', $paramurl);
         redirect($redirecturl);
     }
 
@@ -505,7 +634,7 @@ class usertemplate extends templatebase {
 
         if ($hassubmissions && (!$riskyediting)) {
             echo $OUTPUT->notification(get_string('applyusertemplatedenied01', 'mod_surveypro'), 'notifyproblem');
-            $url = new \moodle_url('/mod/surveypro/view_submissions.php', array('s' => $this->surveypro->id));
+            $url = new \moodle_url('/mod/surveypro/view_submissions.php', ['s' => $this->surveypro->id]);
             echo $OUTPUT->continue_button($url);
             echo $OUTPUT->footer();
             die();
@@ -513,7 +642,7 @@ class usertemplate extends templatebase {
 
         if ($this->surveypro->template && (!$riskyediting)) { // This survey comes from a master template so it is multilang.
             echo $OUTPUT->notification(get_string('applyusertemplatedenied02', 'mod_surveypro'), 'notifyproblem');
-            $url = new \moodle_url('/mod/surveypro/view_userform.php', array('s' => $this->surveypro->id));
+            $url = new \moodle_url('/mod/surveypro/view_userform.php', ['s' => $this->surveypro->id]);
             echo $OUTPUT->continue_button($url);
             echo $OUTPUT->footer();
             die();
@@ -536,7 +665,7 @@ class usertemplate extends templatebase {
         $simplexml = new \SimpleXMLElement($templatecontent);
         // echo '<h2>Items saved in the file ('.count($simplexml->item).')</h2>';
 
-        if (!$sortindexoffset = $DB->get_field('surveypro_item', 'MAX(sortindex)', array('surveyproid' => $this->surveypro->id))) {
+        if (!$sortindexoffset = $DB->get_field('surveypro_item', 'MAX(sortindex)', ['surveyproid' => $this->surveypro->id])) {
             $sortindexoffset = 0;
         }
 
@@ -643,7 +772,7 @@ class usertemplate extends templatebase {
                     $naturalsortindex++;
                     $record->sortindex = $naturalsortindex + $sortindexoffset;
                     if (!empty($record->parentid)) {
-                        $whereparams = array();
+                        $whereparams = [];
                         $whereparams['surveyproid'] = $this->surveypro->id;
                         $whereparams['sortindex'] = $record->parentid + $sortindexoffset;
                         $record->parentid = $DB->get_field('surveypro_item', 'id', $whereparams, MUST_EXIST);
@@ -706,13 +835,12 @@ class usertemplate extends templatebase {
      * @return void
      */
     public function upload_utemplate() {
-
         $templateoptions = $this->get_filemanager_options();
-        $contextid = $this->get_contextid_from_sharinglevel();
+        $contextid = $this->formdata->sharinglevel;
         $fs = get_file_storage();
 
         // Look at what is already on board.
-        $oldfiles = array();
+        $oldfiles = [];
         if ($files = $fs->get_area_files($contextid, 'mod_surveypro', SURVEYPRO_TEMPLATEFILEAREA, 0, 'sortorder', false)) {
             foreach ($files as $file) {
                 $oldfiles[] = $file->get_filename();
@@ -737,7 +865,7 @@ class usertemplate extends templatebase {
                     continue;
                 }
 
-                $filerecord = array();
+                $filerecord = [];
                 $filerecord['contextid'] = $contextid;
                 $filerecord['component'] = 'mod_surveypro';
                 $filerecord['filearea'] = SURVEYPRO_TEMPLATEFILEAREA;
@@ -797,6 +925,7 @@ class usertemplate extends templatebase {
         global $USER;
 
         $this->templatename = $this->formdata->templatename;
+        $this->templatename = str_replace(' ', '_', $this->templatename);
         if (!preg_match('~\.xml$~', $this->templatename)) {
             $this->templatename .= '.xml';
         }
@@ -806,7 +935,7 @@ class usertemplate extends templatebase {
         $fs = get_file_storage();
         $filerecord = new \stdClass;
 
-        $contextid = $this->get_contextid_from_sharinglevel();
+        $contextid = $this->formdata->sharinglevel;
         $filerecord->contextid = $contextid;
 
         $filerecord->component = 'mod_surveypro';
@@ -824,6 +953,39 @@ class usertemplate extends templatebase {
         return true;
     }
 
+
+    /**
+     * Provide a label explaining the meaning of the contexid
+     *
+     * @param int $contextid The contextid I am interested in
+     * @return string
+     */
+    public function contextlevel_to_scontextlabel($contextid) {
+        switch ($contextid) {
+            case CONTEXT_SYSTEM:
+                $sharinglabel = get_string('system', 'mod_surveypro');
+                break;
+            case CONTEXT_COURSECAT:
+                $sharinglabel = get_string('currentcategory', 'mod_surveypro');
+                break;
+            case CONTEXT_COURSE:
+                $sharinglabel = get_string('currentcourse', 'mod_surveypro');
+                break;
+            case CONTEXT_MODULE:
+                $a = get_string('modulename', 'mod_surveypro');
+                $sharinglabel = get_string('module', 'mod_surveypro', $a);
+                break;
+            case CONTEXT_USER:
+                $sharinglabel = get_string('user');
+                break;
+            default:
+                $message = 'Unexpected $contextid = '.$contextid;
+                debugging('Error at line '.__LINE__.' of '.__FILE__.'. '.$message , DEBUG_DEVELOPER);
+        }
+
+        return $sharinglabel;
+    }
+
     /**
      * Display the usertemplates table.
      *
@@ -838,32 +1000,32 @@ class usertemplate extends templatebase {
         $candeleteutemplates = has_capability('mod/surveypro:deleteusertemplates', $this->context);
 
         // Begin of: $paramurlbase definition.
-        $paramurlbase = array();
+        $paramurlbase = [];
         $paramurlbase['id'] = $this->cm->id;
         // End of $paramurlbase definition.
 
         $deletetitle = get_string('delete');
-        $iconparams = array('title' => $deletetitle);
+        $iconparams = ['title' => $deletetitle];
         $deleteicn = new \pix_icon('t/delete', $deletetitle, 'moodle', $iconparams);
 
         $importtitle = get_string('exporttemplate', 'mod_surveypro');
-        $iconparams = array('title' => $importtitle);
+        $iconparams = ['title' => $importtitle];
         $importicn = new \pix_icon('t/download', $importtitle, 'moodle', $iconparams);
 
         $table = new \flexible_table('templatelist');
 
-        $paramurl = array('id' => $this->cm->id);
+        $paramurl = ['id' => $this->cm->id];
         $baseurl = new \moodle_url('/mod/surveypro/utemplate_manage.php', $paramurl);
         $table->define_baseurl($baseurl);
 
-        $tablecolumns = array();
+        $tablecolumns = [];
         $tablecolumns[] = 'templatename';
         $tablecolumns[] = 'sharinglevel';
         $tablecolumns[] = 'timecreated';
         $tablecolumns[] = 'actions';
         $table->define_columns($tablecolumns);
 
-        $tableheaders = array();
+        $tableheaders = [];
         $tableheaders[] = get_string('templatename', 'mod_surveypro');
         $tableheaders[] = get_string('sharinglevel', 'mod_surveypro');
         $tableheaders[] = get_string('timecreated', 'mod_surveypro');
@@ -882,180 +1044,69 @@ class usertemplate extends templatebase {
         $table->set_attribute('class', 'generaltable');
         $table->setup();
 
-        $options = $this->get_sharinglevel_options();
+        $utemplateman = new usertemplate($this->cm, $this->context, $this->surveypro);
+        $xmlfiles = $utemplateman->get_xmlfiles_list();
 
-        $templates = new \stdClass();
-        foreach ($options as $sharinglevel => $unused) {
-            $parts = explode('_', $sharinglevel);
-            $contextlevel = $parts[0];
-
-            $contextid = $this->get_contextid_from_sharinglevel($sharinglevel);
-            $contextstring = $this->get_contextstring_from_sharinglevel($contextlevel);
-            $templates->{$contextstring} = $this->get_available_templates($contextid);
+        $utemplates = [];
+        foreach ($xmlfiles as $contextid => $xmlfile) {
+            foreach ($xmlfiles[$contextid] as $xmlfile) {
+                $utemplate = new \stdClass();
+                $utemplate->filename = $xmlfile->get_filename();
+                $utemplate->sharingcontext = $this->contextlevel_to_scontextlabel($contextid);
+                $utemplate->timecreated = $xmlfile->get_timecreated();
+                $utemplate->fileid = $xmlfile->get_id();
+                $utemplate->userid = $xmlfile->get_userid();
+                $utemplates[] = $utemplate;
+            }
         }
 
-        $virtualtable = $this->get_virtual_table($templates, $table->get_sql_sort());
+        $virtualtable = $this->get_virtual_table($utemplates, $table->get_sql_sort());
 
         $row = 0;
-        foreach ($templates as $contextstring => $contextfiles) {
-            foreach ($contextfiles as $xmlfile) {
-                $tablerow = array();
+        foreach ($utemplates as $utemplate) {
+            $tablerow = [];
 
-                $xmlfileid = $virtualtable[$row]['xmlfileid'];
-                $templatename = $virtualtable[$row]['templatename'];
-                $tmpl = new usertemplate_name($xmlfileid, $templatename);
+            $xmlfileid = $virtualtable[$row]['xmlfileid'];
+            $templatename = $virtualtable[$row]['templatename'];
+            $tmpl = new usertemplate_name($xmlfileid, $templatename);
 
-                $tablerow[] = $OUTPUT->render_from_template('core/inplace_editable', $tmpl->export_for_template($OUTPUT));
-                $tablerow[] = $virtualtable[$row]['sharinglevel'];
-                $tablerow[] = userdate($virtualtable[$row]['creationdate']);
+            $tablerow[] = $OUTPUT->render_from_template('core/inplace_editable', $tmpl->export_for_template($OUTPUT));
+            $tablerow[] = $virtualtable[$row]['sharinglevel'];
+            $tablerow[] = userdate($virtualtable[$row]['creationdate']);
 
-                $paramurlbase['fid'] = $virtualtable[$row]['xmlfileid'];
-                $row++;
+            $paramurlbase['fid'] = $virtualtable[$row]['xmlfileid'];
+            $row++;
 
-                $icons = '';
-                // SURVEYPRO_DELETEUTEMPLATE.
-                if ($candeleteutemplates) {
-                    if ($xmlfile->get_userid() == $USER->id) { // Only the owner can delete his/her template.
-                        $paramurl = $paramurlbase;
-                        $paramurl['act'] = SURVEYPRO_DELETEUTEMPLATE;
-                        $paramurl['sesskey'] = sesskey();
-
-                        $link = new \moodle_url('/mod/surveypro/utemplate_manage.php', $paramurl);
-                        $icons .= $OUTPUT->action_icon($link, $deleteicn, null, array('title' => $deletetitle));
-                    }
-                }
-
-                // SURVEYPRO_EXPORTUTEMPLATE.
-                if ($candownloadutemplates) {
+            $icons = '';
+            // SURVEYPRO_DELETEUTEMPLATE.
+            if ($candeleteutemplates) {
+                if ($utemplate->userid == $USER->id) { // The user template can be deleted only by its owner.
                     $paramurl = $paramurlbase;
-                    $paramurl['act'] = SURVEYPRO_EXPORTUTEMPLATE;
+                    $paramurl['act'] = SURVEYPRO_DELETEUTEMPLATE;
                     $paramurl['sesskey'] = sesskey();
 
                     $link = new \moodle_url('/mod/surveypro/utemplate_manage.php', $paramurl);
-                    $icons .= $OUTPUT->action_icon($link, $importicn, null, array('title' => $importtitle));
+                    $icons .= $OUTPUT->action_icon($link, $deleteicn, null, ['title' => $deletetitle]);
                 }
-
-                $tablerow[] = $icons;
-
-                $table->add_data($tablerow);
             }
+
+            // SURVEYPRO_EXPORTUTEMPLATE.
+            if ($candownloadutemplates) {
+                $paramurl = $paramurlbase;
+                $paramurl['act'] = SURVEYPRO_EXPORTUTEMPLATE;
+                $paramurl['sesskey'] = sesskey();
+
+                $link = new \moodle_url('/mod/surveypro/utemplate_manage.php', $paramurl);
+                $icons .= $OUTPUT->action_icon($link, $importicn, null, ['title' => $importtitle]);
+            }
+
+            $tablerow[] = $icons;
+
+            $table->add_data($tablerow);
         }
         $table->set_attribute('align', 'center');
         $table->summary = get_string('templatelist', 'mod_surveypro');
         $table->print_html();
-    }
-
-    /**
-     * Create the tool to sort usertemplates in the table.
-     *
-     * @param array $templates
-     * @param string $usersort
-     * @return void
-     */
-    private function get_virtual_table($templates, $usersort) {
-        // Original table per columns: originaltablepercols.
-        $templatenamecol = array();
-        $sharinglevelcol = array();
-        $creationdatecol = array();
-        $xmlfileidcol = array();
-        foreach ($templates as $contextstring => $contextfiles) {
-            foreach ($contextfiles as $xmlfile) {
-                $templatenamecol[] = $xmlfile->get_filename();
-                $sharinglevelcol[] = get_string($contextstring, 'mod_surveypro');
-                $creationdatecol[] = $xmlfile->get_timecreated();
-                $xmlfileidcol[] = $xmlfile->get_id();
-            }
-        }
-        $originaltablepercols = array($templatenamecol, $sharinglevelcol, $creationdatecol, $xmlfileidcol);
-
-        // Original table per rows: originaltableperrows.
-        $originaltableperrows = array();
-        foreach ($templatenamecol as $k => $unused) {
-            $tablerow = array();
-            $tablerow['templatename'] = $templatenamecol[$k];
-            $tablerow['sharinglevel'] = $sharinglevelcol[$k];
-            $tablerow['creationdate'] = $creationdatecol[$k];
-            $tablerow['xmlfileid'] = $xmlfileidcol[$k];
-
-            $originaltableperrows[] = $tablerow;
-        }
-
-        // Add orderpart.
-        $orderparts = explode(', ', $usersort);
-        $orderparts = str_replace('templatename', '0', $orderparts);
-        $orderparts = str_replace('sharinglevel', '1', $orderparts);
-        $orderparts = str_replace('timecreated', '2', $orderparts);
-
-        // Include $fieldindex and $sortflag.
-        $fieldindex = array(0, 0, 0);
-        $sortflag = array(SORT_ASC, SORT_ASC, SORT_ASC);
-        foreach ($orderparts as $k => $orderpart) {
-            $pair = explode(' ', $orderpart);
-            $fieldindex[$k] = (int)$pair[0];
-            $sortflag[$k] = ($pair[1] == 'ASC') ? SORT_ASC : SORT_DESC;
-        }
-
-        array_multisort($originaltablepercols[$fieldindex[0]], $sortflag[0],
-                        $originaltablepercols[$fieldindex[1]], $sortflag[1],
-                        $originaltablepercols[$fieldindex[2]], $sortflag[2], $originaltableperrows);
-
-        return $originaltableperrows;
-    }
-
-    /**
-     * Delete usertemplate.
-     *
-     * @return void
-     */
-    public function delete_utemplate() {
-        global $OUTPUT;
-
-        if ($this->action != SURVEYPRO_DELETEUTEMPLATE) {
-            return;
-        }
-
-        if ($this->confirm == SURVEYPRO_UNCONFIRMED) {
-            // Ask for confirmation.
-            $a = $this->get_utemplate_name();
-            $message = get_string('confirm_delete1utemplate', 'mod_surveypro', $a);
-            $optionsbase = array('s' => $this->surveypro->id, 'act' => SURVEYPRO_DELETEUTEMPLATE);
-
-            $optionsyes = $optionsbase;
-            $optionsyes['cnf'] = SURVEYPRO_CONFIRMED_YES;
-            $optionsyes['fid'] = $this->utemplateid;
-            $urlyes = new \moodle_url('/mod/surveypro/utemplate_manage.php', $optionsyes);
-            $buttonyes = new \single_button($urlyes, get_string('yes'));
-
-            $optionsno = $optionsbase;
-            $optionsno['cnf'] = SURVEYPRO_CONFIRMED_NO;
-            $urlno = new \moodle_url('/mod/surveypro/utemplate_manage.php', $optionsno);
-            $buttonno = new \single_button($urlno, get_string('no'));
-
-            echo $OUTPUT->confirm($message, $buttonyes, $buttonno);
-            echo $OUTPUT->footer();
-            die();
-        }
-
-        if ($this->confirm == SURVEYPRO_CONFIRMED_YES) {
-            // Put the name in the gobal vaiable, to remember it for the log.
-            $this->templatename = $this->get_utemplate_name();
-
-            $fs = get_file_storage();
-            $xmlfile = $fs->get_file_by_id($this->utemplateid);
-            $a = $xmlfile->get_filename();
-            $xmlfile->delete();
-
-            $this->trigger_event('usertemplate_deleted');
-
-            // Feedback.
-            $message = get_string('feedback_delete1utemplate', 'mod_surveypro', $a);
-            echo $OUTPUT->notification($message, 'notifymessage');
-        }
-
-        if ($this->confirm == SURVEYPRO_CONFIRMED_NO) {
-            $message = get_string('usercanceled', 'mod_surveypro');
-            echo $OUTPUT->notification($message, 'notifymessage');
-        }
     }
 
     /**
@@ -1086,7 +1137,7 @@ class usertemplate extends templatebase {
      * @return void
      */
     public function trigger_event($eventname, $action=null) {
-        $eventdata = array('context' => $this->context, 'objectid' => $this->surveypro->id);
+        $eventdata = ['context' => $this->context, 'objectid' => $this->surveypro->id];
         switch ($eventname) {
             case 'all_usertemplates_viewed':
                 $event = \mod_surveypro\event\all_usertemplates_viewed::create($eventdata);
@@ -1107,26 +1158,26 @@ class usertemplate extends templatebase {
                 if ($action == SURVEYPRO_DELETEHIDDENITEMS) {
                     $straction = get_string('deletehiddenitems', 'mod_surveypro');
                 }
-                $other = array();
+                $other = [];
                 $other['templatename'] = $this->get_utemplate_name();
                 $other['action'] = $straction;
                 $eventdata['other'] = $other;
                 $event = \mod_surveypro\event\usertemplate_applied::create($eventdata);
                 break;
             case 'usertemplate_exported':
-                $eventdata['other'] = array('templatename' => $this->get_utemplate_name());
+                $eventdata['other'] = ['templatename' => $this->get_utemplate_name()];
                 $event = \mod_surveypro\event\usertemplate_exported::create($eventdata);
                 break;
             case 'usertemplate_imported':
-                $eventdata['other'] = array('templatename' => $this->get_utemplate_name());
+                $eventdata['other'] = ['templatename' => $this->get_utemplate_name()];
                 $event = \mod_surveypro\event\usertemplate_imported::create($eventdata);
                 break;
             case 'usertemplate_saved':
-                $eventdata['other'] = array('templatename' => $this->templatename);
+                $eventdata['other'] = ['templatename' => $this->templatename];
                 $event = \mod_surveypro\event\usertemplate_saved::create($eventdata);
                 break;
             case 'usertemplate_deleted':
-                $eventdata['other'] = array('templatename' => $this->templatename);
+                $eventdata['other'] = ['templatename' => $this->templatename];
                 $event = \mod_surveypro\event\usertemplate_deleted::create($eventdata);
                 break;
             default:

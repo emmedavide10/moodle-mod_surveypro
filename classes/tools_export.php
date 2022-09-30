@@ -18,7 +18,7 @@
  * The exportmanager class
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,10 +28,10 @@ namespace mod_surveypro;
  * The class exporting gathered data
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class view_export {
+class tools_export {
 
     /**
      * @var object Course module object
@@ -85,7 +85,7 @@ class view_export {
      * @return void
      */
     public function trigger_event() {
-        $eventdata = array('context' => $this->context, 'objectid' => $this->surveypro->id);
+        $eventdata = ['context' => $this->context, 'objectid' => $this->surveypro->id];
         $event = \mod_surveypro\event\all_submissions_exported::create($eventdata);
         $event->trigger();
     }
@@ -176,7 +176,7 @@ class view_export {
             $sql .= ' ORDER BY submissionid';
         }
 
-        return array($sql, $whereparams);
+        return [$sql, $whereparams];
     }
 
     /**
@@ -255,7 +255,7 @@ class view_export {
         global $DB;
 
         $itemseeds = $this->export_get_field_list();
-        $headerlabels = array();
+        $headerlabels = [];
         if (empty($this->surveypro->anonymous)) {
             $headerlabels[] = SURVEYPRO_OWNERIDLABEL;
             if (isset($this->formdata->includenames)) {
@@ -264,15 +264,15 @@ class view_export {
             }
         }
 
-        $itemseedskeys = array();
+        $itemseedskeys = [];
         foreach ($itemseeds as $itemseed) {
-            $tablename = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$itemseed->plugin;
-            $where = array('itemid' => $itemseed->id);
+            $tablename = 'surveyprofield_'.$itemseed->plugin;
+            $where = ['itemid' => $itemseed->id];
             $currentheader = $DB->get_field($tablename, 'variable', $where);
             $headerlabels[] = $currentheader;
             $itemseedskeys[] = $itemseed->id;
             if ($this->formdata->outputstyle == SURVEYPRO_RAW) {
-                $classname = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$itemseed->plugin.'\item';
+                $classname = 'surveyprofield_'.$itemseed->plugin.'\item';
                 if ($classname::response_uses_format()) {
                     $headerlabels[] = $currentheader.SURVEYPRO_IMPFORMATSUFFIX;
                     $itemseedskeys[] = $itemseed->id.SURVEYPRO_IMPFORMATSUFFIX;
@@ -294,7 +294,7 @@ class view_export {
         $placeholders = array_fill_keys($itemseedskeys, $answernotprovided);
         // End of: Define once and forever $placeholders.
 
-        return array($headerlabels, $placeholders);
+        return [$headerlabels, $placeholders];
     }
 
     /**
@@ -360,7 +360,7 @@ class view_export {
         $workbook = new \MoodleExcelWorkbook('-');
         $workbook->send($filename);
 
-        $worksheet = array();
+        $worksheet = [];
         $worksheet[0] = $workbook->add_worksheet(get_string('surveypro', 'mod_surveypro'));
 
         $itemseeds = $this->export_get_field_list();
@@ -405,9 +405,9 @@ class view_export {
         global $DB;
 
         // No matter for the page.
-        $where = array();
+        $where = [];
         $where['surveyproid'] = $this->surveypro->id;
-        $where['type'] = SURVEYPRO_TYPEFIELD;
+        $where['type'] = 'field';
         if (!isset($this->formdata->includereserved)) {
             $where['reserved'] = 0;
         }
@@ -422,7 +422,7 @@ class view_export {
                 die(); // Never reached.
             }
         } else {
-            $conditions = array();
+            $conditions = [];
             foreach ($where as $field => $value) {
                 $conditions[] = $field.' = :'.$field;
             }
@@ -447,7 +447,7 @@ class view_export {
      * @return $owner
      */
     public function export_add_ownerid($richsubmission) {
-        $owner = array();
+        $owner = [];
         if (empty($this->surveypro->anonymous)) {
             // If NOT anonymous.
             $owner[SURVEYPRO_OWNERIDLABEL] = $richsubmission->userid;
@@ -463,7 +463,7 @@ class view_export {
      * @return array $names
      */
     public function export_add_names($richsubmission) {
-        $names = array();
+        $names = [];
         if (empty($this->surveypro->anonymous) && isset($this->formdata->includenames)) {
             $names['firstname'] = $richsubmission->firstname;
             $names['lastname'] = $richsubmission->lastname;
@@ -479,7 +479,7 @@ class view_export {
      * @return array $dates
      */
     public function export_add_dates($richsubmission) {
-        $dates = array();
+        $dates = [];
         if (isset($this->formdata->includedates)) {
             if ($this->formdata->outputstyle == SURVEYPRO_VERBOSE) {
                 $dates['timecreated'] = userdate($richsubmission->timecreated);
@@ -509,7 +509,7 @@ class view_export {
      * @return void
      */
     public function export_begin_newrecord($richsubmission, $placeholders) {
-        $recordtoexport = array();
+        $recordtoexport = [];
         $recordtoexport += $this->export_add_ownerid($richsubmission);
         $recordtoexport += $this->export_add_names($richsubmission);
         $recordtoexport += $placeholders;
@@ -531,7 +531,7 @@ class view_export {
         } else {
             $recordtoexport[$richsubmission->itemid] = $richsubmission->content;
 
-            $classname = 'surveypro'.SURVEYPRO_TYPEFIELD.'_'.$richsubmission->plugin.'\item';
+            $classname = 'surveyprofield_'.$richsubmission->plugin.'\item';
             if ($classname::response_uses_format()) {
                 $recordtoexport[$richsubmission->itemid.SURVEYPRO_IMPFORMATSUFFIX] = $richsubmission->contentformat;
             }
@@ -571,7 +571,7 @@ class view_export {
         } else {
             $itemid = $richsubmission->itemid;
             $plugin = $richsubmission->plugin;
-            $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, SURVEYPRO_TYPEFIELD, $plugin);
+            $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, 'field', $plugin);
             $return = $item->userform_db_to_export($richsubmission);
         }
 
@@ -586,7 +586,7 @@ class view_export {
     public function are_attachments_onboard() {
         global $DB;
 
-        $whereparams = array('surveyproid' => $this->surveypro->id, 'plugin' => 'fileupload');
+        $whereparams = ['surveyproid' => $this->surveypro->id, 'plugin' => 'fileupload'];
         $counter = $DB->count_records('surveypro_item', $whereparams);
 
         return ($counter > 0);
@@ -627,8 +627,8 @@ class view_export {
         $itemstr = get_string('item', 'mod_surveypro');
         $submissionstr = get_string('submission', 'mod_surveypro');
         $dummyuserid = 0;
-        $dirnames = array();
-        $filelist = array();
+        $dirnames = [];
+        $filelist = [];
 
         $fs = get_file_storage();
         list($richsubmissionssql, $whereparams) = $this->get_export_sql(true);
@@ -736,8 +736,8 @@ class view_export {
         $itemstr = get_string('item', 'mod_surveypro');
         $submissionstr = get_string('submission', 'mod_surveypro');
         $dummyuserid = 0;
-        $dirnames = array();
-        $filelist = array();
+        $dirnames = [];
+        $filelist = [];
 
         $fs = get_file_storage();
         list($richsubmissionssql, $whereparams) = $this->get_export_sql(true);

@@ -18,7 +18,7 @@
  * Surveypro class to manage colles report
  *
  * @package   surveyproreport_colles
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ use mod_surveypro\reportbase;
  * The class to manage colles report
  *
  * @package   surveyproreport_colles
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report extends reportbase {
@@ -58,42 +58,42 @@ class report extends reportbase {
     /**
      * @var array $xlabels
      */
-    public $xlabels = array();
+    public $xlabels = [];
 
     /**
      * @var array $ylabels
      */
-    public $ylabels = array();
+    public $ylabels = [];
 
     /**
      * @var array $trend1
      */
-    public $trend1 = array();
+    public $trend1 = [];
 
     /**
      * @var array $trend1stdev
      */
-    public $trend1stdev = array();
+    public $trend1stdev = [];
 
     /**
      * @var array $trend2
      */
-    public $trend2 = array();
+    public $trend2 = [];
 
     /**
      * @var array $trend2stdev
      */
-    public $trend2stdev = array();
+    public $trend2stdev = [];
 
     /**
      * @var array $studenttrend1
      */
-    public $studenttrend1 = array();
+    public $studenttrend1 = [];
 
     /**
      * @var array $studenttrend2
      */
-    public $studenttrend2 = array();
+    public $studenttrend2 = [];
 
     /**
      * Class constructor.
@@ -107,11 +107,11 @@ class report extends reportbase {
 
         parent::__construct($cm, $context, $surveypro);
 
-        $this->template = $DB->get_field('surveypro', 'template', array('id' => $this->surveypro->id));
+        $this->template = $DB->get_field('surveypro', 'template', ['id' => $this->surveypro->id]);
 
         // Which plugin has been used to build this master template? Radiobutton or select?
-        $guessplugin = array('radiobutton', 'select');
-        $where = array('surveyproid' => $surveypro->id, 'plugin' => $guessplugin[0]);
+        $guessplugin = ['radiobutton', 'select'];
+        $where = ['surveyproid' => $surveypro->id, 'plugin' => $guessplugin[0]];
         if ($DB->get_records('surveypro_item', $where, 'id', 'id')) {
             $this->templateuseritem = $guessplugin[0];
         } else {
@@ -140,65 +140,55 @@ class report extends reportbase {
     }
 
     /**
-     * Get the list of mastertemplates to which this report is applicable.
+     * Does the current report apply to the passed mastertemplates?
      *
-     * If ruturns an empty array, each report is added to admin menu
-     * If returns a non empty array, only reports listed will be added to admin menu
-     *
+     * @param string $mastertemplate
      * @return void
      */
-    public function report_applies_to() {
-        return array('collesactual', 'collespreferred', 'collesactualpreferred');
+    public function report_applies_to($mastertemplate) {
+        $validutemplates = ['collesactual', 'collespreferred', 'collesactualpreferred'];
+
+        return in_array($mastertemplate, $validutemplates);
     }
 
     /**
-     * Has_student_report.
+     * Returns if this report was created for student too.
      *
      * @return void
      */
-    public function has_student_report() {
+    public function has_studentreport() {
         return true;
+    }
+
+    /**
+     * Get if this report displays user names.
+     *
+     * @return boolean false
+     */
+    public function has_visibleusernames() {
+        return false;
     }
 
     /**
      * Get child reports.
      *
-     * @param bool $canaccessreports
-     * @return $childreports
+     * @return $childrenreports
      */
-    public function has_childreports($canaccessreports) {
-        if (!$canaccessreports) {
-            return false;
-        }
+    public function has_childrenreports() {
+        $questionreports = [];
+        $questionreports['fieldset_content_01'] = ['type' => 'questions', 'area' => 0];
+        $questionreports['fieldset_content_02'] = ['type' => 'questions', 'area' => 1];
+        $questionreports['fieldset_content_03'] = ['type' => 'questions', 'area' => 2];
+        $questionreports['fieldset_content_04'] = ['type' => 'questions', 'area' => 3];
+        $questionreports['fieldset_content_05'] = ['type' => 'questions', 'area' => 4];
+        $questionreports['fieldset_content_06'] = ['type' => 'questions', 'area' => 5];
 
-        $questionreports = array();
-        $questionreports['fieldset_content_01'] = array('type' => 'questions', 'area' => 0);
-        $questionreports['fieldset_content_02'] = array('type' => 'questions', 'area' => 1);
-        $questionreports['fieldset_content_03'] = array('type' => 'questions', 'area' => 2);
-        $questionreports['fieldset_content_04'] = array('type' => 'questions', 'area' => 3);
-        $questionreports['fieldset_content_05'] = array('type' => 'questions', 'area' => 4);
-        $questionreports['fieldset_content_06'] = array('type' => 'questions', 'area' => 5);
+        $childrenreports = [];
+        $childrenreports['summary'] = ['type' => 'summary'];
+        $childrenreports['scales'] = ['type' => 'scales'];
+        $childrenreports['areas'] = $questionreports;
 
-        $childreports = array();
-        $childreports['summary'] = array('type' => 'summary');
-        $childreports['scales'] = array('type' => 'scales');
-        $childreports['areas'] = $questionreports;
-
-        // In order to uncomment the next code to get examples of nested navigation into admin > report block,
-        // you have to add strings corresponding to keys to $this->surveypro->template lang file.
-        // $subfourtharray = array();
-        // $subfourtharray['4.3.1'] = array('type' => 'fourth', 'foo' => 3, 'bar' => 1);
-        // $subfourtharray['4.3.2'] = array('type' => 'fourth', 'foo' => 3, 'bar' => 2);
-        // $subfourtharray['4.3.3'] = array('type' => 'fourth', 'foo' => 3, 'bar' => 3);
-
-        // $fourtharray = array();
-        // $fourtharray['4.1'] = array('type' => 'fourth', 'foo' => 1);
-        // $fourtharray['4.2'] = array('type' => 'fourth', 'foo' => 2);
-        // $fourtharray['4.3'] = $subfourtharray;
-
-        // $childreports['fourth'] = $fourtharray;
-
-        return $childreports;
+        return $childrenreports;
     }
 
     /**
@@ -216,16 +206,16 @@ class report extends reportbase {
             $strseemoredetail = get_string('seemoredetail', 'surveyproreport_colles');
         }
 
-        $imgparams = array();
+        $imgparams = [];
         $imgparams['class'] = 'resultgraph';
         $imgparams['height'] = SURVEYPROREPORT_COLLES_GHEIGHT;
         $imgparams['width'] = SURVEYPROREPORT_COLLES_GWIDTH;
         $imgparams['src'] = $graphurl;
         $imgparams['alt'] = get_string($altkey, 'surveyproreport_colles');
 
-        $content = \html_writer::start_tag('div', array('class' => 'centerpara'));
+        $content = \html_writer::start_tag('div', ['class' => 'centerpara']);
         if ($nexturl) {
-            $content .= \html_writer::start_tag('a', array('title' => $strseemoredetail, 'href' => $nexturl));
+            $content .= \html_writer::start_tag('a', ['title' => $strseemoredetail, 'href' => $nexturl]);
         }
         $content .= \html_writer::empty_tag('img', $imgparams);
         if ($nexturl) {
@@ -243,20 +233,20 @@ class report extends reportbase {
     public function get_qid_per_area() {
         global $DB;
 
-        $qid1area = array(); // Array of id of items referring to the trend 1.
-        $qid2area = array(); // Array of id of items referring to the trend 2.
+        $qid1area = []; // Array of id of items referring to the trend 1.
+        $qid2area = []; // Array of id of items referring to the trend 2.
         $sql = 'SELECT i.id, i.sortindex, i.plugin
                 FROM {surveypro_item} i
                 WHERE i.surveyproid = :surveyproid
                     AND i.plugin = :plugin
                 ORDER BY i.sortindex';
 
-        $where = array('surveyproid' => $this->surveypro->id, 'plugin' => $this->templateuseritem);
+        $where = ['surveyproid' => $this->surveypro->id, 'plugin' => $this->templateuseritem];
         $itemseeds = $DB->get_recordset_sql($sql, $where);
 
         if ($this->template == 'collesactualpreferred') {
-            $id1 = array(); // Id of items referring to preferred trend.
-            $id2 = array(); // Id of items referring to actual trend.
+            $id1 = []; // Id of items referring to preferred trend.
+            $id2 = []; // Id of items referring to actual trend.
             $i = 0;
             foreach ($itemseeds as $itemseed) {
                 $i++;
@@ -267,26 +257,26 @@ class report extends reportbase {
                 }
                 if (count($id1) == 4) {
                     $qid1area[] = $id1;
-                    $id1 = array();
+                    $id1 = [];
                 }
                 if (count($id2) == 4) {
                     $qid2area[] = $id2;
-                    $id2 = array();
+                    $id2 = [];
                 }
             }
         } else {
-            $id1 = array(); // Id of items referring to the trend 1 (it may be preferred such as actual).
+            $id1 = []; // Id of items referring to the trend 1 (it may be preferred such as actual).
             foreach ($itemseeds as $itemseed) {
                 $id1[] = $itemseed->id;
                 if (count($id1) == 4) {
                     $qid1area[] = $id1;
-                    $id1 = array();
+                    $id1 = [];
                 }
             }
         }
         $itemseeds->close();
 
-        return array($qid1area, $qid2area);
+        return [$qid1area, $qid2area];
     }
 
     /**
@@ -298,7 +288,7 @@ class report extends reportbase {
         $canaccessreports = has_capability('mod/surveypro:accessreports', $this->context);
 
         if ($canaccessreports) {
-            $paramnexturl = array();
+            $paramnexturl = [];
             $paramnexturl['s'] = $this->surveypro->id;
             $paramnexturl['type'] = 'scales';
             $nexturl = new \moodle_url('/mod/surveypro/report/colles/view.php', $paramnexturl);
@@ -306,7 +296,7 @@ class report extends reportbase {
             $nexturl = null;
         }
 
-        $paramurl = array();
+        $paramurl = [];
         $paramurl['id'] = $this->cm->id;
         $paramurl['type'] = 'summary';
         $paramurl['groupid'] = $this->groupid;
@@ -341,15 +331,15 @@ class report extends reportbase {
 
         // Begin of: options (label of answers).
         $itemid = $qid1area[0][0]; // One of the itemid of the surveypro (the first).
-        $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, SURVEYPRO_TYPEFIELD, $this->templateuseritem);
+        $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, 'field', $this->templateuseritem);
         $this->ylabels = $item->get_content_array(SURVEYPRO_LABELS, 'options');
         // End of: options (label of answers).
 
         // Begin of: calculate the mean and the standard deviation of answers.
         if ($this->template == 'collesactualpreferred') {
-            $toevaluate = array($qid1area, $qid2area);
+            $toevaluate = [$qid1area, $qid2area];
         } else {
-            $toevaluate = array($qid1area);
+            $toevaluate = [$qid1area];
         }
         foreach ($toevaluate as $k => $qidarea) {
             foreach ($qidarea as $areaidlist) {
@@ -443,11 +433,11 @@ class report extends reportbase {
      * @return void
      */
     public function output_scalesdata() {
-        $paramnexturl = array();
+        $paramnexturl = [];
         $paramnexturl['s'] = $this->surveypro->id;
         $paramnexturl['type'] = 'questions';
 
-        $paramurl = array();
+        $paramurl = [];
         $paramurl['id'] = $this->cm->id;
         $paramurl['groupid'] = $this->groupid;
         $paramurl['type'] = 'scales';
@@ -489,15 +479,15 @@ class report extends reportbase {
 
         // Begin of: options (label of answers).
         $itemid = $qid1area[0][0]; // One of the itemid of the surveypro (the first).
-        $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, SURVEYPRO_TYPEFIELD, $this->templateuseritem);
+        $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, 'field', $this->templateuseritem);
         $this->ylabels = $item->get_content_array(SURVEYPRO_LABELS, 'options');
         // End of: options (label of answers).
 
         // Begin of: calculate the mean and the standard deviation of answers.
         if ($this->template == 'collesactualpreferred') {
-            $toevaluate = array($qid1area[$area], $qid2area[$area]);
+            $toevaluate = [$qid1area[$area], $qid2area[$area]];
         } else {
-            $toevaluate = array($qid1area[$area]);
+            $toevaluate = [$qid1area[$area]];
         }
         foreach ($toevaluate as $k => $areaidlist) {
             foreach ($areaidlist as $itemid) {
@@ -554,7 +544,7 @@ class report extends reportbase {
      * @return void
      */
     public function output_questionsdata($area) {
-        $paramnexturl = array();
+        $paramnexturl = [];
         $paramnexturl['s'] = $this->surveypro->id;
         if ($area == 5) {
             $paramnexturl['type'] = 'summary';
@@ -564,12 +554,12 @@ class report extends reportbase {
         }
         $nexturl = new \moodle_url('/mod/surveypro/report/colles/view.php', $paramnexturl);
 
-        $paramurl = array();
+        $paramurl = [];
         $paramurl['id'] = $this->cm->id;
         $paramurl['groupid'] = $this->groupid;
         $paramurl['type'] = 'questions';
 
-        $areas = array($area);
+        $areas = [$area];
 
         foreach ($areas as $area) {
             $paramurl['area'] = $area;
@@ -597,7 +587,7 @@ class report extends reportbase {
 
         // Begin of: options (label of answers).
         $itemid = $qid1area[$area][$qid]; // One of the itemid of the surveypro (the first).
-        $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, SURVEYPRO_TYPEFIELD, $this->templateuseritem);
+        $item = surveypro_get_item($this->cm, $this->surveypro, $itemid, 'field', $this->templateuseritem);
         $this->xlabels = $item->get_content_array(SURVEYPRO_LABELS, 'options');
         // End of: options (label of answers).
 
@@ -613,9 +603,9 @@ class report extends reportbase {
         }
 
         if ($this->template == 'collesactualpreferred') {
-            $toevaluate = array($qid1area[$area], $qid2area[$area]);
+            $toevaluate = [$qid1area[$area], $qid2area[$area]];
         } else {
-            $toevaluate = array($qid1area[$area]);
+            $toevaluate = [$qid1area[$area]];
         }
         foreach ($toevaluate as $k => $areaidlist) {
             $sql = 'SELECT content, count(a.id) as absolute

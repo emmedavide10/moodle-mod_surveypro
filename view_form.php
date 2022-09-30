@@ -18,7 +18,7 @@
  * Starting page to display the user input form.
  *
  * @package   mod_surveypro
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,11 +35,11 @@ $s = optional_param('s', 0, PARAM_INT);   // Surveypro instance id.
 
 if (!empty($id)) {
     $cm = get_coursemodule_from_id('surveypro', $id, 0, false, MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
 } else {
-    $surveypro = $DB->get_record('surveypro', array('id' => $s), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $surveypro->course), '*', MUST_EXIST);
+    $surveypro = $DB->get_record('surveypro', ['id' => $s], '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $surveypro->course], '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('surveypro', $surveypro->id, $course->id, false, MUST_EXIST);
 }
 $cm = cm_info::create($cm);
@@ -63,7 +63,7 @@ $utilitylayoutman = new utility_layout($cm, $surveypro);
 $utilitylayoutman->add_custom_css();
 
 // Begin of: define $user_form return url.
-$paramurl = array('id' => $cm->id, 'view' => $view);
+$paramurl = ['id' => $cm->id, 'view' => $view];
 $formurl = new \moodle_url('/mod/surveypro/view_form.php', $paramurl);
 // End of: define $user_form return url.
 
@@ -77,8 +77,8 @@ $formparams->canaccessreserveditems = has_capability('mod/surveypro:accessreserv
 $formparams->userfirstpage = $userformman->get_userfirstpage(); // The user first page
 $formparams->userlastpage = $userformman->get_userlastpage(); // The user last page
 $formparams->overflowpage = $overflowpage; // Went the user to a overflow page?
-$formparams->tabpage = $userformman->get_tabpage(); // The page of the TAB-PAGE structure.
-$formparams->readonly = ($userformman->get_tabpage() == SURVEYPRO_SUBMISSION_READONLY);
+$formparams->view = $view; // The view am I going to have in the form.
+$formparams->readonly = ($view == SURVEYPRO_READONLYRESPONSE);
 $formparams->preview = false;
 if ($begin == 1) {
     $userformman->next_not_empty_page(true, 0); // True means direction = right.
@@ -89,11 +89,11 @@ $formparams->formpage = $userformman->get_formpage(); // The page of the form to
 // End of: prepare params for the form.
 
 $editable = ($view == SURVEYPRO_READONLYRESPONSE) ? false : true;
-$userform = new userform($formurl, $formparams, 'post', '', array('id' => 'userentry'), $editable);
+$userform = new userform($formurl, $formparams, 'post', '', ['id' => 'userentry'], $editable);
 
 // Begin of: manage form submission.
 if ($userform->is_cancelled()) {
-    $localparamurl = array('id' => $cm->id, 'view' => $view);
+    $localparamurl = ['id' => $cm->id, 'view' => $view];
     $redirecturl = new \moodle_url('/mod/surveypro/view_submissions.php', $localparamurl);
     redirect($redirecturl, get_string('usercanceled', 'mod_surveypro'));
 }
@@ -104,7 +104,7 @@ if ($userformman->formdata = $userform->get_data()) {
     // If "pause" button has been pressed, redirect.
     $pausebutton = isset($userformman->formdata->pausebutton);
     if ($pausebutton) {
-        $localparamurl = array('id' => $cm->id, 'view' => $view);
+        $localparamurl = ['id' => $cm->id, 'view' => $view];
         $redirecturl = new \moodle_url('/mod/surveypro/view_submissions.php', $localparamurl);
         redirect($redirecturl); // Go somewhere.
     }
@@ -137,13 +137,19 @@ if ($userformman->formdata = $userform->get_data()) {
     // If none redirected you, reload THE RIGHT page WITHOUT $paramurl['view'].
     // This is necessary otherwise if the user switches language using the corresponding menu
     // just after a new response is submitted
-    // the browser redirects to http://localhost/head_behat/mod/surveypro/view_form.php?s=xxx&view=1&lang=it
-    // and not               to http://localhost/head_behat/mod/surveypro/view_submissions.php?s=xxx&lang=it
+    // the browser redirects to mod/surveypro/view_form.php?s=xxx&view=1&lang=it
+    // and not               to mod/surveypro/view_submissions.php?s=xxx&lang=it
     // alias it goes to the page to get one more response
     // instead of remaining in the view submissions page.
-    $paramurl = array();
+    $paramurl = [];
     $paramurl['s'] = $surveypro->id;
     $paramurl['responsestatus'] = $userformman->get_responsestatus();
+    // $userdeservesthanks = 0 if the user does not deserve thanks, $userdeservesthanks = 1 otherwise.
+    // $paramurl['justsubmitted'] holds two informations:
+    // 1st: user just submitted.
+    // 2nd: whether the user deserves thanks?
+    // If $paramurl['justsubmitted'] = 1 it means; user just submitted but does not deserve thanks.
+    // If $paramurl['justsubmitted'] = 2 it means; user just submitted and deserves thanks.
     $paramurl['justsubmitted'] = 1 + $userformman->get_userdeservesthanks();
     $paramurl['formview'] = $userformman->get_view(); // What was I viewing in the form?
     $redirecturl = new \moodle_url('/mod/surveypro/view_submissions.php', $paramurl);
@@ -152,7 +158,7 @@ if ($userformman->formdata = $userform->get_data()) {
 // End of: manage form submission.
 
 // Output starts here.
-$paramurl = array('s' => $surveypro->id, 'view' => $view);
+$paramurl = ['s' => $surveypro->id, 'view' => $view];
 if (!empty($submissionid)) {
     $paramurl['submissionid'] = $submissionid;
 }
@@ -164,14 +170,20 @@ $PAGE->set_title($surveypro->name);
 $PAGE->set_heading($course->shortname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($surveypro->name), 2, null);
 
-// Render the activity information.
-$completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
-$activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
-echo $OUTPUT->activity_information($cm, $completiondetails, $activitydates);
-
-new tabs($cm, $context, $surveypro, $userformman->get_tabtab(), $userformman->get_tabpage());
+$tab = new tabs($cm, $context, $surveypro);
+switch ($view) {
+    case SURVEYPRO_NEWRESPONSE:
+        $activepage = 'newresponse_page';
+        break;
+    case SURVEYPRO_EDITRESPONSE:
+        $activepage = 'editresponse_page';
+        break;
+    case SURVEYPRO_READONLYRESPONSE:
+        $activepage = 'roresponse_page';
+        break;
+}
+$tab->draw_pages_bar(SURVEYPRO_TABDATAENTRY, $activepage);
 
 $userformman->noitem_stopexecution();
 $userformman->nomoresubmissions_stopexecution();
@@ -187,7 +199,7 @@ $prefill['formpage'] = $userformman->get_formpage();
 $userform->set_data($prefill);
 $userform->display();
 
-// If surveypro is multipage and $userformman->tabpage == SURVEYPRO_READONLYRESPONSE.
+// If surveypro is multipage and $userformman->view == SURVEYPRO_READONLYRESPONSE.
 // I need to add navigation buttons manually
 // Because the surveypro is not displayed as a form but as a simple list of graphic user items.
 $userformman->add_readonly_browsing_buttons();

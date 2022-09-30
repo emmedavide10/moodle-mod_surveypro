@@ -18,7 +18,7 @@
  * Starting page to display graphs of the frequency report.
  *
  * @package   surveyproreport_frequency
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,8 +32,8 @@ $id = required_param('id', PARAM_INT); // Course Module ID.
 $itemid = required_param('itemid', PARAM_INT); // Item ID.
 
 $cm = get_coursemodule_from_id('surveypro', $id, 0, false, MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$surveypro = $DB->get_record('surveypro', array('id' => $cm->instance), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+$surveypro = $DB->get_record('surveypro', ['id' => $cm->instance], '*', MUST_EXIST);
 
 $groupid = optional_param('groupid', 0, PARAM_INT); // Group ID.
 
@@ -50,8 +50,8 @@ list($sql, $whereparams) = $reportman->get_submissions_sql($itemid);
 $answers = $DB->get_recordset_sql($sql, $whereparams);
 $item = surveypro_get_item($cm, $surveypro, $itemid);
 
-$content = array();
-$absolute = array();
+$content = [];
+$absolute = [];
 foreach ($answers as $answer) {
     $content[] = $item->userform_db_to_export($answer);
     $absolute[] = $answer->absolute;
@@ -64,7 +64,7 @@ $graph->parameter['title'] = '';
 
 $graph->x_data = $content;
 $graph->y_data['answers1'] = $absolute;
-$answer1format = array();
+$answer1format = [];
 $answer1format['colour'] = 'ltblue';
 $answer1format['bar'] = 'fill';
 $answer1format['legend'] = strip_tags($item->get_content());
@@ -77,7 +77,7 @@ $graph->parameter['legend_size'] = 9;
 $graph->parameter['legend_border'] = 'black';
 $graph->parameter['legend_offset'] = 4;
 
-$graph->y_order = array('answers1');
+$graph->y_order = ['answers1'];
 
 // $graph->parameter['x_axis_gridlines'] can not be set to a number because X axis is not numeric.
 $graph->parameter['y_axis_gridlines'] = min(20, 2 + max($absolute));

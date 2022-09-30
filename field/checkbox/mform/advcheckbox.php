@@ -20,7 +20,7 @@
  * Extends the core mform class for advcheckbox element
  *
  * @package   surveyprofield_checkbox
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,7 +38,7 @@ require_once($CFG->libdir.'/form/advcheckbox.php');
  * Extends the core mform class for advcheckbox element
  *
  * @package   surveyprofield_checkbox
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class surveypromform_advcheckbox extends \MoodleQuickForm_advcheckbox {
@@ -62,7 +62,7 @@ class surveypromform_advcheckbox extends \MoodleQuickForm_advcheckbox {
      *
      * @return html of the frozen element
      */
-    public function getFrozenHtml() {
+    public function getFrozenHtml(): string {
         $output = parent::getFrozenHtml();
 
         if (isset($this->_attributes['class'])) {

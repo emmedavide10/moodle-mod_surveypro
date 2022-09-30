@@ -16,6 +16,9 @@ Feature: apply a COLLES (preferred) mastertemplate to test graphs
       | user     | course      | role           |
       | teacher1 | Test graphs | editingteacher |
       | student1 | Test graphs | student        |
+    And the following "permission overrides" exist:
+      | capability                  | permission | role    | contextlevel | reference   |
+      | mod/surveypro:accessreports | Allow      | student | Course       | Test graphs |
     And the following "activities" exist:
       | activity  | name              | intro                         | course      |
       | surveypro | Run COLLES report | This is to test COLLES graphs | Test graphs |
@@ -23,7 +26,7 @@ Feature: apply a COLLES (preferred) mastertemplate to test graphs
     And I am on "To test COLLES graphs" course homepage
 
   @javascript
-  Scenario: apply COLLES (Preferred) master template, add a record and call reports
+  Scenario: apply COLLES (Preferred) mastertemplate, add a record and call reports
     Given I follow "Run COLLES report"
     And I set the field "Master templates" to "COLLES (Preferred)"
     And I press "Apply"
@@ -69,7 +72,8 @@ Feature: apply a COLLES (preferred) mastertemplate to test graphs
       | Do you have any other comments?                | Am I sexy? |
     And I press "Submit"
 
-    And I navigate to "Report > Colles report" in current page administration
+    And I am on the "Run COLLES report" "mod_surveypro > Report" page
+    And I follow "Colles report" page in tab bar
     Then I should not see "Summary report"
 
     And I log out
@@ -77,78 +81,49 @@ Feature: apply a COLLES (preferred) mastertemplate to test graphs
     When I log in as "teacher1"
     And I am on "To test COLLES graphs" course homepage
     And I follow "Run COLLES report"
+    And I am on the "Run COLLES report" "mod_surveypro > Report" page
 
-    # now test links provided by img's
-
-    And I navigate to "Report > Colles report > Summary" in current page administration
+    And I follow "Colles report" page in tab bar
     # now I should be in front of "Colles report > Summary"
     Then I should not see "Summary report"
 
-    And I click on "div.centerpara a" "css_element"
-    # now I should be in front of "Colles report > Scales"
+    And I set the field "id_type_area_type" to "scales"
+    And I press "Reload"
+    # now I should be in front of "Colles report > Relevance"
     Then I should not see "Scales report"
 
-    And I click on "div.centerpara a" "css_element"
+    And I set the field "id_type_area_type" to "questions"
+    # And I set the field "id_type_area_area" to "0"
+    And I press "Reload"
     # now I should be in front of "Colles report > Questions > Relevance"
     Then I should not see "Questions report"
 
-    And I click on "div.centerpara a" "css_element"
+    # And I set the field "id_type_area_type" to "questions"
+    And I set the field "id_type_area_area" to "1"
+    And I press "Reload"
     # now I should be in front of "Colles report > Questions > Reflective thinking"
     Then I should not see "Questions report"
 
-    And I click on "div.centerpara a" "css_element"
+    # And I set the field "id_type_area_type" to "questions"
+    And I set the field "id_type_area_area" to "2"
+    And I press "Reload"
     # now I should be in front of "Colles report > Questions > Interactivity"
     Then I should not see "Questions report"
 
-    And I click on "div.centerpara a" "css_element"
+    # And I set the field "id_type_area_type" to "questions"
+    And I set the field "id_type_area_area" to "3"
+    And I press "Reload"
     # now I should be in front of "Colles report > Questions > Tutor support"
     Then I should not see "Questions report"
 
-    And I click on "div.centerpara a" "css_element"
+    # And I set the field "id_type_area_type" to "questions"
+    And I set the field "id_type_area_area" to "4"
+    And I press "Reload"
     # now I should be in front of "Colles report > Questions > Peer support"
     Then I should not see "Questions report"
 
-    And I click on "div.centerpara a" "css_element"
-    # now I should be in front of "Colles report > Questions > Interpretation"
-    Then I should not see "Questions report"
-
-    And I click on "div.centerpara a" "css_element"
-    # now I should be in front of "Colles report > Summary"
-    Then I should not see "Summary report"
-
-    # now test links provided by Admin menu
-
-    And I follow "Run COLLES report"
-    And I navigate to "Report > Colles report > Scales" in current page administration
-    # now I should be in front of "Colles report > Scales"
-    Then I should not see "Scales report"
-
-    And I follow "Run COLLES report"
-    And I navigate to "Report > Colles report > Questions > Relevance" in current page administration
-    # now I should be in front of "Colles report > Questions > Relevance"
-    Then I should not see "Questions report"
-
-    And I follow "Run COLLES report"
-    And I navigate to "Report > Colles report > Questions > Reflective thinking" in current page administration
-    # now I should be in front of "Colles report > Questions > Reflective thinking"
-    Then I should not see "Questions report"
-
-    And I follow "Run COLLES report"
-    And I navigate to "Report > Colles report > Questions > Interactivity" in current page administration
-    # now I should be in front of "Colles report > Questions > Interactivity"
-    Then I should not see "Questions report"
-
-    And I follow "Run COLLES report"
-    And I navigate to "Report > Colles report > Questions > Tutor support" in current page administration
-    # now I should be in front of "Colles report > Questions > Tutor support"
-    Then I should not see "Questions report"
-
-    And I follow "Run COLLES report"
-    And I navigate to "Report > Colles report > Questions > Peer support" in current page administration
-    # now I should be in front of "Colles report > Questions > Peer support"
-    Then I should not see "Questions report"
-
-    And I follow "Run COLLES report"
-    And I navigate to "Report > Colles report > Questions > Interpretation" in current page administration
+    # And I set the field "id_type_area_type" to "questions"
+    And I set the field "id_type_area_area" to "5"
+    And I press "Reload"
     # now I should be in front of "Colles report > Questions > Interpretation"
     Then I should not see "Questions report"

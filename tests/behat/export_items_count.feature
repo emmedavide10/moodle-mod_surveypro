@@ -45,7 +45,8 @@ Feature: adding a fileupload item, two more item are added to export type menu
     And I log in as "teacher1"
     And I am on "Count export type menu items" course homepage
     And I follow "Export-item test"
-    And I navigate to "Survey > Export" in current page administration
+    And I follow "Tools"
+    And I follow "Export" page in tab bar
 
     Then "//select[contains(@id, 'id_downloadtype')]//option[contains(@value, '1')]" "xpath_element" should exist
     Then "//select[contains(@id, 'id_downloadtype')]//option[contains(@value, '2')]" "xpath_element" should exist
@@ -57,7 +58,8 @@ Feature: adding a fileupload item, two more item are added to export type menu
     And I follow "delete_item_2"
     And I press "Yes"
 
-    And I navigate to "Survey > Export" in current page administration
+    And I follow "Tools"
+    And I follow "Export" page in tab bar
 
     Then "//select[contains(@id, 'id_downloadtype')]//option[contains(@value, '1')]" "xpath_element" should exist
     Then "//select[contains(@id, 'id_downloadtype')]//option[contains(@value, '2')]" "xpath_element" should exist

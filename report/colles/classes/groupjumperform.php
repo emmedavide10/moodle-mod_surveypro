@@ -18,7 +18,7 @@
  * Class to filter output by group
  *
  * @package   surveyproreport_colles
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * The class to filter the attachment item to overview
  *
  * @package   surveyproreport_colles
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class groupjumperform extends \moodleform {
@@ -43,34 +43,54 @@ class groupjumperform extends \moodleform {
      * @return void
      */
     public function definition() {
-        global $COURSE, $USER;
-
         $mform = $this->_form;
 
         // Get _customdata.
+        $showjumper = $this->_customdata->showjumper;
         $canaccessallgroups = $this->_customdata->canaccessallgroups;
         $addnotinanygroup = $this->_customdata->addnotinanygroup;
         $jumpercontent = $this->_customdata->jumpercontent;
 
-        $fieldname = 'groupid';
-        $options = array();
-        if ($canaccessallgroups) {
-            $options[] = get_string('allgroups');
-        }
-        if ($addnotinanygroup) {
-            $options['-1'] = get_string('notinanygroup', 'surveyproreport_attachments');
-        }
-        foreach ($jumpercontent as $group) {
-            $options[$group->id] = $group->name;
+        $elementgroup = [];
+
+        $fieldname = 'type';
+        $options = ['summary' => 'summary', 'scales' => 'scales', 'questions' => 'questions'];
+        $elementgroup[] =& $mform->createElement('select', $fieldname, '', $options);
+        // $mform->SetDefault($fieldname, $type);
+        // $mform->addElement('select', $fieldname, get_string('type', 'mod_surveypro'), $options);
+
+        $fieldname = 'area';
+        $options = [];
+        $options[] = get_string('fieldset_content_01', 'surveyprotemplate_collesactual');
+        $options[] = get_string('fieldset_content_02', 'surveyprotemplate_collesactual');
+        $options[] = get_string('fieldset_content_03', 'surveyprotemplate_collesactual');
+        $options[] = get_string('fieldset_content_04', 'surveyprotemplate_collesactual');
+        $options[] = get_string('fieldset_content_05', 'surveyprotemplate_collesactual');
+        $options[] = get_string('fieldset_content_06', 'surveyprotemplate_collesactual');
+        $elementgroup[] =& $mform->createElement('select', $fieldname, '', $options);
+        // $mform->SetDefault($fieldname, $area);
+
+        $mform->addGroup($elementgroup, 'type_area', get_string('type', 'mod_surveypro'), [' '], true);
+        $mform->disabledIf('type_area[area]', 'type_area[type]', 'neq', 'questions');
+        // $mform->addElement('select', $fieldname, get_string('area', 'mod_surveypro'), $options);
+
+        if ($showjumper) {
+            $fieldname = 'groupid';
+            $options = [];
+            if ($canaccessallgroups) {
+                $options[] = get_string('allgroups');
+            }
+            if ($addnotinanygroup) {
+                $options['-1'] = get_string('notinanygroup', 'surveyproreport_attachments');
+            }
+            foreach ($jumpercontent as $group) {
+                $options[$group->id] = $group->name;
+            }
+
+            $mform->addElement('select', $fieldname, get_string('group', 'group'), $options, $options);
         }
 
-        $attributes = array('class' => 'autosubmit ignoredirty');
-        $mform->addElement('select', $fieldname, get_string('group', 'group'), $options, $attributes);
-
-        // Legacy standard.
-        // $elementgroup[] = $mform->createElement('select', $fieldname, get_string('group', 'group'), $options);
-        // $elementgroup[] = $mform->createElement('submit', 'submitbutton', get_string('reload'));
-        // $mform->addGroup($elementgroup, 'groupid_group', get_string('filter'), array(' '), false);
+        $mform->addElement('submit', 'submitbutton', get_string('reload'));
     }
 }
 

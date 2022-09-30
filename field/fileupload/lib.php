@@ -18,7 +18,7 @@
  * Library for surveyprofield_fileupload
  *
  * @package   surveyprofield_fileupload
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,7 +36,7 @@ define('SURVEYPROFIELD_FILEUPLOAD_FILEAREA', 'fileuploadfiles');
  * @param array $options
  * @return bool false if file not found, does not return if found - just send the file
  */
-function surveyprofield_fileupload_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function surveyprofield_fileupload_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=[]) {
     global $DB;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -53,7 +53,7 @@ function surveyprofield_fileupload_pluginfile($course, $cm, $context, $filearea,
             FROM {surveypro_item} i
               JOIN {surveypro_answer} a ON a.itemid = i.id
             WHERE a.id = :answerid';
-    $whereparams = array('answerid' => $answerid);
+    $whereparams = ['answerid' => $answerid];
     $answer = $DB->get_record_sql($sql, $whereparams, MUST_EXIST);
 
     if ($cm->instance != $answer->surveyproid) {

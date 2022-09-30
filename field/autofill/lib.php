@@ -18,7 +18,7 @@
  * Library for surveyprofield_autofill
  *
  * @package   surveyprofield_autofill
- * @copyright 2013 onwards kordan <kordan@mclink.it>
+ * @copyright 2022 onwards kordan <kordan@mclink.it>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -51,13 +51,13 @@ function surveypro_autofill_get_elements($surveyproid) {
     $cm = get_coursemodule_from_instance('surveypro', $surveyproid, $COURSE->id, false, MUST_EXIST);
     $usegroups = groups_get_activity_groupmode($cm, $COURSE);
 
-    $options = array();
-    $options[''] = array('' => get_string('choosedots'));
+    $options = [];
+    $options[''] = ['' => get_string('choosedots')];
 
     // Submission date and time.
     $begin = 1;
     $end = $begin + 3; // 3 == ('number of cycles' - 1).
-    $subelements = array();
+    $subelements = [];
     for ($i = $begin; $i <= $end; $i++) {
         $value = constant('SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT'.sprintf('%02d', $i));
         $subelements[$value] = get_string($value, 'surveyprofield_autofill');
@@ -72,7 +72,7 @@ function surveypro_autofill_get_elements($surveyproid) {
         $menuelements += 2; // Add 'group ID' and 'group name'.
     }
     $end = $begin + $menuelements;
-    $subelements = array();
+    $subelements = [];
     for ($i = $begin; $i <= $end; $i++) {
         $value = constant('SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT'.sprintf('%02d', $i));
         $subelements[$value] = get_string($value, 'surveyprofield_autofill');
@@ -87,7 +87,7 @@ function surveypro_autofill_get_elements($surveyproid) {
     }
     $end = $begin + 1; // 1 == ('number of cycles' - 1).
 
-    $subelements = array();
+    $subelements = [];
     for ($i = $begin; $i <= $end; $i++) {
         $value = constant('SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT'.sprintf('%02d', $i));
         $subelements[$value] = get_string($value, 'surveyprofield_autofill');
@@ -98,7 +98,7 @@ function surveypro_autofill_get_elements($surveyproid) {
     // Course.
     $begin = $end + 1;
     $end = $begin + 1; // 1 == ('number of cycles' - 1).
-    $subelements = array();
+    $subelements = [];
     for ($i = $begin; $i <= $end; $i++) {
         $value = constant('SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT'.sprintf('%02d', $i));
         $subelements[$value] = get_string($value, 'surveyprofield_autofill');
@@ -111,7 +111,7 @@ function surveypro_autofill_get_elements($surveyproid) {
     // Custom info.
     $begin = $end + 1;
     $end = $begin; // 0 == ('number of cycles' - 1).
-    $subelements = array();
+    $subelements = [];
     for ($i = $begin; $i <= $end; $i++) {
         $value = constant('SURVEYPROFIELD_AUTOFILL_CONTENTELEMENT'.sprintf('%02d', $i));
         $subelements[$value] = get_string($value, 'surveyprofield_autofill');
