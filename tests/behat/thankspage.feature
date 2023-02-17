@@ -8,6 +8,9 @@ Feature: verify the thanks page is shown properly
     Given the following "courses" exist:
       | fullname  | shortname | category | groupmode |
       | Thank you | Thanks    | 0        | 0         |
+    And the following "blocks" exist:
+      | blockname     | contextlevel | reference | pagetypepattern | defaultregion |
+      | private_files | System       | 1         | my-index        | side-post     |
     And the following "users" exist:
       | username | firstname | lastname | email                |
       | teacher1 | Teacher   | 1        | teacher1@nowhere.net |
