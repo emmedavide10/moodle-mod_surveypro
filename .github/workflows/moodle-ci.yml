@@ -29,12 +29,12 @@ jobs:
       matrix:
         include:
           - php: 8.0
-            moodle-branch: MOODLE_311_STABLE
+            moodle-branch: MOODLE_401_STABLE
             database: pgsql
             suite: default
             profile: chrome
-          - php: 7.3
-            moodle-branch: MOODLE_311_STABLE
+          - php: 7.4
+            moodle-branch: MOODLE_401_STABLE
             database: mariadb
             suite: classic
             profile: default
