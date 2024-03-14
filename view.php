@@ -69,44 +69,10 @@ $utilitypageman = new utility_page($cm, $surveypro);
 
 // MARK cover.
 if ($section == 'cover') {
-    // Get additional specific params.
+    $params = ['s' => $cm->instance, 'section' => 'submissionslist'];
+    $redirecturl = new \moodle_url('/mod/surveypro/view.php', $params);
 
-    // Required capability.
-    $canmanageitems = has_capability('mod/surveypro:manageitems', $context);
-    $canaccessreserveditems = has_capability('mod/surveypro:accessreserveditems', $context);
-
-    // Calculations.
-    // If you are an admin and no items are in this surveypro, you will be redireted.
-    $utilitylayoutman = new utility_layout($cm, $surveypro);
-    $utilitylayoutman->noitem_redirect();
-    $itemcount = $utilitylayoutman->has_items(0, SURVEYPRO_TYPEFIELD, $canmanageitems, $canaccessreserveditems, true);
-
-    $coverman = new view_cover($cm, $context, $surveypro);
-
-    // Set $PAGE params.
-    $paramurl = ['s' => $surveypro->id, 'area' => 'surveypro', 'section' => 'cover'];
-    $url = new \moodle_url('/mod/surveypro/view.php', $paramurl);
-    $PAGE->set_url($url);
-    $PAGE->set_context($context);
-    $PAGE->set_cm($cm);
-    $PAGE->set_title($surveypro->name);
-    $PAGE->set_heading($course->shortname);
-    $PAGE->navbar->add(get_string('surveypro_dashboard', 'mod_surveypro'));
-    // Is it useful? $PAGE->add_body_class('mediumwidth');.
-    $utilitypageman->manage_editbutton($edit);
-
-    // Output starts here.
-    echo $OUTPUT->header();
-
-    $actionbar = new \mod_surveypro\output\action_bar($cm, $context, $surveypro);
-    echo $actionbar->draw_view_action_bar();
-
-    if (!$itemcount) { // Admin was redirected. Student gets the alert.
-        $message = get_string('noitemsfound', 'mod_surveypro');
-        echo $OUTPUT->notification($message, 'notifyproblem');
-    } else {
-        $coverman->display_cover();
-    }
+    redirect($redirecturl);
 }
 
 // MARK submissionslist.
@@ -274,22 +240,49 @@ if ($section == 'submissionform') {
         // Surveypro has been submitted. Notify people.
         $submissionformman->notifypeople();
 
-        // If none redirected you, reload THE RIGHT page WITHOUT $paramurl['mode'].
-        // This is necessary otherwise if the user switches language using the corresponding menu
-        // just after a new response is submitted
-        // the browser redirects to http://localhost/head_behat/mod/surveypro/view.php?s=xxx&view=1&lang=it&section=submissionform
-        // and not               to http://localhost/head_behat/mod/surveypro/view.php?s=xxx&lang=it&section=collectedsubmissions
-        // alias it goes to the page to get one more response
-        // instead of remaining in the view submissions page.
-        $paramurl = [];
-        $paramurl['s'] = $surveypro->id;
-        // $paramurl['responsestatus'] = $submissionformman->get_responsestatus();
-        $paramurl['justsubmitted'] = 1 + $submissionformman->get_userdeservesthanks();
-        $paramurl['formview'] = $submissionformman->get_mode(); // In which way am I using this form?
-        $paramurl['section'] = 'submissionslist';
-        $redirecturl = new \moodle_url('/mod/surveypro/view.php', $paramurl);
-        redirect($redirecturl);
+        // Define parameters for the URL to redirect to submissions list
+        $paramurlansw = ['s' => $cm->instance, 'section' => 'submissionslist'];
+        $redirectlistansw = new \moodle_url('/mod/surveypro/view.php', $paramurlansw);
+
+        // Retrieve the spromonitor record based on the surveypro id
+        $spromonitor = $DB->get_record('spromonitor', ['surveyproid' => $surveypro->id]);
+        $spromonitorid = $spromonitor->id;
+
+        // Retrieve the course_modules record based on the spromonitor id
+        $cmspromonitor = $DB->get_record('course_modules', ['instance' => $spromonitorid]);
+        $cmspromonitorid = $cmspromonitor->id;
+
+        // Check if surveypro id is valid
+        if ($surveypro->id) {
+            // Check if course_modules record for spromonitor exists
+            if ($cmspromonitor) {
+                // Display a confirmation message with buttons for redirecting to monitor chart and submissions list
+                $message = get_string('messageaftersubmission', 'mod_surveypro');
+                $chartbutton = get_string('redirectmonitor', 'mod_surveypro');
+                $answbutton = get_string('redirectsublist', 'mod_surveypro');
+
+                // Create URLs for redirecting to monitor chart and submissions list
+                $paramurlchart = ['id' => $cmspromonitorid];
+                $urlmonitor = new \moodle_url('/mod/spromonitor/view.php', $paramurlchart);
+                $redirecturlmonitor = new \single_button($urlmonitor, $chartbutton);
+
+                $redirecturlansw = new \single_button($redirectlistansw, $answbutton);
+
+                // Output header, confirmation message, and footer, then terminate execution
+                echo $OUTPUT->header();
+                echo $OUTPUT->confirm($message, $redirecturlmonitor, $redirecturlansw);
+                echo $OUTPUT->footer();
+                die();
+            } else {
+                // If course_modules record doesn't exist, redirect to submissions list
+                redirect($redirectlistansw);
+            }
+         } else {
+            // If surveypro id is not valid, redirect to submissions list
+            redirect($redirectlistansw);
+         }
     }
+
     // End of: manage form submission.
 
     // Set $PAGE params.
