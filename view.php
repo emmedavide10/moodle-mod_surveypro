@@ -34,8 +34,8 @@ use mod_surveypro\view_submissionsearch;
 use mod_surveypro\local\form\userform;
 use mod_surveypro\local\form\usersearch;
 
-require_once(dirname(__FILE__).'/../../config.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__) . '/../../config.php');
+require_once(dirname(__FILE__) . '/lib.php');
 
 $defaultsection = surveypro_get_defaults_section_per_area('surveypro');
 
@@ -47,8 +47,8 @@ $edit = optional_param('edit', -1, PARAM_BOOL);
 // Verify I used correct names all along the module code.
 $validsections = ['cover', 'submissionslist', 'submissionform', 'searchsubmissions'];
 if (!in_array($section, $validsections)) {
-    $message = 'The section param \''.$section.'\' is invalid.';
-    debugging('Error at line '.__LINE__.' of file '.__FILE__.'. '.$message , DEBUG_DEVELOPER);
+    $message = 'The section param \'' . $section . '\' is invalid.';
+    debugging('Error at line ' . __LINE__ . ' of file ' . __FILE__ . '. ' . $message, DEBUG_DEVELOPER);
 }
 // End of: Verify I used correct names all along the module code.
 
@@ -157,6 +157,7 @@ if ($section == 'submissionform') {
     $mode = optional_param('mode', SURVEYPRO_NOMODE, PARAM_INT);
     $begin = optional_param('begin', 0, PARAM_INT);
     $overflowpage = optional_param('overflowpage', 0, PARAM_INT); // Went the user to a overflow page?
+    $spromonitorid = optional_param('spromonitorid', 0, PARAM_INT);
 
     // Calculations.
     mod_surveypro\utility_mform::register_form_elements();
@@ -203,9 +204,13 @@ if ($section == 'submissionform') {
         redirect($redirecturl, get_string('usercanceled', 'mod_surveypro'));
     }
 
-    if ($submissionformman->formdata = $userform->get_data()) {
-        $submissionformman->save_user_data(); // SAVE SAVE SAVE SAVE.
+    $sprosend = false;
 
+    if ($submissionformman->formdata = $userform->get_data()) {
+
+        $submissionformman->save_user_data();
+        $sprosend = true;
+        // SAVE SAVE SAVE SAVE.
         // If "pause" button has been pressed, redirect.
         $pausebutton = isset($submissionformman->formdata->pausebutton);
         if ($pausebutton) {
@@ -229,6 +234,7 @@ if ($section == 'submissionform') {
 
         // If "next" button has been pressed, redirect.
         $nextbutton = isset($submissionformman->formdata->nextbutton);
+        echo $nextbutton;
         if ($nextbutton) {
             $submissionformman->next_not_empty_page(true);
             $paramurl['formpage'] = $submissionformman->get_nextpage();
@@ -240,50 +246,26 @@ if ($section == 'submissionform') {
         // Surveypro has been submitted. Notify people.
         $submissionformman->notifypeople();
 
-        // Define parameters for the URL to redirect to submissions list
-        $paramurlansw = ['s' => $cm->instance, 'section' => 'submissionslist'];
-        $redirectlistansw = new \moodle_url('/mod/surveypro/view.php', $paramurlansw);
-
-        // Retrieve the spromonitor record based on the surveypro id
-        $spromonitor = $DB->get_record('spromonitor', ['surveyproid' => $surveypro->id]);
-        $spromonitorid = $spromonitor->id;
-
-        // Retrieve the course_modules record based on the spromonitor id
-        $cmspromonitor = $DB->get_record('course_modules', ['instance' => $spromonitorid]);
-        $cmspromonitorid = $cmspromonitor->id;
-
-        // Check if surveypro id is valid
-        if ($surveypro->id) {
-            // Check if course_modules record for spromonitor exists
-            if ($cmspromonitor) {
-                // Display a confirmation message with buttons for redirecting to monitor chart and submissions list
-                $message = get_string('messageaftersubmission', 'mod_surveypro');
-                $chartbutton = get_string('redirectmonitor', 'mod_surveypro');
-                $answbutton = get_string('redirectsublist', 'mod_surveypro');
-
-                // Create URLs for redirecting to monitor chart and submissions list
-                $paramurlchart = ['id' => $cmspromonitorid];
-                $urlmonitor = new \moodle_url('/mod/spromonitor/view.php', $paramurlchart);
-                $redirecturlmonitor = new \single_button($urlmonitor, $chartbutton);
-
-                $redirecturlansw = new \single_button($redirectlistansw, $answbutton);
-
-                // Output header, confirmation message, and footer, then terminate execution
-                echo $OUTPUT->header();
-                echo $OUTPUT->confirm($message, $redirecturlmonitor, $redirecturlansw);
-                echo $OUTPUT->footer();
-                die();
-            } else {
-                // If course_modules record doesn't exist, redirect to submissions list
-                redirect($redirectlistansw);
+        // Is there a spromonitor looking at this instance of surveypro?
+        $records = $DB->get_records('spromonitor', ['surveyproid' => $surveypro->id]);
+        if (count($records)) {
+            // Filter out records pending deletion.
+            foreach ($records as $record) {
+                if (!course_module_instance_pending_deletion($course->id, 'spromonitor', $record->id)) {
+                    $spromonitorid = $record->id;
+                    break;
+                }
             }
-         } else {
-            // If surveypro id is not valid, redirect to submissions list
-            redirect($redirectlistansw);
-         }
+        }
     }
 
     // End of: manage form submission.
+    $paramstoanswers = ['s' => $cm->instance, 'section' => 'submissionslist'];
+    $urltoanswers = new \moodle_url('/mod/surveypro/view.php', $paramstoanswers);
+
+    if ($sprosend && empty($spromonitorid)) {
+        redirect($urltoanswers);
+    }
 
     // Set $PAGE params.
     $paramurl = ['s' => $surveypro->id, 'area' => 'surveypro', 'section' => 'submissionform', 'mode' => $mode];
@@ -296,6 +278,10 @@ if ($section == 'submissionform') {
     if (!empty($begin)) {
         $paramurl['begin'] = $begin;
     }
+    if (!empty($spromonitorid)) {
+        $paramurl['spromonitorid'] = $spromonitorid;
+    }
+
     $url = new \moodle_url('/mod/surveypro/view.php', $paramurl);
     $PAGE->set_url($url);
     $PAGE->set_context($context);
@@ -319,14 +305,34 @@ if ($section == 'submissionform') {
             // It should never be verified.
             break;
         default:
-            $message = 'Unexpected $mode = '.$mode;
-            debugging('Error at line '.__LINE__.' of '.__FILE__.'. '.$message , DEBUG_DEVELOPER);
+            $message = 'Unexpected $mode = ' . $mode;
+            debugging('Error at line ' . __LINE__ . ' of ' . __FILE__ . '. ' . $message, DEBUG_DEVELOPER);
     }
     // Is it useful? $PAGE->add_body_class('mediumwidth');.
     $utilitypageman->manage_editbutton($edit);
 
     // Output starts here.
     echo $OUTPUT->header();
+
+    if (!empty($spromonitorid)) {
+        $cmmonitor = get_coursemodule_from_instance('spromonitor', $spromonitorid, $course->id, false, MUST_EXIST);
+
+        // Display a confirmation message with buttons for redirecting to monitor chart and submissions list
+        $message = get_string('messageaftersubmission', 'mod_surveypro');
+        $chartbutton = get_string('redirectmonitor', 'mod_surveypro');
+        $answbutton = get_string('redirectsublist', 'mod_surveypro');
+
+        // Create URLs for redirecting to monitor chart and submissions list.
+        $paramstomonitor = ['id' => $cmmonitor->id];
+        $urltomonitor = new \moodle_url('/mod/spromonitor/view.php', $paramstomonitor);
+        $gotomonitor = new \single_button($urltomonitor, $chartbutton);
+        $gotoanswers = new \single_button($urltoanswers, $answbutton);
+
+        // Output header, confirmation message, and footer, then terminate execution
+        echo $OUTPUT->confirm($message, $gotomonitor, $gotoanswers);
+        echo $OUTPUT->footer();
+        die();
+    }
 
     $actionbar = new \mod_surveypro\output\action_bar($cm, $context, $surveypro);
     echo $actionbar->draw_view_action_bar();
