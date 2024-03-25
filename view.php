@@ -322,6 +322,9 @@ if ($section == 'submissionform') {
         $chartbutton = get_string('redirectmonitor', 'mod_surveypro');
         $answbutton = get_string('redirectsublist', 'mod_surveypro');
 
+        // Set or update the session variable monitorid
+        $_SESSION['monitorid'] = $cmmonitor->id;
+
         // Create URLs for redirecting to monitor chart and submissions list.
         $paramstomonitor = ['id' => $cmmonitor->id];
         $urltomonitor = new \moodle_url('/mod/spromonitor/view.php', $paramstomonitor);
